@@ -103,7 +103,7 @@ namespace uTPro.Foundation.Middleware
                 bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
                 if (isEnableCheckBackoffice)
                 {
-                    var lstUrl = _currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Url)?.Value?
+                    var lstUrl = _currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Domain)?.Value?
                         .Split(new List<string> { ",", ";" }.ToArray(), StringSplitOptions.RemoveEmptyEntries);
 
                     if (lstUrl == null || !lstUrl.Any())
