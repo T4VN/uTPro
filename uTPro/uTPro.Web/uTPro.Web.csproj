@@ -15,10 +15,10 @@
 
 	<ItemGroup>
 		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-		<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.436" />
+		<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />
 		<PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-		<PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.0" />
-		<PackageReference Include="uSync" Version="16.0.0" />
+		<PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.3" />
+		<PackageReference Include="uSync" Version="16.1.0" />
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.19.0" />
 		<ProjectReference Include="..\uTPro.Common\uTPro.Common.csproj" />
 		<ProjectReference Include="..\uTPro.Configure\uTPro.Configure.csproj" />
