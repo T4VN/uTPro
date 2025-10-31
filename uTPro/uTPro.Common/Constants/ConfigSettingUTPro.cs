@@ -8,7 +8,7 @@
         {
             public const string Key = KeyPath + ":Backoffice";
             public const string Enabled = Key + ":Enabled";
-            public const string Url = Key + ":Url";
+            public const string Domain = Key + ":Url";
         }
 
         public struct ListRememberLanguage
