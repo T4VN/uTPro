@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Favicon", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Middleware", "uTPro.Foundation.Middleware\uTPro.Foundation.Middleware.csproj", "{B4167671-FAAC-45F5-AF04-04FF196046FB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Feature", "Feature", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,5 +90,8 @@ Global
 		{6D0EB8DD-D697-4381-A4DD-B29468734209} = {C47DDDB1-58C4-4FEC-BB0C-1E452FB526E1}
 		{2017A7B3-BBB0-4F75-86CA-1280432764A2} = {C47DDDB1-58C4-4FEC-BB0C-1E452FB526E1}
 		{B4167671-FAAC-45F5-AF04-04FF196046FB} = {C47DDDB1-58C4-4FEC-BB0C-1E452FB526E1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EEF559D3-C416-4C76-A0BD-CD923A2994F8}
 	EndGlobalSection
 EndGlobal

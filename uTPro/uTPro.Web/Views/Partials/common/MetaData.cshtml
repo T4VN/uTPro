@@ -21,10 +21,10 @@
         {
             value = Model.Name();
         }
-        if (!string.IsNullOrEmpty(folderSettings.Value<string>(nameof(GlobalSiteSettings.SiteSettingsTitleSuffix))))
+        if (!string.IsNullOrEmpty(folderSettings.Value<string>(nameof(folderSettings.SiteTitleSuffix))))
         {
-            value = folderSettings.Value<string>(nameof(GlobalSiteSettings.SiteSettingsTitleSuffix))?.Replace("<titlePage>", value)
-            .Replace("<titleSiteName>", CurrentSite.GetItem().FolderSite.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription))?.Title, StringComparison.OrdinalIgnoreCase);
+            value = folderSettings.Value<string>(nameof(folderSettings.SiteTitleSuffix))?.Replace("<titlePage>", value)
+            .Replace("<titleSiteName>", CurrentSite.GetItem().FolderSite.SiteName?.Title, StringComparison.OrdinalIgnoreCase);
         }
         return Html.Raw(value ?? string.Empty);
     }

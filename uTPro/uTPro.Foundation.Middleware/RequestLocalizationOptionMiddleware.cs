@@ -29,7 +29,6 @@ namespace uTPro.Foundation.Middleware
         private readonly DateTime exp_Cookie = DateTime.Now.AddDays(3);
 
         RequestDelegate _next;
-        HttpContext _httpContext;
         ICurrentSiteExtension _currentSite;
 
         public RequestLocalizationOptionMiddleware(RequestDelegate next)
@@ -45,11 +44,11 @@ namespace uTPro.Foundation.Middleware
             }
             else
             {
-                _httpContext = context;
                 _currentSite = currentSite;
+                if (_currentSite?.Configuration == null) return;
                 try
                 {
-                    string url = await DetermineProviderCultureResult();
+                    string url = await DetermineProviderCultureResult(context);
                     if (!string.IsNullOrEmpty(url))
                     {
                         context.Response.Redirect(url, true);
@@ -64,34 +63,34 @@ namespace uTPro.Foundation.Middleware
             await _next.Invoke(context);
         }
 
-        private async Task<string> DetermineProviderCultureResult()
+        private async Task<string> DetermineProviderCultureResult(HttpContext? context)
         {
-            string[] parts = (_httpContext.Request?.Path.Value ?? string.Empty).Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if (IsExludeHost(_httpContext.Request?.Host))
+            if (IsExludeHost(context, context?.Request?.Host))
             {
                 return string.Empty;
             }
+            string[] parts = (context?.Request?.Path.Value ?? string.Empty).Split('/', StringSplitOptions.RemoveEmptyEntries);
             if (IsExludePathUrl(parts))
             {
                 return string.Empty;
             }
 
-            (string culture, string urlRedirect, bool isRedirect) = await GetUrlCulture(parts);
+            (string culture, string urlRedirect, bool isRedirect) = await GetUrlCulture(context, parts);
 
-            if (SetGlobal(culture))
+            if (SetGlobal(context,culture))
             {
-                return GetUrlRedirect(_httpContext, culture, urlRedirect, isRedirect);
+                return GetUrlRedirect(context, culture, urlRedirect, isRedirect);
             }
             return string.Empty;
         }
 
-        private bool IsExludeHost(HostString? host)
+        private bool IsExludeHost(HttpContext? context, HostString? host)
         {
-            if (!host.HasValue)
+            if (host?.HasValue == false)
             {
                 return false;
             }
-            if (_httpContext.Request.Path.StartsWithSegments("/umbraco"))
+            if (context.Request.Path.StartsWithSegments("/umbraco"))
             {
                 bool isEnableCheckBackoffice = false;
                 bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
@@ -143,7 +142,7 @@ namespace uTPro.Foundation.Middleware
                             }
                         }
                     }
-                    
+
                 }
 
                 //Folders and files in wwwroot
@@ -177,7 +176,7 @@ namespace uTPro.Foundation.Middleware
                 );
         }
 
-        private bool SetGlobal(string culture)
+        private bool SetGlobal(HttpContext? context, string culture)
         {
             try
             {
@@ -187,7 +186,7 @@ namespace uTPro.Foundation.Middleware
                 CultureInfo.DefaultThreadCurrentUICulture = cul;
                 Thread.CurrentThread.CurrentCulture = cul;
                 Thread.CurrentThread.CurrentUICulture = cul;
-                StoreCookie(_httpContext, culture);
+                StoreCookie(context, culture);
                 return true;
             }
             catch (Exception ex)
@@ -198,9 +197,9 @@ namespace uTPro.Foundation.Middleware
 
         private string GetLanguageDefault() => _currentSite.DefaultCulture;
 
-        private string GetUrlRedirect(HttpContext httpContext, string culture, string urlRedirect, bool isRedirect)
+        private string GetUrlRedirect(HttpContext? httpContext, string culture, string urlRedirect, bool isRedirect)
         {
-            if (!isRedirect)
+            if (!isRedirect || httpContext == null)
             {
                 return string.Empty;
             }
@@ -217,7 +216,7 @@ namespace uTPro.Foundation.Middleware
             return url;
         }
 
-        private async Task<Tuple<string, string, bool>> GetUrlCulture(string[] parts)
+        private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
         {
             Umbraco.Cms.Core.Routing.Domain? cul = null;
             bool isRedirect = true;
@@ -232,7 +231,7 @@ namespace uTPro.Foundation.Middleware
             else//root url
             {
                 //Get Cookie
-                string culture = _httpContext?.Request?.Cookies[cookie_Culture]?.ToString();
+                string culture = context?.Request?.Cookies[cookie_Culture]?.ToString() ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(culture))
                 {
                     culture = GetLanguageDefault();
