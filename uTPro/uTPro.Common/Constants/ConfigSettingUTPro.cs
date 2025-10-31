@@ -11,11 +11,16 @@
             public const string Url = Key + ":Url";
         }
 
-        public struct ListExludeRequestLanguage
+        public struct ListRememberLanguage
         {
-            public const string Key = KeyPath + ":ListExludeRequestLanguage";
+            public const string Key = KeyPath + ":RememberLanguage";
             public const string Enabled = Key + ":Enabled";
-            public const string Paths = Key + ":Paths";
+            public struct ListExludeRequestLanguage
+            {
+                public const string Key = KeyPath + ":ListExludeRequestLanguage";
+                public const string Enabled = Key + ":Enabled";
+                public const string Paths = Key + ":Paths";
+            }
         }
     }
 }
