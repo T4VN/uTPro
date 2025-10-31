@@ -16,9 +16,16 @@ namespace uTPro.Foundation.Middleware
     {
         public static IApplicationBuilder UseWebRequestLocalization(this IApplicationBuilder app)
         {
-            var requestLocalizationOptions = app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
-            app.UseRequestLocalization(requestLocalizationOptions.Value);
-            return app.UseMiddleware<RequestLocalizationOptionMiddleware>();
+            var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
+            bool isEnabled = true;
+            bool.TryParse(config.GetSection(ConfigSettingUTPro.ListRememberLanguage.Enabled)?.Value, out isEnabled);
+            if (isEnabled)
+            {
+                var requestLocalizationOptions = app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+                app.UseRequestLocalization(requestLocalizationOptions.Value);
+                return app.UseMiddleware<RequestLocalizationOptionMiddleware>();
+            }
+            return app;
         }
     }
 
@@ -77,7 +84,7 @@ namespace uTPro.Foundation.Middleware
 
             (string culture, string urlRedirect, bool isRedirect) = await GetUrlCulture(context, parts);
 
-            if (SetGlobal(context,culture))
+            if (SetGlobal(context, culture))
             {
                 return GetUrlRedirect(context, culture, urlRedirect, isRedirect);
             }
@@ -128,10 +135,10 @@ namespace uTPro.Foundation.Middleware
 
                 //Exclude request config setting
                 bool isEnabled = false;
-                bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.ListExludeRequestLanguage.Enabled)?.Value, out isEnabled);
+                bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Enabled)?.Value, out isEnabled);
                 if (isEnabled)
                 {
-                    var lstPaths = _currentSite.Configuration.GetSection(ConfigSettingUTPro.ListExludeRequestLanguage.Paths).Get<string[]>();
+                    var lstPaths = _currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Paths).Get<string[]>();
                     if (lstPaths != null)
                     {
                         foreach (var item in lstPaths)
@@ -180,22 +187,36 @@ namespace uTPro.Foundation.Middleware
         {
             try
             {
-                var cul = new CultureInfo(culture);
-                _currentSite.SetCurrentCulture(cul);
-                CultureInfo.DefaultThreadCurrentCulture = cul;
-                CultureInfo.DefaultThreadCurrentUICulture = cul;
-                Thread.CurrentThread.CurrentCulture = cul;
-                Thread.CurrentThread.CurrentUICulture = cul;
-                StoreCookie(context, culture);
-                return true;
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    var cul = new CultureInfo(culture);
+                    _currentSite.SetCurrentCulture(cul);
+                    CultureInfo.DefaultThreadCurrentCulture = cul;
+                    CultureInfo.DefaultThreadCurrentUICulture = cul;
+                    Thread.CurrentThread.CurrentCulture = cul;
+                    Thread.CurrentThread.CurrentUICulture = cul;
+                    StoreCookie(context, culture);
+                    return true;
+                }
             }
             catch (Exception ex)
             {
-                return false;
             }
+            return false;
         }
 
-        private string GetLanguageDefault() => _currentSite.DefaultCulture;
+        private string GetLanguageDefault(IEnumerable<Umbraco.Cms.Core.Routing.Domain>? domains)
+        {
+            if (domains != null)
+            {
+                var langDefault = domains.FirstOrDefault(x => x.Name == "/");//languge default with url /
+                if (langDefault != null && !string.IsNullOrEmpty(langDefault.Culture))
+                {
+                    return langDefault.Culture;
+                }
+            }
+            return _currentSite.DefaultCulture;//default with umbraco
+        }
 
         private string GetUrlRedirect(HttpContext? httpContext, string culture, string urlRedirect, bool isRedirect)
         {
@@ -219,10 +240,11 @@ namespace uTPro.Foundation.Middleware
         private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
         {
             Umbraco.Cms.Core.Routing.Domain? cul = null;
+            IEnumerable<Umbraco.Cms.Core.Routing.Domain> domains = await _currentSite.GetDomains(false);
             bool isRedirect = true;
             if (parts.Length > 0)//parts > 0
             {
-                cul = (await _currentSite.GetDomains(false))?.FirstOrDefault(x => x.Name.Contains(parts[0]));
+                cul = domains?.FirstOrDefault(x => x.Name.Contains(parts[0]));
                 if (cul != null)
                 {
                     isRedirect = false;
@@ -234,19 +256,14 @@ namespace uTPro.Foundation.Middleware
                 string culture = context?.Request?.Cookies[cookie_Culture]?.ToString() ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(culture))
                 {
-                    culture = GetLanguageDefault();
+                    culture = GetLanguageDefault(domains);
                 }
 
-                cul = (await _currentSite.GetDomains(false))?.FirstOrDefault(x => x.Culture == null ? false :
-                                                                       (x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase)//set current
-                                                                       || x.Culture.Equals(GetLanguageDefault(), StringComparison.OrdinalIgnoreCase)//set default => if not correct cookie
-                                                                       )
-                                                                       ) ?? null;
+                cul = domains?.FirstOrDefault(x => x.Culture == null ? false : x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase)) ?? null;
             }
 
             if (cul == null)
             {
-                var domains = await _currentSite.GetDomains(false);
                 cul = domains?.FirstOrDefault();
             }
             return Tuple.Create(cul?.Culture ?? string.Empty, cul?.Name ?? string.Empty, isRedirect);
