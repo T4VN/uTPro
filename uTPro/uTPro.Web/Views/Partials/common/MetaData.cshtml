@@ -1,10 +1,13 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inject Umbraco.Cms.Core.Services.IDomainService _domainService
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     var folderSettings = CurrentSite.GetItem().FolderSettings;
-    if (folderSettings == null || Model == null)
+    var folderSite = CurrentSite.GetItem().FolderSite;
+    if (folderSettings == null || folderSite == null || Model == null)
     {
         return;
     }
+
     var seo = Model.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription));
     string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
     string canonical = Model.Url(mode: UrlMode.Absolute); //$"{url}{Context.Request.Path}";
@@ -24,7 +27,7 @@
         if (!string.IsNullOrEmpty(folderSettings.Value<string>(nameof(folderSettings.SiteTitleSuffix))))
         {
             value = folderSettings.Value<string>(nameof(folderSettings.SiteTitleSuffix))?.Replace("<titlePage>", value)
-            .Replace("<titleSiteName>", CurrentSite.GetItem().FolderSite.SiteName?.Title, StringComparison.OrdinalIgnoreCase);
+            .Replace("<titleSiteName>", folderSite.SiteName?.Title, StringComparison.OrdinalIgnoreCase);
         }
         return Html.Raw(value ?? string.Empty);
     }
@@ -63,24 +66,21 @@
     IHtmlContent GetSocialFB()
     {
         List<string> value = new List<string>();
-        string ogType =!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgType))) 
-        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgType)) 
+        string ogType = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgType)))
+        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgType))
         : "website";
         value.Add($"<meta property=\"og:type\" content=\"{ogType}\"/>");
-        
-        value.Add($@"<meta property=""og:title"" content=""{
-                        (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle))) 
-                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)) 
+
+        value.Add($@"<meta property=""og:title"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)))
+                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle))
                         : title)}""/>");
 
-        value.Add($@"<meta property=""og:description"" content=""{
-                        (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription))) 
-                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)) 
+        value.Add($@"<meta property=""og:description"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)))
+                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription))
                         : description)}""/>");
 
-        value.Add($@"<meta property=""og:image"" content=""{
-                        (!string.IsNullOrEmpty(Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage))) 
-                        ? Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage)) 
+        value.Add($@"<meta property=""og:image"" content=""{(!string.IsNullOrEmpty(Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage)))
+                        ? Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage))
                         : thumbnail)}""/>");
 
         if (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.FacebookAppId))))
@@ -95,35 +95,58 @@
     IHtmlContent GetSocialTwitter()
     {
         List<string> value = new List<string>();
-        string cardType =!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterCardType))) 
-        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterCardType)) 
+        string cardType = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterCardType)))
+        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterCardType))
         : "summary";
         value.Add($"<meta property=\"twitter:card\" content=\"{cardType}\"/>");
-        
-        value.Add($@"<meta property=""twitter:title"" content=""{
-                        (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle))) 
-                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)) 
+
+        value.Add($@"<meta property=""twitter:title"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)))
+                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle))
                         : title)}""/>");
 
-        value.Add($@"<meta property=""twitter:description"" content=""{
-                        (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription))) 
-                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)) 
+        value.Add($@"<meta property=""twitter:description"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)))
+                        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription))
                         : description)}""/>");
 
-        value.Add($@"<meta property=""twitter:image"" content=""{
-                        (!string.IsNullOrEmpty(Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage))) 
-                        ? Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage)) 
+        value.Add($@"<meta property=""twitter:image"" content=""{(!string.IsNullOrEmpty(Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage)))
+                        ? Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage))
                         : thumbnail)}""/>");
 
         if (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterSite))))
         {
             value.Add($"<meta property=\"twitter:site\" content=\"{Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterSite))}\"/>");
         }
-        
+
         if (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterImageAlt))))
         {
             value.Add($"<meta property=\"twitter:image:alt\" content=\"{Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterImageAlt))}\"/>");
         }
+        return Html.Raw(string.Join(Environment.NewLine, value));
+    }
+
+    async Task<IHtmlContent> GetAlternateHreflang()
+    {
+        List<string> value = new List<string>();
+        string formatTag = "<link rel=\"alternate\" hreflang=\"{0}\" href=\"{1}\" />";
+        var lstDomain = await CurrentSite.GetDomains(true);
+        if (lstDomain.Count() > 1)
+        {
+            var domainDefault = lstDomain.FirstOrDefault(x => x.Name.EndsWith("/"));
+            string url = Model.Url(mode: UrlMode.Absolute, culture: domainDefault?.Culture);
+            if (domainDefault != null)
+            {
+                value.Add(string.Format(formatTag, "x-default", url));
+            }
+            foreach (var item in lstDomain)
+            {
+                url = Model.Url(mode: UrlMode.Absolute, culture: item.Culture); 
+                if (item.Culture != domainDefault?.Culture)
+                {
+                    value.Add(string.Format(formatTag, item.Culture?.ToLower(), url));
+                }
+            }
+        }
+
         return Html.Raw(string.Join(Environment.NewLine, value));
     }
 }
@@ -160,9 +183,9 @@ else
 {
     <meta name="keywords" content="@keywords" />
 }
-@GetSocialFB()
-@GetSocialTwitter()
-@*<link rel="alternate" hreflang="en" href="http://site.com" />*@
 <link rel="canonical" href="@canonical" />
 <link rel="sitemap" href="@sitemap" />
-<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="shortcut icon" href="@(folderSite.SiteFavicon != null ? folderSite.SiteFavicon.Url() : "/favicon.ico")" />
+@GetSocialFB()
+@GetSocialTwitter()
+@(await GetAlternateHreflang())

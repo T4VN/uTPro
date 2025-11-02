@@ -50,6 +50,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		// properties
 
 		///<summary>
+		/// Remember Language Disable
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.0.0+9812630")]
+		[ImplementPropertyType("rememberLanguageDisable")]
+		public virtual bool RememberLanguageDisable => this.Value<bool>(_publishedValueFallback, "rememberLanguageDisable");
+
+		///<summary>
 		/// Turn Off Responsive Image: Turn on: Image url links will be resized and converted to .webp format.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.0.0+9812630")]
@@ -94,22 +101,6 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual string RobotsContent => this.Value<string>(_publishedValueFallback, "robotsContent");
 
 		///<summary>
-		/// Site Favicon
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.0.0+9812630")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("siteFavicon")]
-		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops SiteFavicon => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "siteFavicon");
-
-		///<summary>
-		/// Site Logo
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.0.0+9812630")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("siteLogo")]
-		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops SiteLogo => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "siteLogo");
-
-		///<summary>
 		/// Ignored Document Types: Content based on these document types will be ignored on the sitemap use alias of the document types
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.0.0+9812630")]
@@ -131,6 +122,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("siteTitleSuffix")]
 		public virtual string SiteTitleSuffix => this.Value<string>(_publishedValueFallback, "siteTitleSuffix");
+
+		///<summary>
+		/// Turn Off AppSettings: Use the config here to make SMTP settings instead of the AppSettings config
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.0.0+9812630")]
+		[ImplementPropertyType("turnOffAppSettings")]
+		public virtual bool TurnOffAppSettings => this.Value<bool>(_publishedValueFallback, "turnOffAppSettings");
 
 		///<summary>
 		/// Credential Password

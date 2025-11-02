@@ -32,7 +32,7 @@ namespace uTPro.Foundation.Middleware
     internal class RequestLocalizationOptionMiddleware
     {
 
-        private const string cookie_Culture = ".AspNetCore.Culture";
+        private const string cookie_Culture = ".UTPro.Culture";
         private readonly DateTime exp_Cookie = DateTime.Now.AddDays(3);
 
         RequestDelegate _next;
@@ -55,11 +55,14 @@ namespace uTPro.Foundation.Middleware
                 if (_currentSite?.Configuration == null) return;
                 try
                 {
-                    string url = await DetermineProviderCultureResult(context);
-                    if (!string.IsNullOrEmpty(url))
+                    if (!_currentSite.GetItem().FolderSettings.RememberLanguageDisable)
                     {
-                        context.Response.Redirect(url, true);
-                        return;
+                        string url = await DetermineProviderCultureResult(context);
+                        if (!string.IsNullOrEmpty(url))
+                        {
+                            context.Response.Redirect(url, true);
+                            return;
+                        }
                     }
                 }
                 catch (Exception)
@@ -209,7 +212,7 @@ namespace uTPro.Foundation.Middleware
         {
             if (domains != null)
             {
-                var langDefault = domains.FirstOrDefault(x => x.Name == "/");//languge default with url /
+                var langDefault = domains.FirstOrDefault(x => x.Name.EndsWith("/"));//languge default with url /
                 if (langDefault != null && !string.IsNullOrEmpty(langDefault.Culture))
                 {
                     return langDefault.Culture;
@@ -242,6 +245,7 @@ namespace uTPro.Foundation.Middleware
             Umbraco.Cms.Core.Routing.Domain? cul = null;
             IEnumerable<Umbraco.Cms.Core.Routing.Domain> domains = await _currentSite.GetDomains(false);
             bool isRedirect = true;
+            string culture = string.Empty;
             if (parts.Length > 0)//parts > 0
             {
                 cul = domains?.FirstOrDefault(x => x.Name.Contains(parts[0]));
@@ -253,18 +257,17 @@ namespace uTPro.Foundation.Middleware
             else//root url
             {
                 //Get Cookie
-                string culture = context?.Request?.Cookies[cookie_Culture]?.ToString() ?? string.Empty;
+                culture = context?.Request?.Cookies[cookie_Culture]?.ToString() ?? string.Empty;
+            }
+
+            if (cul == null)
+            {
                 if (string.IsNullOrWhiteSpace(culture))
                 {
                     culture = GetLanguageDefault(domains);
                 }
 
                 cul = domains?.FirstOrDefault(x => x.Culture == null ? false : x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase)) ?? null;
-            }
-
-            if (cul == null)
-            {
-                cul = domains?.FirstOrDefault();
             }
             return Tuple.Create(cul?.Culture ?? string.Empty, cul?.Name ?? string.Empty, isRedirect);
         }
