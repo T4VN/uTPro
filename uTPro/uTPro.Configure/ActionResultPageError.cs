@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Routing;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Configure
@@ -60,8 +61,10 @@ namespace uTPro.Configure
             context.HttpContext.Items.Add("title", _title ?? "Welcome to " + _currentSite.GetItem().PageHome?.Value<SeoVisualizer.SeoValues>(nameof(SeoVisualizer.SeoValues))?.Title);
             context.HttpContext.Items.Add("titlePage", _titlePage);
 
-            if (_currentSite.GetItem().PageErrors != null)
+            var pageError = _currentSite.GetItem().PageErrors;
+            if (pageError != null)
             {
+                //pageError.TemplateId.ToString();
 
             }
             var viewResult = new ViewResult { ViewName = "globalPageError" };

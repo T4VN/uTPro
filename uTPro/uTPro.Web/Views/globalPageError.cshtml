@@ -8,6 +8,8 @@
 @inject IHostingEnvironment hostingEnvironment
 @inject IOptions<GlobalSettings> globalSettings
 @{
+    Layout = null;
+
     var seo = Model?.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription));
 
     var titlePage = seo?.Title ?? (string?)Context.Items["titlePage"] ?? "Page Not Found";
