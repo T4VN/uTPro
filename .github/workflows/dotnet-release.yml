@@ -38,7 +38,7 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.version_tag }}
           name: Release ${{ steps.version.outputs.version_tag }}
-          body: "Auto-generated release from main branch"
+          body: "Auto-generated release from main branch, build ${{ steps.version.outputs.version_tag }}"
           draft: true
           prerelease: true
           files: publish_output.zip
