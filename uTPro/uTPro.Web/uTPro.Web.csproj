@@ -20,7 +20,6 @@
 		<PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.3" />
 		<PackageReference Include="uSync" Version="16.1.0" />
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.19.0" />
-		<ProjectReference Include="..\uTPro.Common\uTPro.Common.csproj" />
 		<ProjectReference Include="..\uTPro.Configure\uTPro.Configure.csproj" />
 		<ProjectReference Include="..\uTPro.Extension\uTPro.Extension.csproj" />
 		<ProjectReference Include="..\uTPro.Foundation\uTPro.Foundation.csproj" />

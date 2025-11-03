@@ -66,8 +66,11 @@ namespace uTPro.Configure
                         view = "~/Views/" + UmbracoRouteValues.TemplateName + ".cshtml" ?? string.Empty;
                         if (!EnsurePhsyicalViewExists(view))
                         {
-                            // no physical template file was found
-                            return new ActionResultPageError(_currentSite);
+                            if (!_compositeViewEngine.GetView(null, view, isMainPage: false).Success)
+                            {
+                                // no physical template file was found
+                                return new ActionResultPageError(_currentSite);
+                            }
                         }
                     }
                 }

@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\uTPro.Common\uTPro.Common.csproj" />
     <ProjectReference Include="..\uTPro.Extension\uTPro.Extension.csproj" />
   </ItemGroup>
 

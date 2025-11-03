@@ -8,11 +8,13 @@
 @inject IHostingEnvironment hostingEnvironment
 @inject IOptions<GlobalSettings> globalSettings
 @{
+    Layout = null;
+
     var seo = Model?.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription));
 
     var titlePage = seo?.Title ?? (string?)Context.Items["titlePage"] ?? "Page Not Found";
     var logo = Model?.Value<string>(nameof(GlobalSiteSettings.SiteSettingsLogo)) ?? "/App_Plugins/assets/img/logo.svg";
-    var title = (string?)Context.Items["title"];
+    var title = (string?)Context.Items["title"] ?? titlePage;
     var message = seo?.Description ?? (string?)Context.Items["message"] ?? string.Empty;
 }
 <!doctype html>
