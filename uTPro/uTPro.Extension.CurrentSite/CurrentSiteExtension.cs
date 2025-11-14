@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
@@ -109,13 +110,15 @@ namespace uTPro.Extension.CurrentSite
 
         public ICurrentItemExtension GetItem()
         {
-            var logger = _serviceProvider.GetService<ILogger<CurrentItemExtension>>();
-            using (var current = new CurrentItemExtension(logger, this))
-            {
-                return current;
-            }
-        }
+            // Resolve ICurrentItemExtension from the DI container so the container can manage its lifetime
+            var item = _serviceProvider.GetService<ICurrentItemExtension>();
+            if (item != null)
+                return item;
 
+            // Fallback: create a new instance if DI cannot provide one
+            var logger = _serviceProvider.GetService<ILogger<CurrentItemExtension>>();
+            return new CurrentItemExtension(logger, this);
+        }
 
         IUmbracoContext _umbracoContext;
         public IUmbracoContext UContext
@@ -130,7 +133,6 @@ namespace uTPro.Extension.CurrentSite
                 return this._umbracoContext ?? throw new Exception("UmbracoContext is null");
             }
         }
-
 
         public IEnumerable<PublishedCultureInfo> GetCultures()
         {
@@ -148,7 +150,6 @@ namespace uTPro.Extension.CurrentSite
             }
         }
 
-
         public string GetDictionaryValue(string key, string valueDefault = "", bool showKey = false)
         {
             key = this.GetItem().Root.Name + "." + key;
@@ -160,18 +161,34 @@ namespace uTPro.Extension.CurrentSite
             return dictionaryValue;
         }
 
+        // Simple in-memory cache for all domains to reduce repeated UContext access
+        private static readonly object _domainsLock = new object();
+        private static IEnumerable<Domain> _cachedAllDomains = Enumerable.Empty<Domain>();
+        private static DateTime _cachedAllDomainsExpires = DateTime.MinValue;
+        private const int CachedAllDomainsSeconds = 60;
+
         public Task<IEnumerable<Domain>> GetDomains(bool isGetAll)
         {
-            return Task.Run<IEnumerable<Domain>>(() =>
+            if (isGetAll)
             {
-                if (isGetAll)
+                // return cached list when available
+                if (DateTime.UtcNow < _cachedAllDomainsExpires && _cachedAllDomains != null && _cachedAllDomains.Any())
                 {
-                    return UContext?.Domains?.GetAll(true) ?? new List<Domain>();
+                    return Task.FromResult(_cachedAllDomains);
                 }
-                var idItem = this.GetItem().Current?.Id;
-                var domain = UContext?.Domains?.GetAssigned(idItem ?? 0, true);
-                return domain ?? new List<Domain>();
-            });
+
+                var all = UContext?.Domains?.GetAll(true) ?? new List<Domain>();
+                lock (_domainsLock)
+                {
+                    _cachedAllDomains = all;
+                    _cachedAllDomainsExpires = DateTime.UtcNow.AddSeconds(CachedAllDomainsSeconds);
+                }
+                return Task.FromResult(_cachedAllDomains);
+            }
+
+            var idItem = this.GetItem().Current?.Id;
+            var domain = UContext?.Domains?.GetAssigned(idItem ?? 0, true);
+            return Task.FromResult(domain ?? new List<Domain>());
         }
 
         public void SetCurrentCulture(CultureInfo cul) => this._currentCulture = cul;
