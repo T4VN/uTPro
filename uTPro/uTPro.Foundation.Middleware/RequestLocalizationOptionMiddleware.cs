@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using System.Globalization;
 using System.IO;
+using Umbraco.Cms.Core.Media.EmbedProviders;
 using uTPro.Common.Constants;
+using uTPro.Extension;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Foundation.Middleware
@@ -31,55 +34,78 @@ namespace uTPro.Foundation.Middleware
 
     internal class RequestLocalizationOptionMiddleware
     {
-
         private const string cookie_Culture = ".UTPro.Culture";
-        private readonly DateTime exp_Cookie = DateTime.Now.AddDays(3);
+        private static readonly DateTimeOffset exp_Cookie = DateTimeOffset.UtcNow.AddDays(3);
+        private static readonly Lazy<HashSet<string>> _wwwRootEntries = new(() =>
+        {
+            try
+            {
+                var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                result.Add("error");
+                result.Add("robots");
+                result.Add("robots.txt");
+                result.Add("sitemap");
+                result.Add("sitemap.xml");
+                result.Add("favicon");
+                result.Add("favicon.ico");
+                //folder
+                var folderROOT = PathFolder.DirectoryWWWRoot;
+                if (Directory.Exists(folderROOT))
+                {
+                    var lst = Directory.GetDirectories(folderROOT).Concat(Directory.GetFiles(folderROOT));
+                    foreach (var item in lst)
+                    {
+                        result.Add(Path.GetFileName(item));
+                    }
+                }
+                return result;
+            }
+            catch
+            {
+                return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
+        });
+
         private IEnumerable<Umbraco.Cms.Core.Routing.Domain> domains = Enumerable.Empty<Umbraco.Cms.Core.Routing.Domain>();
         RequestDelegate _next;
         ICurrentSiteExtension _currentSite;
+        ILogger<RequestLocalizationOptionMiddleware> _logger;
 
         public RequestLocalizationOptionMiddleware(RequestDelegate next)
         {
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, ICurrentSiteExtension currentSite)
+        public async Task InvokeAsync(HttpContext context, ICurrentSiteExtension currentSite, ILogger<RequestLocalizationOptionMiddleware> logger)
         {
             if (context == null)
             {
+                _logger.LogError($"Error in RequestLocalizationOptionMiddleware: Context is null");
                 throw new ArgumentNullException(nameof(context));
             }
             else
             {
+                _logger = logger;
                 _currentSite = currentSite;
                 if (_currentSite?.Configuration == null) return;
                 try
                 {
                     if (!_currentSite.GetItem().FolderSettings.RememberLanguageDisable)
                     {
-                        string url = await DetermineProviderCultureResult(context);
-                        if (!string.IsNullOrEmpty(url))
+                        string fullUrl = await DetermineProviderCultureResult(context).ConfigureAwait(false);
+                        if (!string.IsNullOrEmpty(fullUrl))
                         {
-                            // Enhanced: Only allow redirect if URL is relative OR host (if present) is trusted
-                            Uri? redirectUri = null;
-                            if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out redirectUri))
-                            {
-                                // Allow only absolute URLs with a trusted host
-                                if (domains.Any(x => string.Equals(x.Name, redirectUri.Host, StringComparison.OrdinalIgnoreCase)))
-                                {
-                                    context.Response.Redirect(url, true);
-                                    return;
-                                }
-                            }
+                            context.Response.Redirect(fullUrl, true);
+                            return;
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-
+                    _logger.LogError(ex, $"Error in RequestLocalizationOptionMiddleware: {ex.Message}");
                 }
             }
-            await _next.Invoke(context);
+            await _next.Invoke(context).ConfigureAwait(false);
         }
 
         private async Task<string> DetermineProviderCultureResult(HttpContext? context)
@@ -94,11 +120,11 @@ namespace uTPro.Foundation.Middleware
                 return string.Empty;
             }
 
-            (string culture, string urlRedirect, bool isRedirect) = await GetUrlCulture(context, parts);
+            (string culture, string prefixUrl, bool isRedirect) = await GetUrlCulture(context, parts).ConfigureAwait(false);
 
             if (SetGlobal(context, culture))
             {
-                return GetUrlRedirect(context, culture, urlRedirect, isRedirect);
+                return GetSchemeRedirect(context, culture, prefixUrl, isRedirect);
             }
             return string.Empty;
         }
@@ -131,18 +157,6 @@ namespace uTPro.Foundation.Middleware
         {
             get
             {
-                //exclude paths
-                yield return "error";
-
-                yield return "robots";
-                yield return "robots.txt";
-
-                yield return "sitemap";
-                yield return "sitemap.xml";
-
-                yield return "favicon";
-                yield return "favicon.ico";
-
                 //Exclude request config setting
                 bool isEnabled = false;
                 bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Enabled)?.Value, out isEnabled);
@@ -162,13 +176,10 @@ namespace uTPro.Foundation.Middleware
 
                 }
 
-                //Folders and files in wwwroot
-                var folderROOT = PathFolder.DirectoryWWWRoot;
-                var lst = Directory.GetDirectories(folderROOT).Concat(Directory.GetFiles(folderROOT));
-
-                foreach (var item in lst)
+                //Folders and files in wwwroot (cached to avoid IO on every request)
+                foreach (var item in _wwwRootEntries.Value)
                 {
-                    yield return Path.GetFileName(item);
+                    yield return item;
                 }
             }
         }
@@ -182,15 +193,19 @@ namespace uTPro.Foundation.Middleware
 
         private void StoreCookie(HttpContext httpContext, string culture)
         {
-            if (httpContext.Request.Cookies[cookie_Culture] != culture)
+            if (httpContext == null) return;
+
+            if (!string.Equals(httpContext.Request.Cookies[cookie_Culture], culture, StringComparison.Ordinal))
+            {
                 httpContext.Response.Cookies.Append(cookie_Culture, culture, new CookieOptions
                 {
                     Expires = exp_Cookie,
                     IsEssential = true,
                     HttpOnly = true,
-                    Secure = true
+                    Secure = httpContext.Request.IsHttps
                 }
                 );
+            }
         }
 
         private bool SetGlobal(HttpContext? context, string culture)
@@ -205,12 +220,14 @@ namespace uTPro.Foundation.Middleware
                     CultureInfo.DefaultThreadCurrentUICulture = cul;
                     Thread.CurrentThread.CurrentCulture = cul;
                     Thread.CurrentThread.CurrentUICulture = cul;
-                    StoreCookie(context, culture);
+                    if (context != null)
+                        StoreCookie(context, culture);
                     return true;
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"SetGlobal culture error: {ex.Message}");
             }
             return false;
         }
@@ -228,30 +245,39 @@ namespace uTPro.Foundation.Middleware
             return _currentSite.DefaultCulture;//default with umbraco
         }
 
-        private string GetUrlRedirect(HttpContext? httpContext, string culture, string urlRedirect, bool isRedirect)
+        private string GetSchemeRedirect(HttpContext? httpContext, string culture, string prefixUrl, bool isRedirect)
         {
             if (!isRedirect || httpContext == null)
             {
                 return string.Empty;
             }
 
-            var request = httpContext.Request;
+            prefixUrl = SchemeUrlExtensions.AddScheme(prefixUrl);
 
-            // Path + Query
-            var pathAndQuery = $"{request.Path}{request.QueryString}";
-
-            // If urlRedirect have scheme (http/https)
-            var scheme = (urlRedirect.StartsWith("http://") || urlRedirect.StartsWith("https://")) ? string.Empty : "//";
-            return $"{scheme}{urlRedirect}{pathAndQuery}";
+            if (!string.IsNullOrEmpty(prefixUrl) && Uri.TryCreate(prefixUrl, UriKind.RelativeOrAbsolute, out var redirectUri))
+            {
+                foreach (var item in domains)
+                {
+                    if (Uri.TryCreate(SchemeUrlExtensions.AddScheme(item.Name), UriKind.RelativeOrAbsolute, out var domainHost))
+                    {
+                        if (string.Equals(domainHost.Host, redirectUri.Host, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return prefixUrl + httpContext.Request.Path + httpContext.Request.QueryString;
+                        }
+                    }
+                }
+            }
+            return string.Empty;
         }
+
 
         private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
         {
             Umbraco.Cms.Core.Routing.Domain? cul = null;
-            domains = await _currentSite.GetDomains(false);
+            domains = await _currentSite.GetDomains(false).ConfigureAwait(false);
             bool isRedirect = true;
             string culture = string.Empty;
-            if (parts.Length > 0)//parts > 0
+            if (parts.Length > 0)//parts >0
             {
                 cul = domains?.FirstOrDefault(x => x.Name.Contains(parts[0]));
                 if (cul != null)
@@ -274,12 +300,7 @@ namespace uTPro.Foundation.Middleware
 
                 cul = domains?.FirstOrDefault(x => x.Culture == null ? false : x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase)) ?? null;
             }
-            if (cul != null && cul.Name.IndexOf(context?.Request?.Host.Value ?? string.Empty) != 0)
-            {
-                isRedirect = false;
-            }
             return Tuple.Create(cul?.Culture ?? string.Empty, cul?.Name ?? string.Empty, isRedirect);
         }
-
     }
 }
