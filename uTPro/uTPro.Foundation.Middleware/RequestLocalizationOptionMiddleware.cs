@@ -34,7 +34,7 @@ namespace uTPro.Foundation.Middleware
 
         private const string cookie_Culture = ".UTPro.Culture";
         private readonly DateTime exp_Cookie = DateTime.Now.AddDays(3);
-
+        private IEnumerable<Umbraco.Cms.Core.Routing.Domain>? domains = null;
         RequestDelegate _next;
         ICurrentSiteExtension _currentSite;
 
@@ -60,8 +60,13 @@ namespace uTPro.Foundation.Middleware
                         string url = await DetermineProviderCultureResult(context);
                         if (!string.IsNullOrEmpty(url))
                         {
-                            context.Response.Redirect(url, true);
-                            return;
+                            //check host get and request
+                            var cultureHost = new Uri(url).Host;
+                            if (domains?.Any(x => !string.Equals(x.Name, cultureHost, StringComparison.OrdinalIgnoreCase)) == true)
+                            {
+                                context.Response.Redirect(url, true);
+                                return;
+                            }
                         }
                     }
                 }
@@ -226,14 +231,6 @@ namespace uTPro.Foundation.Middleware
                 return string.Empty;
             }
 
-            //check host get and request
-            var requestHost = httpContext.Request.Host.Host ?? string.Empty;
-            var cultureHost = new Uri(urlRedirect).Host;
-            if (!string.Equals(requestHost, cultureHost, StringComparison.OrdinalIgnoreCase))
-            {
-                return string.Empty;
-            }
-
             var request = httpContext.Request;
 
             // Path + Query
@@ -247,7 +244,7 @@ namespace uTPro.Foundation.Middleware
         private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
         {
             Umbraco.Cms.Core.Routing.Domain? cul = null;
-            IEnumerable<Umbraco.Cms.Core.Routing.Domain> domains = await _currentSite.GetDomains(false);
+            domains = await _currentSite.GetDomains(false);
             bool isRedirect = true;
             string culture = string.Empty;
             if (parts.Length > 0)//parts > 0
