@@ -225,6 +225,15 @@ namespace uTPro.Foundation.Middleware
             {
                 return string.Empty;
             }
+
+            //check host get and request
+            var requestHost = httpContext.Request.Host.Host ?? string.Empty;
+            var cultureHost = new Uri(urlRedirect).Host;
+            if (!string.Equals(requestHost, cultureHost, StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Empty;
+            }
+
             var request = httpContext.Request;
 
             // Path + Query
@@ -263,10 +272,6 @@ namespace uTPro.Foundation.Middleware
                 }
 
                 cul = domains?.FirstOrDefault(x => x.Culture == null ? false : x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase)) ?? null;
-            }
-            if (cul != null && cul.Name.IndexOf(context?.Request?.Host.Value ?? string.Empty) != 0)
-            {
-                isRedirect = false;
             }
             return Tuple.Create(cul?.Culture ?? string.Empty, cul?.Name ?? string.Empty, isRedirect);
         }
