@@ -100,21 +100,19 @@ namespace uTPro.Foundation.Middleware
             {
                 return false;
             }
-            if (context.Request.Path.StartsWithSegments("/umbraco"))
-            {
-                bool isEnableCheckBackoffice = false;
-                bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
-                if (isEnableCheckBackoffice)
-                {
-                    var lstUrl = _currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Domain)?.Value?
-                        .Split(new List<string> { ",", ";" }.ToArray(), StringSplitOptions.RemoveEmptyEntries);
 
-                    if (lstUrl == null || !lstUrl.Any())
-                    {
-                        return false;
-                    }
-                    return lstUrl.Any(x => x.Equals(host.Value.Host, StringComparison.OrdinalIgnoreCase));
+            bool isEnableCheckBackoffice = false;
+            bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
+            if (isEnableCheckBackoffice)
+            {
+                var lstUrl = _currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Domain)?.Value?
+                    .Split(new List<string> { ",", ";" }.ToArray(), StringSplitOptions.RemoveEmptyEntries);
+
+                if (lstUrl == null || !lstUrl.Any())
+                {
+                    return false;
                 }
+                return lstUrl.Any(x => x.Equals(host.Value.Host, StringComparison.OrdinalIgnoreCase));
             }
 
             return false;
@@ -227,17 +225,17 @@ namespace uTPro.Foundation.Middleware
             {
                 return string.Empty;
             }
-            string urlPath = (urlRedirect + "/" + httpContext.Request.Path).Replace("//", "/");
-            string url = urlRedirect;
-            if (urlRedirect.StartsWith("/"))
+            var request = httpContext.Request;
+
+            // Path + Query
+            var pathAndQuery = $"{request.Path}{request.QueryString}";
+
+            // If urlRedirect have scheme (http/https)
+            if (urlRedirect.StartsWith("http"))
             {
-                url = httpContext.Request.Scheme + ":/" + urlPath;
+                return $"{urlRedirect}{pathAndQuery}";
             }
-            else
-            {
-                url = httpContext.Request.Scheme + "://" + urlPath;
-            }
-            return url;
+            return $"{request.Scheme}://{urlRedirect}{pathAndQuery}";
         }
 
         private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
