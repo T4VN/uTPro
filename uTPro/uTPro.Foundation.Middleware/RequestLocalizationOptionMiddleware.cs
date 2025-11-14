@@ -34,7 +34,7 @@ namespace uTPro.Foundation.Middleware
 
         private const string cookie_Culture = ".UTPro.Culture";
         private readonly DateTime exp_Cookie = DateTime.Now.AddDays(3);
-        private IEnumerable<Umbraco.Cms.Core.Routing.Domain>? domains = null;
+        private IEnumerable<Umbraco.Cms.Core.Routing.Domain> domains = Enumerable.Empty<Umbraco.Cms.Core.Routing.Domain>();
         RequestDelegate _next;
         ICurrentSiteExtension _currentSite;
 
@@ -61,12 +61,11 @@ namespace uTPro.Foundation.Middleware
                         if (!string.IsNullOrEmpty(url))
                         {
                             // Enhanced: Only allow redirect if URL is relative OR host (if present) is trusted
-                            Uri redirectUri;
+                            Uri? redirectUri = null;
                             if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out redirectUri))
                             {
-                                // Allow only relative URLs, or absolute URLs with a trusted host
-                                if (!redirectUri.IsAbsoluteUri ||
-                                    (domains != null && domains.Any(x => string.Equals(x.Name, redirectUri.Host, StringComparison.OrdinalIgnoreCase))))
+                                // Allow only absolute URLs with a trusted host
+                                if (domains.Any(x => string.Equals(x.Name, redirectUri.Host, StringComparison.OrdinalIgnoreCase)))
                                 {
                                     context.Response.Redirect(url, true);
                                     return;
@@ -242,7 +241,7 @@ namespace uTPro.Foundation.Middleware
             var pathAndQuery = $"{request.Path}{request.QueryString}";
 
             // If urlRedirect have scheme (http/https)
-            var scheme = (urlRedirect.StartsWith("http")) ? string.Empty : $"{request.Scheme}://";
+            var scheme = (urlRedirect.StartsWith("http")) ? string.Empty : $"//";
             return $"{scheme}{urlRedirect}{pathAndQuery}";
         }
 
