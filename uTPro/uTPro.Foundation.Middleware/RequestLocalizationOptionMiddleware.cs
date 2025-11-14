@@ -80,7 +80,8 @@ namespace uTPro.Foundation.Middleware
         {
             if (context == null)
             {
-                _logger.LogError($"Error in RequestLocalizationOptionMiddleware: Context is null");
+                // use incoming logger parameter to avoid referencing uninitialized field
+                logger?.LogError("Error in RequestLocalizationOptionMiddleware: Context is null");
                 throw new ArgumentNullException(nameof(context));
             }
             else
@@ -102,7 +103,7 @@ namespace uTPro.Foundation.Middleware
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error in RequestLocalizationOptionMiddleware: {ex.Message}");
+                    _logger?.LogError(ex, $"Error in RequestLocalizationOptionMiddleware: {ex.Message}");
                 }
             }
             await _next.Invoke(context).ConfigureAwait(false);
@@ -202,7 +203,9 @@ namespace uTPro.Foundation.Middleware
                     Expires = exp_Cookie,
                     IsEssential = true,
                     HttpOnly = true,
-                    Secure = httpContext.Request.IsHttps
+                    Secure = httpContext.Request.IsHttps,
+                    SameSite = SameSiteMode.Lax,
+                    Path = "/"
                 }
                 );
             }
@@ -227,7 +230,7 @@ namespace uTPro.Foundation.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"SetGlobal culture error: {ex.Message}");
+                _logger?.LogError(ex, $"SetGlobal culture error: {ex.Message}");
             }
             return false;
         }

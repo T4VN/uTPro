@@ -177,7 +177,7 @@ namespace uTPro.Extension.CurrentSite
             }
             else//find domain
             {
-                var domains = _currentSite.GetDomains(true).Result.ToList();
+                var domains = _currentSite.GetDomains(true).GetAwaiter().GetResult().ToList();
                 foreach (var domain in domains)
                 {
                     if (domain != null)
