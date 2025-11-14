@@ -3,3 +3,4 @@
 @{
 	Layout = "/Views/globalLayout.cshtml";
 }
+@await Html.GetBlockGridHtmlAsync(Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content"))
