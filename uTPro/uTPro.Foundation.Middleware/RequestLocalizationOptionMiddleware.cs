@@ -242,7 +242,7 @@ namespace uTPro.Foundation.Middleware
             var pathAndQuery = $"{request.Path}{request.QueryString}";
 
             // If urlRedirect have scheme (http/https)
-            var scheme = (urlRedirect.StartsWith("http")) ? string.Empty : $"{request.Scheme}://";
+            var scheme = (urlRedirect.StartsWith("http")) ? string.Empty : $"https://";
             return $"{scheme}{urlRedirect}{pathAndQuery}";
         }
 
