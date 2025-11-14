@@ -60,12 +60,17 @@ namespace uTPro.Foundation.Middleware
                         string url = await DetermineProviderCultureResult(context);
                         if (!string.IsNullOrEmpty(url))
                         {
-                            //check host get and request
-                            var cultureHost = new Uri(url).Host;
-                            if (domains?.Any(x => !string.Equals(x.Name, cultureHost, StringComparison.OrdinalIgnoreCase)) == true)
+                            // Enhanced: Only allow redirect if URL is relative OR host (if present) is trusted
+                            Uri redirectUri;
+                            if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out redirectUri))
                             {
-                                context.Response.Redirect(url, true);
-                                return;
+                                // Allow only relative URLs, or absolute URLs with a trusted host
+                                if (!redirectUri.IsAbsoluteUri ||
+                                    (domains != null && domains.Any(x => string.Equals(x.Name, redirectUri.Host, StringComparison.OrdinalIgnoreCase))))
+                                {
+                                    context.Response.Redirect(url, true);
+                                    return;
+                                }
                             }
                         }
                     }
