@@ -225,6 +225,15 @@ namespace uTPro.Foundation.Middleware
             {
                 return string.Empty;
             }
+
+            //check host get and request
+            var requestHost = httpContext.Request.Host.Host ?? string.Empty;
+            var cultureHost = new Uri(urlRedirect).Host;
+            if (!string.Equals(requestHost, cultureHost, StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Empty;
+            }
+
             var request = httpContext.Request;
 
             // Path + Query
