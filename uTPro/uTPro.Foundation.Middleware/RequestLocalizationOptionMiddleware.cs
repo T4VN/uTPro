@@ -231,11 +231,8 @@ namespace uTPro.Foundation.Middleware
             var pathAndQuery = $"{request.Path}{request.QueryString}";
 
             // If urlRedirect have scheme (http/https)
-            if (urlRedirect.StartsWith("http"))
-            {
-                return $"{urlRedirect}{pathAndQuery}";
-            }
-            return $"{request.Scheme}://{urlRedirect}{pathAndQuery}";
+            var scheme = (urlRedirect.StartsWith("http")) ? string.Empty : $"{request.Scheme}://";
+            return $"{scheme}{urlRedirect}{pathAndQuery}";
         }
 
         private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
@@ -266,6 +263,10 @@ namespace uTPro.Foundation.Middleware
                 }
 
                 cul = domains?.FirstOrDefault(x => x.Culture == null ? false : x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase)) ?? null;
+            }
+            if (cul != null && cul.Name.IndexOf(context?.Request?.Host.Value ?? string.Empty) != 0)
+            {
+                isRedirect = false;
             }
             return Tuple.Create(cul?.Culture ?? string.Empty, cul?.Name ?? string.Empty, isRedirect);
         }
