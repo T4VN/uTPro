@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Community.BlockPreview.Extensions;
@@ -25,7 +26,10 @@ var umbracoBuilder = builder.CreateUmbracoBuilder()
 umbracoBuilder.Build();
 
 // Razor + runtime compilation
-builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddRazorPages().AddRazorRuntimeCompilation().AddRazorOptions(options =>
+{
+    options.ViewLocationExpanders.Add(new CustomBlockPreviewLocationExpander());
+});
 builder.Services.AddSession();
 
 // WebOptimizer (CSS/JS/HTML minify)
@@ -78,11 +82,6 @@ builder.Services.AddControllers();
 builder.Services.Configure<UmbracoRenderingDefaultsOptions>(c =>
 {
     c.DefaultControllerType = typeof(ConfigureRenderController);
-});
-
-builder.Services.Configure<RazorViewEngineOptions>(options =>
-{
-    options.ViewLocationExpanders.Add(new CustomBlockPreviewLocationExpander());
 });
 
 // Form + IIS + Kestrel config

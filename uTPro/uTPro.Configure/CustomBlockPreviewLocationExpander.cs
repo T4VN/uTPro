@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Razor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using uTPro.Common.Constants;
 
 namespace uTPro.Configure
 {
@@ -11,7 +7,6 @@ namespace uTPro.Configure
     {
         public void PopulateValues(ViewLocationExpanderContext context)
         {
-
         }
 
         public IEnumerable<string> ExpandViewLocations(
@@ -32,17 +27,35 @@ namespace uTPro.Configure
     {
         public static string GetPathViewBlockPreview(string viewName, string siteName = "")
         {
-            if (viewName.Contains("__"))
+            (siteName, var fileName) = CustomPathViews.GetSiteAndFileName(viewName, siteName);
+            if (!string.IsNullOrEmpty(siteName))
             {
-                var parts = viewName.Split("__");
-                if (parts.Length >= 2)
-                {
-                    var siteNameOf = parts[0];
-                    var fileNameOf = parts[1];
-                    return $"~/Views/{(!string.IsNullOrEmpty(siteName) ? siteName : siteNameOf)}/blockgrid/Components/{fileNameOf}.cshtml";
-                }
+                return $"~/Views/{siteName}/blockgrid/Components/{fileName}.cshtml";
             }
             return viewName;
+        }
+
+        public static (string, string) GetSiteAndFileName(string viewName, string siteName = "")
+        {
+            if (string.IsNullOrEmpty(siteName))
+            {
+                return (string.Empty, viewName);
+            }
+
+            if (viewName.IndexOf($"{siteName}{Prefix.PrefixData}") == 0)
+            {
+                var parts = viewName.Split(Prefix.PrefixData);
+                if (parts.Length >= 2)
+                {
+                    return (siteName, parts[1]);
+                }
+            }
+
+            if (viewName.Equals("globalLayout", StringComparison.OrdinalIgnoreCase))
+            {
+                return (siteName, "_Layout");
+            }
+            return (string.Empty, viewName);
         }
     }
 }

@@ -11,6 +11,7 @@ using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.PublishedModels;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Controllers;
+using uTPro.Common.Constants;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Configure
@@ -53,9 +54,9 @@ namespace uTPro.Configure
                 //CurrentPage
                 string reasonPolicty = _checkPolicy.Check(HttpContext);
                 string nameView = UmbracoRouteValues.PublishedRequest.PublishedContent?.ContentType?.Alias ?? string.Empty;// ?? UmbracoRouteValues.TemplateName ?? string.Empty;
-                if (!string.IsNullOrWhiteSpace(nameView) && nameView.Contains("__"))
+                if (!string.IsNullOrWhiteSpace(nameView) && nameView.Contains(Prefix.PrefixData))
                 {
-                    nameView = nameView.Split("__")[1];
+                    nameView = nameView.Split(Prefix.PrefixData)[1];
                 }
                 string view = "~/Views/" + _currentSite.GetItem().Root.Name + "/" + nameView + ".cshtml";
 
