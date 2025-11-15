@@ -1,0 +1,11 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__BannerHeader>>
+@{
+    var bkgImage = Model.Content.BackgroundImage?.Url() ?? "";
+	var bkgImageCss = string.IsNullOrEmpty(bkgImage) ? "" : $"background-image: url('{bkgImage}');";
+}
+<section class="header wrapper" style="@(bkgImageCss)">
+	<div class="logo">
+		<h1>@Model.Content.Title</h1>
+		<p>@Model.Content.Description</p>
+	</div>
+</section>
