@@ -12,6 +12,14 @@
 		<EmbeddedResource Remove="Controllers\Api\**" />
 		<None Remove="Controllers\Api\**" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Content Include="App_Plugins\assets\img\bkg-login.jpg" />
+	  <Content Include="App_Plugins\assets\img\logo.svg" />
+	  <Content Include="App_Plugins\cms-screen\index.js" />
+	  <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
+	  <Content Include="App_Plugins\cms-screen\style.css" />
+	  <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
