@@ -35,14 +35,14 @@ builder.Services.AddWebOptimizer(pipeline =>
     {
         IgnoreAllErrors = true,
         CommentMode = NUglify.Css.CssComment.None,
-    }, "css/**/*.css", "lib/**/*.css");
+    }, "css/**/*.css", "assets/**/*.css");
 
     pipeline.MinifyJsFiles(
         new WebOptimizer.Processors.JsSettings(new NUglify.JavaScript.CodeSettings()
         {
             IgnoreAllErrors = true,
         }),
-        "js/**/*.js", "lib/**/*.js"
+        "js/**/*.js", "assets/**/*.js"
     );
 
     pipeline.MinifyHtmlFiles();
