@@ -1,8 +1,12 @@
-.block-preview-edit:hover umb-block-grid-areas-container::after {
+.block-preview-edit grid-section umb-block-grid-areas-container::after {
     content: '...';
     position: absolute;
     top: 0;
-    left: 0px;
+    left: -20px;
     font-weight: 700;
     font-size: 16px;
+}
+
+.block-preview-edit grid-section umb-block-grid-areas-container::after {
+    content: '...';
 }

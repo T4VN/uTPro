@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Community.BlockPreview.Extensions;
@@ -84,6 +85,14 @@ builder.Services.Configure<UmbracoRenderingDefaultsOptions>(c =>
 builder.Services.Configure<RazorViewEngineOptions>(options =>
 {
     options.ViewLocationExpanders.Add(new CustomBlockPreviewLocationExpander());
+});
+
+builder.Services.Configure<UmbracoRequestPathsOptions>(options =>
+{
+    options.IsBackOfficeRequest = path =>
+    {
+        return path.StartsWith("/umbraco", StringComparison.OrdinalIgnoreCase);
+    };
 });
 
 // Form + IIS + Kestrel config

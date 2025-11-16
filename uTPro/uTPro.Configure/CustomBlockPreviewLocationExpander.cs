@@ -52,7 +52,7 @@ namespace uTPro.Configure
             }
 
             var (site, fileName) = GetSiteAndFileName(viewName, siteName, isCheckSiteName);
-            string? result = null;
+            string result = viewName;
 
             if (!string.IsNullOrEmpty(site) && !string.IsNullOrEmpty(fileName))
             {
@@ -68,10 +68,7 @@ namespace uTPro.Configure
                     result = $"~/Views/{site}/blockgrid/Components/{fileName}.cshtml";
                 }
             }
-            if (result == null)
-            {
-                result = viewName;
-            }
+
             s_pathCache.TryAdd(cacheKey, result);
             return result;
         }
@@ -80,6 +77,12 @@ namespace uTPro.Configure
         {
             if (string.IsNullOrEmpty(viewName))
                 return (string.Empty, string.Empty);
+
+            // special-case for global layout name (preserve behavior: only return when siteName provided)
+            if (viewName.Equals("globalLayout", StringComparison.OrdinalIgnoreCase))
+            {
+                return (siteName ?? string.Empty, "_Layout");
+            }
 
             // Short-circuit: when checking site name is required but none provided, match original behavior
             if (isCheckSiteName && string.IsNullOrEmpty(siteName))
@@ -106,12 +109,6 @@ namespace uTPro.Configure
 
                 // not checking siteName: return whatever we parsed
                 return (parsedSite, parsedFile);
-            }
-
-            // special-case for global layout name (preserve behavior: only return when siteName provided)
-            if (viewName.Equals("globalLayout", StringComparison.OrdinalIgnoreCase))
-            {
-                return (siteName ?? string.Empty, "_Layout");
             }
 
             return (string.Empty, viewName);
