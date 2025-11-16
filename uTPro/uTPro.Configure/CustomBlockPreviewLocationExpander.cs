@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Razor;
+using System.Collections.Concurrent;
+using System.IO;
+using System.Linq;
 using uTPro.Common.Constants;
 
 namespace uTPro.Configure
 {
-    public class CustomBlockPreviewLocationExpander : IViewLocationExpander
+    public sealed class CustomBlockPreviewLocationExpander : IViewLocationExpander
     {
         public void PopulateValues(ViewLocationExpanderContext context)
         {
@@ -13,9 +16,15 @@ namespace uTPro.Configure
             ViewLocationExpanderContext context,
             IEnumerable<string> viewLocations)
         {
-            var viewName = context.ViewName;
+            var viewName = context?.ViewName ?? string.Empty;
 
-            yield return CustomPathViews.GetPathViewBlockPreview(viewName);// $"Views/{folder}/blockgrid/Components/{file}.cshtml";
+            // Try to get a cached custom location. If one exists and it's not a duplicate, yield it.
+            var custom = CustomPathViews.GetPathViewBlockPreview(viewName, isCheckSiteName: false);
+            if (!string.IsNullOrEmpty(custom) && !viewLocations.Contains(custom, StringComparer.OrdinalIgnoreCase))
+            {
+                yield return custom;
+            }
+
             foreach (var location in viewLocations)
             {
                 yield return location;
@@ -25,36 +34,86 @@ namespace uTPro.Configure
 
     public static class CustomPathViews
     {
-        public static string GetPathViewBlockPreview(string viewName, string siteName = "")
+        // Cache computed paths to avoid repeated parsing for the same view name
+        private static readonly ConcurrentDictionary<string, string?> s_pathCache = new(StringComparer.OrdinalIgnoreCase);
+
+        public static string? GetPathViewBlockPreview(string viewName, string siteName = "", bool isCheckSiteName = true)
         {
-            (siteName, var fileName) = CustomPathViews.GetSiteAndFileName(viewName, siteName);
-            if (!string.IsNullOrEmpty(siteName))
+            if (string.IsNullOrEmpty(viewName))
+                return null;
+
+            var cacheKey = string.Concat(viewName, "|", siteName ?? string.Empty, "|", isCheckSiteName ? "1" : "0");
+            if (s_pathCache.TryGetValue(cacheKey, out var cached))
             {
-                return $"~/Views/{siteName}/blockgrid/Components/{fileName}.cshtml";
+                if (cached != null)
+                {
+                    return cached;
+                }
             }
-            return viewName;
+
+            var (site, fileName) = GetSiteAndFileName(viewName, siteName, isCheckSiteName);
+            string? result = null;
+
+            if (!string.IsNullOrEmpty(site) && !string.IsNullOrEmpty(fileName))
+            {
+                // Basic sanitization: remove leading slashes and keep only filename part to avoid traversal
+                fileName = fileName.TrimStart('/', '\\');
+                if (fileName.IndexOfAny(new[] { '\\', '/' }) >= 0)
+                {
+                    fileName = Path.GetFileName(fileName);
+                }
+
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    result = $"~/Views/{site}/blockgrid/Components/{fileName}.cshtml";
+                }
+            }
+            if (result == null)
+            {
+                result = viewName;
+            }
+            s_pathCache.TryAdd(cacheKey, result);
+            return result;
         }
 
-        public static (string, string) GetSiteAndFileName(string viewName, string siteName = "")
+        public static (string, string) GetSiteAndFileName(string viewName, string siteName = "", bool isCheckSiteName = true)
         {
-            if (string.IsNullOrEmpty(siteName))
+            if (string.IsNullOrEmpty(viewName))
+                return (string.Empty, string.Empty);
+
+            // Short-circuit: when checking site name is required but none provided, match original behavior
+            if (isCheckSiteName && string.IsNullOrEmpty(siteName))
             {
                 return (string.Empty, viewName);
             }
 
-            if (viewName.IndexOf($"{siteName}{Prefix.PrefixData}") == 0)
+            // Try to parse pattern: "{site}{Prefix.PrefixData}{fileName}" where Prefix.PrefixData = "__"
+            var prefix = Prefix.PrefixData;
+            var idx = viewName.IndexOf(prefix, StringComparison.Ordinal);
+            if (idx > 0)
             {
-                var parts = viewName.Split(Prefix.PrefixData);
-                if (parts.Length >= 2)
+                var parsedSite = viewName.Substring(0, idx);
+                var parsedFile = idx + prefix.Length < viewName.Length ? viewName.Substring(idx + prefix.Length) : string.Empty;
+
+                if (isCheckSiteName)
                 {
-                    return (siteName, parts[1]);
+                    if (!string.IsNullOrEmpty(siteName) && string.Equals(parsedSite, siteName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return (siteName, parsedFile);
+                    }
+                    return (string.Empty, viewName);
                 }
+
+                // not checking siteName: return whatever we parsed
+                return (parsedSite, parsedFile);
             }
 
+            // special-case for global layout name (preserve behavior: only return when siteName provided)
             if (viewName.Equals("globalLayout", StringComparison.OrdinalIgnoreCase))
             {
-                return (siteName, "_Layout");
+                return (siteName ?? string.Empty, "_Layout");
             }
+
             return (string.Empty, viewName);
         }
     }
