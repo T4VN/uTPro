@@ -14,6 +14,7 @@
     }
 
     <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
+	<link rel="stylesheet" href="/css/uTPro/layout.css" />
 	<link rel="stylesheet" href="/css/uTPro/main.css" />
     @RenderSection("Styles", false)
 
@@ -23,7 +24,7 @@
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
         Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop);
     }
-	<main id="page-wrapper">
+	<main class="page-wrapper">
 		<nav class="navHeader">
 			<ul>
 				<li style="display: none;"><a href="/">Home</a></li>

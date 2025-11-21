@@ -31,10 +31,6 @@
     row-gap: var(--umb-block-grid--areas-row-gap, 0);
 }
 
-.umb-block-grid__layout-container::part(umb-block-grid__block){
-    padding: 100px
-}
-
 .umb-block-grid__area {
     position: relative;
     height: 100%;
