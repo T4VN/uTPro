@@ -103,7 +103,8 @@
 				if (/^\s*</.test(config.target)) {
 					throw new Error('Unsafe value for "target" option: must be a CSS selector or jQuery object, not HTML.');
 				}
-				config.target = $(config.target);
+				// Use find() to ensure config.target is only ever interpreted as a selector, never as HTML
+				config.target = $(document).find(config.target);
 			} else {
 				// Not a string or jQuery object: throw error.
 				throw new Error('"target" option must be a jQuery object or CSS selector string.');
