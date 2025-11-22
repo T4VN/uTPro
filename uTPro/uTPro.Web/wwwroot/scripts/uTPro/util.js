@@ -37,6 +37,7 @@
 	/**
 	 * Panel-ify an element.
 	 * @param {object} userConfig User config.
+	 *   - userConfig.target: jQuery object or CSS selector string ONLY. Do not pass HTML strings; they will be rejected to prevent XSS.
 	 * @return {jQuery} jQuery object.
 	 */
 	$.fn.panel = function (userConfig) {
@@ -95,8 +96,19 @@
 		}, userConfig);
 
 		// Expand "target" if it's not a jQuery object already.
-		if (typeof config.target != 'jQuery')
-			config.target = $(config.target);
+		if (!(config.target instanceof jQuery)) {
+			// Only allow strings that are valid CSS selectors (not HTML snippets).
+			if (typeof config.target === "string") {
+				// If it starts with "<", it may be interpreted as HTML, which is unsafe.
+				if (/^\s*</.test(config.target)) {
+					throw new Error('Unsafe value for "target" option: must be a CSS selector or jQuery object, not HTML.');
+				}
+				config.target = $(config.target);
+			} else {
+				// Not a string or jQuery object: throw error.
+				throw new Error('"target" option must be a jQuery object or CSS selector string.');
+			}
+		}
 
 		// Panel.
 
