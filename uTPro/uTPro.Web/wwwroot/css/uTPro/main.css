@@ -1098,7 +1098,7 @@ ul.actions.special {
 /* Medium */
 
 #navPanel,
-#titleBar {
+.btnBar {
 	display: none;
 }
 
@@ -1191,7 +1191,7 @@ ul.actions.special {
 		padding-bottom: 1px;
 	}
 
-	#titleBar {
+	.btnBar {
 		-moz-backface-visibility: hidden;
 		-webkit-backface-visibility: hidden;
 		-ms-backface-visibility: hidden;
@@ -1210,11 +1210,11 @@ ul.actions.special {
 		background: none;
 	}
 
-	#titleBar .title {
+	.btnBar .title {
 		display: none;
 	}
 
-	#titleBar .toggle {
+	.btnBar .toggle {
 		text-decoration: none;
 		position: absolute;
 		top: 0;
@@ -1223,7 +1223,7 @@ ul.actions.special {
 		height: 44px;
 	}
 
-	#titleBar .toggle:before {
+	.btnBar .toggle:before {
 		-moz-osx-font-smoothing: grayscale;
 		-webkit-font-smoothing: antialiased;
 		display: inline-block;
@@ -1236,7 +1236,7 @@ ul.actions.special {
 		font-weight: 900;
 	}
 
-	#titleBar .toggle:before {
+	.btnBar .toggle:before {
 		-moz-transition: all .15s ease-in-out;
 		-webkit-transition: all .15s ease-in-out;
 		-ms-transition: all .15s ease-in-out;
@@ -1257,7 +1257,7 @@ ul.actions.special {
 		border-radius: 0.25em;
 	}
 
-	#titleBar .toggle:active:before {
+	.btnBar .toggle:active:before {
 		background-color: rgba(92, 95, 103, 0.75);
 	}
 
@@ -1344,7 +1344,7 @@ ul.actions.special {
 		transform: translateX(275px);
 	}
 
-	body.navPanel-visible #titleBar {
+	body.navPanel-visible .btnBar {
 		-moz-transform: translateX(275px);
 		-webkit-transform: translateX(275px);
 		-ms-transform: translateX(275px);
