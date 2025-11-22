@@ -13,7 +13,7 @@
     var seo = Model?.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription));
 
     var titlePage = seo?.Title ?? (string?)Context.Items["titlePage"] ?? "Page Not Found";
-    var logo = Model?.Value<string>(nameof(GlobalSiteSettings.SiteSettingsLogo)) ?? "/App_Plugins/assets/img/logo.svg";
+    var logo = Model?.Value<string>(nameof(GlobalSiteSettings.SiteSettingsLogo)) ?? "/assets/img/logo.svg";
     var title = (string?)Context.Items["title"] ?? titlePage;
     var message = seo?.Description ?? (string?)Context.Items["message"] ?? string.Empty;
 }
@@ -40,7 +40,7 @@
             width: 100%;
             height: 100vh;
             margin: auto;
-            background-image: url(/App_Plugins/assets/img/bkg-login.jpg);
+            background-image: url(/assets/img/bkg-login.jpg);
             background-repeat: no-repeat;
             background-position-y: bottom;
             background-position-x: center;

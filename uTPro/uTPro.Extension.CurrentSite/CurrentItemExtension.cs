@@ -15,19 +15,12 @@ namespace uTPro.Extension.CurrentSite
             => builder.Services.AddScoped<ICurrentItemExtension, CurrentItemExtension>();
     }
 
-    public class Recaptchav2
-    {
-        public bool IsEnable { get; set; }
-        public string SiteKey { get; set; }
-        public string SecretKey { get; set; }
-    }
-
     public interface ICurrentItemExtension
     {
         GlobalRoot Root { get; }
         GlobalFolderSites FolderSite { get; }
         GlobalFolderSettings FolderSettings { get; }
-        GlobalFolderArchives? FolderArchives { get; }
+        //GlobalFolderArchives? FolderArchives { get; }
         IPublishedContent? Current { get; }
         IPublishedContent? PageHome { get; }
         IPublishedContent? PageErrors { get; }
@@ -52,21 +45,6 @@ namespace uTPro.Extension.CurrentSite
                 // free managed resources
             }
             // free native resources if there are any.
-        }
-
-        public Recaptchav2 RecapchaV2
-        {
-            get
-            {
-                bool isEnableRecaptcha = false;
-                bool.TryParse(_currentSite.Configuration.GetSection("reCAPTCHAv2:On")?.Value, out isEnableRecaptcha);
-                return new Recaptchav2()
-                {
-                    IsEnable = isEnableRecaptcha,
-                    SiteKey = _currentSite.Configuration.GetSection("reCAPTCHAv2:SiteKey")?.Value ?? string.Empty,
-                    SecretKey = _currentSite.Configuration.GetSection("reCAPTCHAv2:SecretKey")?.Value ?? string.Empty
-                };
-            }
         }
 
         readonly ICurrentSiteExtension _currentSite;
@@ -95,7 +73,7 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                return this.Root.FirstChild<GlobalFolderSites>() ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
+                return this.PageHome?.Parent<GlobalFolderSites>() ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
             }
         }
 
@@ -103,17 +81,21 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
+                if (this.FolderSite.GlobalSettings != null)
+                {
+                    return (GlobalFolderSettings)this.FolderSite.GlobalSettings;
+                }
                 return this.Root.FirstChild<GlobalFolderSettings>() ?? throw new Exception(nameof(GlobalFolderSettings) + " is null");
             }
         }
 
-        public GlobalFolderArchives? FolderArchives
-        {
-            get
-            {
-                return this.Root.FirstChild<GlobalFolderArchives>();
-            }
-        }
+        //public GlobalFolderArchives? FolderArchives
+        //{
+        //    get
+        //    {
+        //        return this.Root.FirstChild<GlobalFolderArchives>();
+        //    }
+        //}
 
         public IPublishedContent? Current
         {
