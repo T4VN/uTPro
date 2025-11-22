@@ -8,7 +8,6 @@
 <head>
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_MetaData);
-        // @await SmidgeHelper.CssHereAsync("css-main", debug: false);
         @RenderSection("Styles", false);
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderOpeningScripts));
         @Html.RenderSections(HtmlSectionBlockExtensions.Position.Head)
@@ -29,6 +28,5 @@
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
         Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyBottom);
     }
-    @* @await SmidgeHelper.JsHereAsync("js-main", debug: false) *@
 </body>
 </html>

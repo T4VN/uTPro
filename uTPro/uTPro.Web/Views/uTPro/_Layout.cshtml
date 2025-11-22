@@ -1,0 +1,77 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null;
+    var dir = CurrentSite.CurrentCulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
+}
+<!DOCTYPE html>
+<html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir" language="@CurrentSite.CurrentCulture.DisplayName">
+<head>
+    @{
+        await Html.RenderPartialAsync(PathFileViews.Partials_MetaData);
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderOpeningScripts));
+        @Html.RenderSections(HtmlSectionBlockExtensions.Position.Head)
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderClosingScripts));
+    }
+
+    <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
+	<link rel="stylesheet" href="/css/uTPro/layout.css" />
+	<link rel="stylesheet" href="/css/uTPro/main.css" />
+    @RenderSection("Styles", false)
+
+</head>
+<body class="bodypage is-preload">
+    @{
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
+        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop);
+    }
+	<main class="page-wrapper">
+		<nav class="navHeader">
+			<ul>
+				<li style="display: none;"><a href="/">Home</a></li>
+				<li><a href="/">About</a></li>
+				<!-- <li>
+					<a href="#">Dropdown</a>
+					<ul>
+						<li><a href="#">Lorem ipsum</a></li>
+						<li><a href="#">Magna veroeros</a></li>
+						<li><a href="#">Etiam nisl</a></li>
+						<li>
+							<a href="#">Sed consequat</a>
+							<ul>
+								<li><a href="#">Lorem dolor</a></li>
+								<li><a href="#">Amet consequat</a></li>
+								<li><a href="#">Magna phasellus</a></li>
+								<li><a href="#">Etiam nisl</a></li>
+								<li><a href="#">Sed feugiat</a></li>
+							</ul>
+						</li>
+						<li><a href="#">Nisl tempus</a></li>
+					</ul>
+				</li>
+				<li><a href="left-sidebar.html">Left Sidebar</a></li> -->
+				<li class="nav-logo">
+					<a class="nav-logo-href" href="/">
+						<img src="/assets/img/logo.svg" alt="UTPro - Umbraco Turbo Pro">
+					</a>
+				</li>
+				<li><a href="/">Security</a></li>
+				<!-- <li><a href="right-sidebar.html">Right Sidebar</a></li>
+				<li><a href="no-sidebar.html">No Sidebar</a></li>
+				<li><a href="no-sidebar.html">No Sidebar</a></li> -->
+			</ul>
+		</nav>
+        @RenderBody()
+    </main>
+	<script src="/assets/scripts/jquery.min.js"></script>
+	<script src="/assets/scripts/jquery.dropotron.min.js"></script>
+	<script src="/assets/scripts/browser.min.js"></script>
+	<script src="/assets/scripts/breakpoints.min.js"></script>
+	<script src="/scripts/uTPro/util.js"></script>
+	<script src="/scripts/uTPro/main.js"></script>
+    @{
+        RenderSection("Scripts", false);
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
+        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyBottom);
+    }
+</body>
+</html>

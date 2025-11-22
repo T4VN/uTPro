@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Community.BlockPreview.Extensions;
@@ -18,8 +20,7 @@ var umbracoBuilder = builder.CreateUmbracoBuilder()
     .AddBlockPreview(options =>
     {
         options.BlockGrid.Enabled = true;
-        options.BlockList.Enabled = true;
-        options.RichText.Enabled = true;
+        options.BlockGrid.Stylesheet = "/assets/css/blockgridlayout-backoffice.css";
     });
 
 umbracoBuilder.Build();
@@ -35,14 +36,14 @@ builder.Services.AddWebOptimizer(pipeline =>
     {
         IgnoreAllErrors = true,
         CommentMode = NUglify.Css.CssComment.None,
-    }, "css/**/*.css", "lib/**/*.css");
+    }, "css/**/*.css", "assets/**/*.css");
 
     pipeline.MinifyJsFiles(
         new WebOptimizer.Processors.JsSettings(new NUglify.JavaScript.CodeSettings()
         {
             IgnoreAllErrors = true,
         }),
-        "js/**/*.js", "lib/**/*.js"
+        "js/**/*.js", "assets/**/*.js"
     );
 
     pipeline.MinifyHtmlFiles();
@@ -75,9 +76,23 @@ builder.Services.AddRenderingDefaults();
 
 builder.Services.AddControllers();
 
+// Configure Services
 builder.Services.Configure<UmbracoRenderingDefaultsOptions>(c =>
 {
     c.DefaultControllerType = typeof(ConfigureRenderController);
+});
+
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+    options.ViewLocationExpanders.Add(new CustomBlockPreviewLocationExpander());
+});
+
+builder.Services.Configure<UmbracoRequestPathsOptions>(options =>
+{
+    options.IsBackOfficeRequest = path =>
+    {
+        return path.StartsWith("/umbraco", StringComparison.OrdinalIgnoreCase);
+    };
 });
 
 // Form + IIS + Kestrel config

@@ -5,21 +5,29 @@
 		<Nullable>enable</Nullable>
 		<CompressionEnabled>false</CompressionEnabled>
 		<!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
-	</PropertyGroup>
+  </PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="Controllers\Api\**" />
 		<Content Remove="Controllers\Api\**" />
 		<EmbeddedResource Remove="Controllers\Api\**" />
 		<None Remove="Controllers\Api\**" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Content Include="App_Plugins\assets\img\bkg-login.jpg" />
+	  <Content Include="App_Plugins\assets\img\logo.svg" />
+	  <Content Include="App_Plugins\cms-screen\index.js" />
+	  <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
+	  <Content Include="App_Plugins\cms-screen\style.css" />
+	  <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
 		<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />
 		<PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-		<PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.3" />
+		<PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.5" />
 		<PackageReference Include="uSync" Version="16.1.0" />
-		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.19.0" />
+		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.20.0" />
 		<ProjectReference Include="..\uTPro.Configure\uTPro.Configure.csproj" />
 		<ProjectReference Include="..\uTPro.Extension\uTPro.Extension.csproj" />
 		<ProjectReference Include="..\uTPro.Foundation\uTPro.Foundation.csproj" />

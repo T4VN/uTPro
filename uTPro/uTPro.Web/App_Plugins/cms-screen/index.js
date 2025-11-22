@@ -8,5 +8,5 @@ document.head.appendChild(styleLink);
 const iconLink = document.createElement('link');
 iconLink.rel = 'icon';
 iconLink.type = 'image/svg+xml';
-iconLink.href = '/App_Plugins/assets/img/logo.svg';
+iconLink.href = '/assets/img/logo.svg';
 document.head.appendChild(iconLink);
