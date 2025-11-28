@@ -18,9 +18,13 @@
 
 name: "Microsoft Defender For Devops"
 
+permissions:
+  contents: read
+  security-events: write
+
 on:
   push:
-    branches: [ "main", "dev/v16", "gh-pages" ]
+    branches: [ "main", "gh-pages" ]
   pull_request:
     branches: [ "main" ]
   schedule:
