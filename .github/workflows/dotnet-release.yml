@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
-
+      
+permissions:
+  contents: read
+  pull-requests: read
+  
 jobs:
   build-and-release:
     permissions:
