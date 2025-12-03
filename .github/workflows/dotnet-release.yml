@@ -38,7 +38,19 @@ jobs:
         run: |
           VERSION="v$(date +'%Y%m%d.%H%M')"
           echo "version_tag=$VERSION" >> $GITHUB_OUTPUT
-
+          
+      - name: Delete existing draft releases
+        run: |
+          releases=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }}/releases)
+          for id in $(echo "$releases" | jq '.[] | select(.draft==true) | .id'); do
+            echo "Deleting draft release id=$id"
+            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              https://api.github.com/repos/${{ github.repository }}/releases/$id
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
