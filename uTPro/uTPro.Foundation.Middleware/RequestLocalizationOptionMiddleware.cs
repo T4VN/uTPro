@@ -91,14 +91,11 @@ namespace uTPro.Foundation.Middleware
                 if (_currentSite?.Configuration == null) return;
                 try
                 {
-                    if (!_currentSite.GetItem().FolderSettings.RememberLanguageDisable)
+                    string fullUrl = await DetermineProviderCultureResult(context).ConfigureAwait(false);
+                    if (!string.IsNullOrEmpty(fullUrl))
                     {
-                        string fullUrl = await DetermineProviderCultureResult(context).ConfigureAwait(false);
-                        if (!string.IsNullOrEmpty(fullUrl))
-                        {
-                            context.Response.Redirect(fullUrl, true);
-                            return;
-                        }
+                        context.Response.Redirect(fullUrl, true);
+                        return;
                     }
                 }
                 catch (Exception ex)
@@ -121,11 +118,14 @@ namespace uTPro.Foundation.Middleware
                 return string.Empty;
             }
 
-            (string culture, string prefixUrl, bool isRedirect) = await GetUrlCulture(context, parts).ConfigureAwait(false);
-
-            if (SetGlobal(context, culture))
+            if (!_currentSite.GetItem().FolderSettings.RememberLanguageDisable)
             {
-                return GetSchemeRedirect(context, culture, prefixUrl, isRedirect);
+                (string culture, string prefixUrl, bool isRedirect) = await GetUrlCulture(context, parts).ConfigureAwait(false);
+
+                if (SetGlobal(context, culture))
+                {
+                    return GetSchemeRedirect(context, culture, prefixUrl, isRedirect);
+                }
             }
             return string.Empty;
         }

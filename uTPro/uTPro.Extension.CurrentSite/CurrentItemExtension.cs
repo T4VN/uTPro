@@ -65,7 +65,7 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                return (GlobalRoot)this.GetItemRoot(Current);
+                return (GlobalRoot)this.GetItemByAlias(Current, GlobalRoot.ModelTypeAlias, true);
             }
         }
 
@@ -73,7 +73,12 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                return this.PageHome?.Parent<GlobalFolderSites>() ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
+                var folderSite = this.PageHome?.Parent<GlobalFolderSites>() ?? null;
+                if (folderSite == null)
+                {
+                    folderSite = (GlobalFolderSites)GetItemByAlias(this.PageHome, GlobalFolderSites.ModelTypeAlias, true);
+                }
+                return folderSite ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
             }
         }
 
@@ -177,61 +182,76 @@ namespace uTPro.Extension.CurrentSite
             return null;
         }
 
-        private IPublishedContent GetItemRoot(IPublishedContent? item)
+        private IPublishedContent GetItemByAlias(IPublishedContent? item, string alias, bool isFisrt)
         {
             if (item == null)
             {
                 item = this.PageHome;
             }
-            string strIdRoot = GetIdRoot(item);
+            else
+            {
+                if (item.ContentType.Alias == alias)
+                {
+                    return item;
+                }
+            }
+
+            var (strIdRoot, pathIds) = GetIdParent(item?.Path ?? string.Empty, isFisrt);
             if (!string.IsNullOrEmpty(strIdRoot))
             {
                 int idRoot = int.Parse(strIdRoot);
                 item = _currentSite.UContext.Content?.GetById(idRoot);
                 if (item != null)
                 {
-                    if (item.ContentType.Alias == GlobalRoot.ModelTypeAlias)
+                    if (item.ContentType.Alias == alias)
                     {
                         return item;
                     }
                     else
                     {
-                        return GetItemRoot(null);
+                        (strIdRoot, pathIds) = GetIdParent(pathIds ?? string.Empty, false);
+                        idRoot = int.Parse(strIdRoot);
+                        item = _currentSite.UContext.Content?.GetById(idRoot);
+                        return GetItemByAlias(item, alias, false);
                     }
                 }
             }
-            throw new Exception("Not found item: Folder Site");
+            throw new Exception("Not found item: " + alias);
         }
 
-        private string GetIdRoot(IPublishedContent? item)
+        private static (string, string?) GetIdParent(string pathId, bool isRoot = false)
         {
-            if (item == null)
-            {
-                return string.Empty;
-            }
-            return GetId(item.Path);
-        }
-
-        private static string GetId(string pathId)
-        {
+            string? pathIds = pathId;
             if (string.IsNullOrEmpty(pathId))
             {
-                return pathId;
+                return (pathId, null);
             }
             else
             {
                 if (pathId.StartsWith("-1"))
                 {
                     int first = pathId.IndexOf(',') + 1;
-                    pathId = pathId.Substring(first);//Remove id CURRENT
+                    pathIds = pathId.Substring(first);//Remove id CURRENT
                 }
-                if (pathId.IndexOf(',') > 0)
+
+                if (pathIds != null && pathIds.IndexOf(',') > 0)
                 {
-                    pathId = pathId.Substring(0, pathId.IndexOf(','));//Get id Parrent
+                    var arrayPathId = pathIds.Split(',');
+                    if (isRoot)
+                    {
+                        pathId = arrayPathId.FirstOrDefault() ?? string.Empty;//id Root
+                    }
+                    else
+                    {
+                        if (arrayPathId.Length >= 2)
+                        {
+                            pathId = arrayPathId[arrayPathId.Length - 2];////Get id Parent
+                        }
+                    }
                 }
             }
 
-            return pathId;
+            return (pathId, pathIds);
         }
 
     }
