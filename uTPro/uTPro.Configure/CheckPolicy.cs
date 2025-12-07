@@ -38,7 +38,7 @@ namespace uTPro.Configure
                     ?? checkDomain(httpContext)
                     ?? string.Empty;
             }
-            return string.Empty;
+            //return string.Empty;
         }
 
         string? checkExp()

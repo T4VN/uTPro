@@ -65,7 +65,7 @@ namespace uTPro.Configure
                     if (!_compositeViewEngine.GetView(null, view, isMainPage: false).Success)
                     {
                         view = "~/Views/" + UmbracoRouteValues.TemplateName + ".cshtml" ?? string.Empty;
-                        if (!EnsurePhsyicalViewExists(view))
+                        if (!EnsurePhysicalViewExists(view))
                         {
                             if (!_compositeViewEngine.GetView(null, view, isMainPage: false).Success)
                             {
@@ -121,7 +121,7 @@ namespace uTPro.Configure
         {
             // In the rare case that an umbracoContext cannot be built from the request,
             // we will not be able to find the page
-            if (_queryAccessor.TryGetValue(out IPublishedContentQuery query))
+            if (_queryAccessor.TryGetValue(out IPublishedContentQuery? query) && query != null)
             {
                 // Find the first notFound page at the root level through the published content cache by its documentTypeAlias
                 // You can make this search as complex as you want, you can return different pages based on anything in the original request

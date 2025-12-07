@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.PublishedModels;
@@ -62,7 +64,7 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                return (GlobalRoot)this.GetItemByAlias(Current, GlobalRoot.ModelTypeAlias, true);
+                return (GlobalRoot)this.GetItemByAlias(this.Current, GlobalRoot.ModelTypeAlias, true);
             }
         }
 
@@ -124,8 +126,9 @@ namespace uTPro.Extension.CurrentSite
                 {
                     return this.GetItemWithDomain() ?? null;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger?.LogError(ex, "Get PageHome error");
                     return null;
                 }
             }
@@ -137,15 +140,16 @@ namespace uTPro.Extension.CurrentSite
                 try
                 {
                     var pageHome = this.PageHome;
-                    if (this.PageHome != null)
+                    if (pageHome != null)
                     {
-                        var pageNotFound = this.PageHome.Value<IPublishedContent>(nameof(GlobalPageNavigationConfigSettingForHomePage.PageNotFound));
+                        var pageNotFound = pageHome.Value<IPublishedContent>(nameof(GlobalPageNavigationConfigSettingForHomePage.PageNotFound));
                         return pageNotFound;
                     }
                     return this.FolderSite.FirstChild<GlobalPageError>() ?? null;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger?.LogError(ex, "Get PageErrors error");
                     return null;
                 }
             }
@@ -161,94 +165,101 @@ namespace uTPro.Extension.CurrentSite
             }
             else//find domain
             {
-                var domains = _currentSite.GetDomains(true).GetAwaiter().GetResult().ToList();
+                var domains = _currentSite.GetDomains(true).GetAwaiter().GetResult();
+                if (domains == null) return null;
                 foreach (var domain in domains)
                 {
-                    if (domain != null)
-                    {
-                        var currentItem = _currentSite.UContext.Content?.GetById(domain.ContentId);
-                        if (currentItem is null)
-                            continue;
-                        else
-                        {
-                            return currentItem;
-                        }
-                    }
+                    if (domain == null) continue;
+                    var currentItem = _currentSite.UContext.Content?.GetById(domain.ContentId);
+                    if (currentItem != null)
+                        return currentItem;
                 }
             }
             return null;
         }
 
-        private IPublishedContent GetItemByAlias(IPublishedContent? item, string alias, bool isFisrt)
+        private IPublishedContent GetItemByAlias(IPublishedContent? item, string alias, bool isFirst)
         {
-            if (item == null)
+            // Start from provided item
+            var current = item;
+            if (current == null)
+                throw new Exception("Not found item: " + alias);
+
+            // quick check
+            if (string.Equals(current.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
+                return current;
+
+            // try traversing parents first (cheaper, no parsing)
+            var parent = current.Parent();
+            while (parent != null)
             {
-                item = this.PageHome;
-            }
-            else
-            {
-                if (item.ContentType.Alias == alias)
-                {
-                    return item;
-                }
+                if (string.Equals(parent.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
+                    return parent;
+                parent = parent.Parent();
             }
 
-            var (strIdRoot, pathIds) = GetIdParent(item?.Path ?? string.Empty, isFisrt);
-            if (!string.IsNullOrEmpty(strIdRoot))
+            // fallback to path-based traversal (optimized parsing)
+            var (idToken, pathIds) = GetIdParent(current.Path ?? string.Empty, isFirst);
+            while (!string.IsNullOrEmpty(idToken))
             {
-                int idRoot = int.Parse(strIdRoot);
-                item = _currentSite.UContext.Content?.GetById(idRoot);
-                if (item != null)
+                if (int.TryParse(idToken, out var idRoot))
                 {
-                    if (item.ContentType.Alias == alias)
+                    var p = _currentSite.UContext.Content?.GetById(idRoot);
+                    if (p != null)
                     {
-                        return item;
-                    }
-                    else
-                    {
-                        (strIdRoot, pathIds) = GetIdParent(pathIds ?? string.Empty, false);
-                        idRoot = int.Parse(strIdRoot);
-                        item = _currentSite.UContext.Content?.GetById(idRoot);
-                        return GetItemByAlias(item, alias, false);
+                        if (string.Equals(p.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
+                            return p;
                     }
                 }
+
+                if (string.IsNullOrEmpty(pathIds))
+                    break;
+
+                (idToken, pathIds) = GetIdParent(pathIds ?? string.Empty, false);
             }
+
             throw new Exception("Not found item: " + alias);
         }
 
         private static (string, string?) GetIdParent(string pathId, bool isRoot = false)
         {
-            string? pathIds = pathId;
             if (string.IsNullOrEmpty(pathId))
+                return (string.Empty, null);
+
+            string pathIds = pathId;
+
+            if (pathId.StartsWith("-1", StringComparison.Ordinal))
             {
-                return (pathId, null);
+                int firstComma = pathId.IndexOf(',');
+                pathIds = (firstComma >= 0 && firstComma + 1 < pathId.Length) ? pathId.Substring(firstComma + 1) : string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(pathIds))
+                return (string.Empty, pathIds);
+
+            if (isRoot)
+            {
+                int firstComma = pathIds.IndexOf(',');
+                var root = firstComma >= 0 ? pathIds.Substring(0, firstComma) : pathIds;
+                return (root ?? string.Empty, pathIds);
+            }
+
+            int lastComma = pathIds.LastIndexOf(',');
+            if (lastComma < 0)
+            {
+                return (pathIds, pathIds);
+            }
+            int prevComma = pathIds.LastIndexOf(',', lastComma - 1);
+            string parent;
+            if (prevComma >= 0)
+            {
+                parent = pathIds.Substring(prevComma + 1, lastComma - prevComma - 1);
             }
             else
             {
-                if (pathId.StartsWith("-1"))
-                {
-                    int first = pathId.IndexOf(',') + 1;
-                    pathIds = pathId.Substring(first);//Remove id CURRENT
-                }
-
-                if (pathIds != null && pathIds.IndexOf(',') > 0)
-                {
-                    var arrayPathId = pathIds.Split(',');
-                    if (isRoot)
-                    {
-                        pathId = arrayPathId.FirstOrDefault() ?? string.Empty;//id Root
-                    }
-                    else
-                    {
-                        if (arrayPathId.Length >= 2)
-                        {
-                            pathId = arrayPathId[arrayPathId.Length - 2];//Get id Parent
-                        }
-                    }
-                }
+                parent = pathIds.Substring(0, lastComma);
             }
-
-            return (pathId, pathIds);
+            return (parent, pathIds);
         }
 
     }

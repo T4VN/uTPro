@@ -68,8 +68,8 @@ namespace uTPro.Foundation.Middleware
 
         private IEnumerable<Umbraco.Cms.Core.Routing.Domain> domains = Enumerable.Empty<Umbraco.Cms.Core.Routing.Domain>();
         RequestDelegate _next;
-        ICurrentSiteExtension _currentSite;
-        ILogger<RequestLocalizationOptionMiddleware> _logger;
+        ICurrentSiteExtension? _currentSite;
+        ILogger<RequestLocalizationOptionMiddleware>? _logger;
 
         public RequestLocalizationOptionMiddleware(RequestDelegate next)
         {
@@ -118,7 +118,7 @@ namespace uTPro.Foundation.Middleware
                 return string.Empty;
             }
 
-            if (!_currentSite.GetItem().FolderSettings.RememberLanguageDisable)
+            if (_currentSite?.GetItem()?.FolderSettings?.RememberLanguageDisable == false)
             {
                 (string culture, string prefixUrl, bool isRedirect) = await GetUrlCulture(context, parts).ConfigureAwait(false);
 
@@ -138,17 +138,17 @@ namespace uTPro.Foundation.Middleware
             }
 
             bool isEnableCheckBackoffice = false;
-            bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
+            bool.TryParse(_currentSite?.Configuration?.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
             if (isEnableCheckBackoffice)
             {
-                var lstUrl = _currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Domain)?.Value?
+                var lstUrl = _currentSite?.Configuration?.GetSection(ConfigSettingUTPro.Backoffice.Domain)?.Value?
                     .Split(new List<string> { ",", ";" }.ToArray(), StringSplitOptions.RemoveEmptyEntries);
 
                 if (lstUrl == null || !lstUrl.Any())
                 {
                     return false;
                 }
-                return lstUrl.Any(x => x.Equals(host.Value.Host, StringComparison.OrdinalIgnoreCase));
+                return lstUrl.Any(x => x.Equals(host!.Value.Host, StringComparison.OrdinalIgnoreCase));
             }
 
             return false;
@@ -158,12 +158,13 @@ namespace uTPro.Foundation.Middleware
         {
             get
             {
-                //Exclude request config setting
+                // Exclude request config setting
                 bool isEnabled = false;
-                bool.TryParse(_currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Enabled)?.Value, out isEnabled);
-                if (isEnabled)
+                var configSection = _currentSite?.Configuration?.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Enabled);
+                if (configSection != null && bool.TryParse(configSection.Value, out isEnabled) && isEnabled)
                 {
-                    var lstPaths = _currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Paths).Get<string[]>();
+                    var pathsSection = _currentSite?.Configuration?.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Paths);
+                    var lstPaths = pathsSection?.Get<string[]>();
                     if (lstPaths != null)
                     {
                         foreach (var item in lstPaths)
@@ -174,10 +175,9 @@ namespace uTPro.Foundation.Middleware
                             }
                         }
                     }
-
                 }
 
-                //Folders and files in wwwroot (cached to avoid IO on every request)
+                // Folders and files in wwwroot (cached to avoid IO on every request)
                 foreach (var item in _wwwRootEntries.Value)
                 {
                     yield return item;
@@ -218,7 +218,7 @@ namespace uTPro.Foundation.Middleware
                 if (!string.IsNullOrEmpty(culture))
                 {
                     var cul = new CultureInfo(culture);
-                    _currentSite.SetCurrentCulture(cul);
+                    _currentSite?.SetCurrentCulture(cul);
                     CultureInfo.DefaultThreadCurrentCulture = cul;
                     CultureInfo.DefaultThreadCurrentUICulture = cul;
                     Thread.CurrentThread.CurrentCulture = cul;
@@ -245,7 +245,7 @@ namespace uTPro.Foundation.Middleware
                     return langDefault.Culture;
                 }
             }
-            return _currentSite.DefaultCulture;//default with umbraco
+            return _currentSite?.DefaultCulture ?? Thread.CurrentThread.CurrentCulture.Name;//default with umbraco
         }
 
         private string GetSchemeRedirect(HttpContext? httpContext, string culture, string prefixUrl, bool isRedirect)
@@ -277,7 +277,7 @@ namespace uTPro.Foundation.Middleware
         private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
         {
             Umbraco.Cms.Core.Routing.Domain? cul = null;
-            domains = await _currentSite.GetDomains(false).ConfigureAwait(false);
+            domains = _currentSite != null ? await _currentSite.GetDomains(false).ConfigureAwait(false) : Enumerable.Empty<Umbraco.Cms.Core.Routing.Domain>();
             bool isRedirect = true;
             string culture = string.Empty;
             if (parts.Length > 0)//parts >0

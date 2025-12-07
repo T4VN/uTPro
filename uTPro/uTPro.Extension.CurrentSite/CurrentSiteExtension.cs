@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
@@ -116,7 +117,7 @@ namespace uTPro.Extension.CurrentSite
                 return item;
 
             // Fallback: create a new instance if DI cannot provide one
-            var logger = _serviceProvider.GetService<ILogger<CurrentItemExtension>>();
+            var logger = _serviceProvider.GetService<ILogger<CurrentItemExtension>>() ?? NullLogger<CurrentItemExtension>.Instance;
             return new CurrentItemExtension(logger, this);
         }
 

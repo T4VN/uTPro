@@ -51,7 +51,7 @@ namespace uTPro.Configure
                 }
             }
 
-            var (site, fileName) = GetSiteAndFileName(viewName, siteName, isCheckSiteName);
+            var (site, fileName) = GetSiteAndFileName(viewName, siteName ?? string.Empty, isCheckSiteName);
             string result = viewName;
 
             if (!string.IsNullOrEmpty(site) && !string.IsNullOrEmpty(fileName))

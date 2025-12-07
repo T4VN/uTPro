@@ -41,7 +41,7 @@ namespace uTPro.Foundation
         }
 
         /// <inheritdoc />
-        public string GetFilePath(MediaFileManager fileSystem, Guid itemGuid, Guid propertyGuid, string filename)
+        public new string GetFilePath(MediaFileManager fileSystem, Guid itemGuid, Guid propertyGuid, string filename)
         {
             try
             {
@@ -81,10 +81,10 @@ namespace uTPro.Foundation
         }
 
         /// <inheritdoc />
-        public string GetDeleteDirectory(MediaFileManager fileSystem, string filepath)
-        {
-            return null;
-        }
+        //public string? GetDeleteDirectory(MediaFileManager fileSystem, string filepath)
+        //{
+        //    return null;
+        //}
 
         private string GetNextDirectory(IFileSystem fileSystem, string type)
         {
