@@ -50,6 +50,28 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		// properties
 
 		///<summary>
+		/// Add "noreferrer" to link
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[ImplementPropertyType("addNoreferrerToLink")]
+		public virtual bool AddNoreferrerToLink => this.Value<bool>(_publishedValueFallback, "addNoreferrerToLink");
+
+		///<summary>
+		/// Add "noopener" to link
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[ImplementPropertyType("navAddNoopenerToLink")]
+		public virtual bool NavAddNoopenerToLink => this.Value<bool>(_publishedValueFallback, "navAddNoopenerToLink");
+
+		///<summary>
+		/// Children: For multi-level menus
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("navChildren")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockListModel NavChildren => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockListModel>(_publishedValueFallback, "navChildren");
+
+		///<summary>
 		/// Hidden Item: Remove items where umbracoNavHide is true
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
@@ -78,7 +100,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual bool NavHideLabel => this.Value<bool>(_publishedValueFallback, "navHideLabel");
 
 		///<summary>
-		/// Inner CSS Class
+		/// Include Child Nodes: Automatically includes child links defined within the parent navLink.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[ImplementPropertyType("navIncludeChildNodes")]
+		public virtual bool NavIncludeChildNodes => this.Value<bool>(_publishedValueFallback, "navIncludeChildNodes");
+
+		///<summary>
+		/// Inner CSS Class: Example: Using css class tag a
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
@@ -94,7 +123,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.Link NavLink => this.Value<global::Umbraco.Cms.Core.Models.Link>(_publishedValueFallback, "navLink");
 
 		///<summary>
-		/// Outer CSS Class
+		/// Outer CSS Class: Example: Using css class tag li
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
