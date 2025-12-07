@@ -22,6 +22,11 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 	/// <summary>Global - Page Navigation Config Setting for Home Page</summary>
 	public partial interface IGlobalPageNavigationConfigSettingForHomePage : IPublishedElement
 	{
+		/// <summary>Navigation Link</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent NavigationLink { get; }
+
 		/// <summary>Page Not Found</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
@@ -58,6 +63,19 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Navigation Link
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("navigationLink")]
+		public virtual global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent NavigationLink => GetNavigationLink(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Navigation Link</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent GetNavigationLink(IGlobalPageNavigationConfigSettingForHomePage that, IPublishedValueFallback publishedValueFallback) => that.Value<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent>(publishedValueFallback, "navigationLink");
 
 		///<summary>
 		/// Page Not Found

@@ -170,6 +170,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual string TwitterTitle => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPageHeadSocialMetaSetting.GetTwitterTitle(this, _publishedValueFallback);
 
 		///<summary>
+		/// Navigation Link
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("navigationLink")]
+		public virtual global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent NavigationLink => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPageNavigationConfigSettingForHomePage.GetNavigationLink(this, _publishedValueFallback);
+
+		///<summary>
 		/// Page Not Found
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
