@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
 {
-	/// <summary>uTPro - Banner Header</summary>
-	[PublishedModel("uTPro__BannerHeader")]
-	public partial class UTpro__BannerHeader : PublishedElementModel
+	/// <summary>Global Navigation Item</summary>
+	[PublishedModel("globalNavigationItem")]
+	public partial class GlobalNavigationItem : PublishedElementModel
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
-		public new const string ModelTypeAlias = "uTPro__BannerHeader";
+		public new const string ModelTypeAlias = "globalNavigationItem";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
@@ -34,14 +34,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<UTpro__BannerHeader, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<GlobalNavigationItem, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public UTpro__BannerHeader(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public GlobalNavigationItem(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,27 +50,55 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		// properties
 
 		///<summary>
-		/// Background Image
+		/// Hidden Item: Remove items where umbracoNavHide is true
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("backgroundImage")]
-		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops BackgroundImage => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "backgroundImage");
+		[ImplementPropertyType("navHiddenItem")]
+		public virtual bool NavHiddenItem => this.Value<bool>(_publishedValueFallback, "navHiddenItem");
 
 		///<summary>
-		/// Description
+		/// Hide if member is logged in
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("description")]
-		public virtual string Description => this.Value<string>(_publishedValueFallback, "description");
+		[ImplementPropertyType("navHideIfMemberIsLoggedIn")]
+		public virtual bool NavHideIfMemberIsLoggedIn => this.Value<bool>(_publishedValueFallback, "navHideIfMemberIsLoggedIn");
 
 		///<summary>
-		/// Title
+		/// Hide if member is logged out
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[ImplementPropertyType("navHideIfMemberIsLoggedOut")]
+		public virtual bool NavHideIfMemberIsLoggedOut => this.Value<bool>(_publishedValueFallback, "navHideIfMemberIsLoggedOut");
+
+		///<summary>
+		/// Hide label
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[ImplementPropertyType("navHideLabel")]
+		public virtual bool NavHideLabel => this.Value<bool>(_publishedValueFallback, "navHideLabel");
+
+		///<summary>
+		/// Inner CSS Class
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("title")]
-		public virtual string Title => this.Value<string>(_publishedValueFallback, "title");
+		[ImplementPropertyType("navInnerCssClass")]
+		public virtual string NavInnerCssClass => this.Value<string>(_publishedValueFallback, "navInnerCssClass");
+
+		///<summary>
+		/// Link
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("navLink")]
+		public virtual global::Umbraco.Cms.Core.Models.Link NavLink => this.Value<global::Umbraco.Cms.Core.Models.Link>(_publishedValueFallback, "navLink");
+
+		///<summary>
+		/// Outer CSS Class
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("navOuterCSSClass")]
+		public virtual string NavOuterCssclass => this.Value<string>(_publishedValueFallback, "navOuterCSSClass");
 	}
 }

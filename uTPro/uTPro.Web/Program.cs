@@ -87,14 +87,6 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
     options.ViewLocationExpanders.Add(new CustomBlockPreviewLocationExpander());
 });
 
-builder.Services.Configure<UmbracoRequestPathsOptions>(options =>
-{
-    options.IsBackOfficeRequest = path =>
-    {
-        return path.StartsWith("/umbraco", StringComparison.OrdinalIgnoreCase);
-    };
-});
-
 // Form + IIS + Kestrel config
 builder.Services.Configure<FormOptions>(options =>
 {
