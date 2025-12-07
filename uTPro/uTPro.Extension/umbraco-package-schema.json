@@ -10756,6 +10756,9 @@
                 },
                 "pathname": {
                     "type": "string"
+                },
+                "preventUrlRetention": {
+                    "type": "boolean"
                 }
             },
             "required": [

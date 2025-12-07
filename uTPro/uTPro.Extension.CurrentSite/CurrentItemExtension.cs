@@ -2,10 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.PublishedModels;
-using Umbraco.Cms.Web.Common.UmbracoContext;
-using static Umbraco.Cms.Core.Constants.HttpContext;
 
 namespace uTPro.Extension.CurrentSite
 {
@@ -245,7 +242,7 @@ namespace uTPro.Extension.CurrentSite
                     {
                         if (arrayPathId.Length >= 2)
                         {
-                            pathId = arrayPathId[arrayPathId.Length - 2];////Get id Parent
+                            pathId = arrayPathId[arrayPathId.Length - 2];//Get id Parent
                         }
                     }
                 }
