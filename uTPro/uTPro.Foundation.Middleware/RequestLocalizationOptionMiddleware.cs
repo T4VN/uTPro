@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -65,6 +65,7 @@ namespace uTPro.Foundation.Middleware
                 return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             }
         });
+        private bool isEnableCheckBackoffice = false;
 
         private IEnumerable<Umbraco.Cms.Core.Routing.Domain> domains = Enumerable.Empty<Umbraco.Cms.Core.Routing.Domain>();
         RequestDelegate _next;
@@ -91,6 +92,7 @@ namespace uTPro.Foundation.Middleware
                 if (_currentSite?.Configuration == null) return;
                 try
                 {
+                    bool.TryParse(_currentSite?.Configuration?.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
                     string fullUrl = await DetermineProviderCultureResult(context).ConfigureAwait(false);
                     if (!string.IsNullOrEmpty(fullUrl))
                     {
@@ -137,8 +139,6 @@ namespace uTPro.Foundation.Middleware
                 return false;
             }
 
-            bool isEnableCheckBackoffice = false;
-            bool.TryParse(_currentSite?.Configuration?.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
             if (isEnableCheckBackoffice)
             {
                 var lstUrl = _currentSite?.Configuration?.GetSection(ConfigSettingUTPro.Backoffice.Domain)?.Value?
@@ -175,6 +175,12 @@ namespace uTPro.Foundation.Middleware
                             }
                         }
                     }
+                }
+
+                if (!isEnableCheckBackoffice)
+                {
+                    yield return "umbraco";
+                    yield return "app_plugins";
                 }
 
                 // Folders and files in wwwroot (cached to avoid IO on every request)
@@ -255,9 +261,9 @@ namespace uTPro.Foundation.Middleware
                 return string.Empty;
             }
 
-            prefixUrl = SchemeUrlExtensions.AddScheme(prefixUrl);
+            string _prefixUrl = SchemeUrlExtensions.AddScheme(prefixUrl);
 
-            if (!string.IsNullOrEmpty(prefixUrl) && Uri.TryCreate(prefixUrl, UriKind.RelativeOrAbsolute, out var redirectUri))
+            if (!string.IsNullOrEmpty(_prefixUrl) && Uri.TryCreate(_prefixUrl, UriKind.RelativeOrAbsolute, out var redirectUri))
             {
                 foreach (var item in domains)
                 {
