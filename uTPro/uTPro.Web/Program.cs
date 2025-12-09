@@ -1,7 +1,6 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Community.BlockPreview.Extensions;
 using uTPro.Configure;
@@ -107,6 +106,10 @@ builder.Services.Configure<FormOptions>(options =>
     options.AddServerHeader = false;
     options.Limits.MaxRequestBodySize = long.MaxValue;
 });
+
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "umbraco", "PersistKeysToFileSystem")))
+    .SetApplicationName("uTPro")
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 var app = builder.Build();
 var env = app.Environment;
