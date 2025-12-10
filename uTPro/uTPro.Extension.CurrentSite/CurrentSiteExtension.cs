@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
@@ -38,7 +39,7 @@ namespace uTPro.Extension.CurrentSite
 
     internal class CurrentSiteExtension : ICurrentSiteExtension
     {
-        readonly IServiceProvider _serviceProvider;
+        readonly IServiceScopeFactory _scopeFactory;
         readonly ILogger<CurrentSiteExtension> _logger;
         readonly ICultureDictionary _cultureDictionary;
         readonly IUmbracoContextFactory _umbracoContextFactory;
@@ -46,7 +47,7 @@ namespace uTPro.Extension.CurrentSite
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public CurrentSiteExtension(
             ILogger<CurrentSiteExtension> logger,
-            IServiceProvider serviceProvider,
+            IServiceScopeFactory scopeFactory,
             IWebHostEnvironment webHostEnvironment,
             IConfiguration configuration,
             IUmbracoContextFactory umbracoContextFactory,
@@ -58,7 +59,7 @@ namespace uTPro.Extension.CurrentSite
             _umbracoContextFactory = umbracoContextFactory;
             _cultureDictionary = cultureDictionary;
             _logger = logger;
-            _serviceProvider = serviceProvider;
+            _scopeFactory = scopeFactory;
         }
 
         public string DefaultCulture
@@ -111,12 +112,13 @@ namespace uTPro.Extension.CurrentSite
         public ICurrentItemExtension GetItem()
         {
             // Resolve ICurrentItemExtension from the DI container so the container can manage its lifetime
-            var item = _serviceProvider.GetService<ICurrentItemExtension>();
+            using var scope = _scopeFactory.CreateScope();
+            var item = scope.ServiceProvider.GetRequiredService<ICurrentItemExtension>();
             if (item != null)
                 return item;
 
             // Fallback: create a new instance if DI cannot provide one
-            var logger = _serviceProvider.GetService<ILogger<CurrentItemExtension>>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<CurrentItemExtension>>() ?? NullLogger<CurrentItemExtension>.Instance;
             return new CurrentItemExtension(logger, this);
         }
 
