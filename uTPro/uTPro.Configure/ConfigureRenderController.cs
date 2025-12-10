@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.DependencyInjection;
@@ -129,14 +129,14 @@ namespace uTPro.Configure
                 if (notFoundPage != null)
                 {
                     //Set the content on the request and mark our search as successful
+                    request.SetIs404();
                     request.SetPublishedContent(notFoundPage);
-                    //request.SetResponseStatus(404);
-                    return Task.FromResult(true);
+                    return Task.FromResult(request.PublishedContent != null);
                 }
             }
             //request.SetIs404();
             request.SetRedirect("/error");
-            return Task.FromResult(true);
+            return Task.FromResult(request.PublishedContent != null);
         }
     }
 
