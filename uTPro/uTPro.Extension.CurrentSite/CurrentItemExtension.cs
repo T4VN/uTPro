@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -247,7 +247,7 @@ namespace uTPro.Extension.CurrentSite
             int lastComma = pathIds.LastIndexOf(',');
             if (lastComma < 0)
             {
-                return (pathIds, pathIds);
+                return (pathIds, null);
             }
             int prevComma = pathIds.LastIndexOf(',', lastComma - 1);
             string parent;
