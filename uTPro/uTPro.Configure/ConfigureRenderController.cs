@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +11,7 @@ using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.PublishedModels;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Controllers;
+using uTPro.Common.Constants;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Configure
@@ -53,9 +54,9 @@ namespace uTPro.Configure
                 //CurrentPage
                 string reasonPolicty = _checkPolicy.Check(HttpContext);
                 string nameView = UmbracoRouteValues.PublishedRequest.PublishedContent?.ContentType?.Alias ?? string.Empty;// ?? UmbracoRouteValues.TemplateName ?? string.Empty;
-                if (!string.IsNullOrWhiteSpace(nameView) && nameView.Contains("__"))
+                if (!string.IsNullOrWhiteSpace(nameView) && nameView.Contains(Prefix.PrefixData))
                 {
-                    nameView = nameView.Split("__")[1];
+                    nameView = nameView.Split(Prefix.PrefixData)[1];
                 }
                 string view = "~/Views/" + _currentSite.GetItem().Root.Name + "/" + nameView + ".cshtml";
 
@@ -64,7 +65,7 @@ namespace uTPro.Configure
                     if (!_compositeViewEngine.GetView(null, view, isMainPage: false).Success)
                     {
                         view = "~/Views/" + UmbracoRouteValues.TemplateName + ".cshtml" ?? string.Empty;
-                        if (!EnsurePhsyicalViewExists(view))
+                        if (!EnsurePhysicalViewExists(view))
                         {
                             if (!_compositeViewEngine.GetView(null, view, isMainPage: false).Success)
                             {
@@ -120,7 +121,7 @@ namespace uTPro.Configure
         {
             // In the rare case that an umbracoContext cannot be built from the request,
             // we will not be able to find the page
-            if (_queryAccessor.TryGetValue(out IPublishedContentQuery query))
+            if (_queryAccessor.TryGetValue(out IPublishedContentQuery? query) && query != null)
             {
                 // Find the first notFound page at the root level through the published content cache by its documentTypeAlias
                 // You can make this search as complex as you want, you can return different pages based on anything in the original request
@@ -128,14 +129,14 @@ namespace uTPro.Configure
                 if (notFoundPage != null)
                 {
                     //Set the content on the request and mark our search as successful
+                    request.SetIs404();
                     request.SetPublishedContent(notFoundPage);
-                    //request.SetResponseStatus(404);
-                    return Task.FromResult(true);
+                    return Task.FromResult(request.PublishedContent != null);
                 }
             }
             //request.SetIs404();
             request.SetRedirect("/error");
-            return Task.FromResult(true);
+            return Task.FromResult(request.PublishedContent != null);
         }
     }
 
