@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.PublishedModels;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Configure
@@ -54,20 +53,30 @@ namespace uTPro.Configure
                     }
                 }
             }
+            var item = _currentSite.GetItem();
+            Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent? pageError = null;
 
+            string titleSite = string.Empty;
+            string logo = string.Empty;
+            if (item != null)
+            {
+                pageError = item.PageErrors;
+                logo = item.FolderSite.SiteLogo?.Url() ?? string.Empty;
+                titleSite = item.FolderSite?.Value<SeoVisualizer.SeoValues>(nameof(GlobalFolderSites.SiteName))?.Title ?? string.Empty;
+            }
             context.HttpContext.Items.Add(
                     "message",
                     string.Format(_message ?? "Cannot render the page at URL '{0}'.", url));
-            context.HttpContext.Items.Add("title", _title ?? "Welcome to " + _currentSite.GetItem().PageHome?.Value<SeoVisualizer.SeoValues>(nameof(SeoVisualizer.SeoValues))?.Title);
+            context.HttpContext.Items.Add("title", _title ?? "Welcome to " + titleSite);
             context.HttpContext.Items.Add("titlePage", _titlePage);
+            context.HttpContext.Items.Add("logo", logo);
 
-            var pageError = _currentSite.GetItem().PageErrors;
+            string? templateError = null;
             if (pageError != null)
             {
-                //pageError.TemplateId.ToString();
-
+                templateError = pageError.GetTemplateAlias();
             }
-            var viewResult = new ViewResult { ViewName = "globalPageError" };
+            var viewResult = new ViewResult { ViewName = templateError ?? "globalPageError" };
             await viewResult.ExecuteResultAsync(context);
         }
     }
