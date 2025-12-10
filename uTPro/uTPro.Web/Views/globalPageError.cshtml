@@ -1,4 +1,4 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @using Microsoft.Extensions.Options
 @using Umbraco.Cms.Core.Configuration.Models
@@ -10,12 +10,19 @@
 @{
     Layout = null;
 
-    var seo = Model?.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription));
+    var titlePage = string.IsNullOrWhiteSpace(Context.Items["titlePage"]?.ToString())
+        ? "Page Not Found"
+        : Context.Items["titlePage"]!.ToString();
 
-    var titlePage = seo?.Title ?? (string?)Context.Items["titlePage"] ?? "Page Not Found";
-    var logo = Model?.Value<string>(nameof(GlobalSiteSettings.SiteSettingsLogo)) ?? "/App_Plugins/assets/img/logo.svg";
-    var title = (string?)Context.Items["title"] ?? titlePage;
-    var message = seo?.Description ?? (string?)Context.Items["message"] ?? string.Empty;
+    var logo = string.IsNullOrWhiteSpace(Context.Items["logo"]?.ToString())
+        ? "/assets/img/logo.svg"
+        : Context.Items["logo"]!.ToString();
+
+    var title = string.IsNullOrWhiteSpace(Context.Items["title"]?.ToString())
+        ? titlePage
+        : Context.Items["title"]!.ToString();
+
+    var message = Context.Items["message"]!.ToString();
 }
 <!doctype html>
 <html>
@@ -40,7 +47,7 @@
             width: 100%;
             height: 100vh;
             margin: auto;
-            background-image: url(/App_Plugins/assets/img/bkg-login.jpg);
+            background-image: url(/assets/img/bkg-login.jpg);
             background-repeat: no-repeat;
             background-position-y: bottom;
             background-position-x: center;
