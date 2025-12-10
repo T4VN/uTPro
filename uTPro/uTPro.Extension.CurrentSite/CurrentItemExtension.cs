@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.PublishedModels;
-using Umbraco.Cms.Web.Common.UmbracoContext;
-using static Umbraco.Cms.Core.Constants.HttpContext;
 
 namespace uTPro.Extension.CurrentSite
 {
@@ -15,19 +14,12 @@ namespace uTPro.Extension.CurrentSite
             => builder.Services.AddScoped<ICurrentItemExtension, CurrentItemExtension>();
     }
 
-    public class Recaptchav2
-    {
-        public bool IsEnable { get; set; }
-        public string SiteKey { get; set; }
-        public string SecretKey { get; set; }
-    }
-
     public interface ICurrentItemExtension
     {
         GlobalRoot Root { get; }
         GlobalFolderSites FolderSite { get; }
         GlobalFolderSettings FolderSettings { get; }
-        GlobalFolderArchives? FolderArchives { get; }
+        //GlobalFolderArchives? FolderArchives { get; }
         IPublishedContent? Current { get; }
         IPublishedContent? PageHome { get; }
         IPublishedContent? PageErrors { get; }
@@ -54,21 +46,6 @@ namespace uTPro.Extension.CurrentSite
             // free native resources if there are any.
         }
 
-        public Recaptchav2 RecapchaV2
-        {
-            get
-            {
-                bool isEnableRecaptcha = false;
-                bool.TryParse(_currentSite.Configuration.GetSection("reCAPTCHAv2:On")?.Value, out isEnableRecaptcha);
-                return new Recaptchav2()
-                {
-                    IsEnable = isEnableRecaptcha,
-                    SiteKey = _currentSite.Configuration.GetSection("reCAPTCHAv2:SiteKey")?.Value ?? string.Empty,
-                    SecretKey = _currentSite.Configuration.GetSection("reCAPTCHAv2:SecretKey")?.Value ?? string.Empty
-                };
-            }
-        }
-
         readonly ICurrentSiteExtension _currentSite;
         readonly ILogger<CurrentItemExtension> _logger;
 
@@ -87,7 +64,7 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                return (GlobalRoot)this.GetItemRoot(Current);
+                return (GlobalRoot)this.GetItemByAlias(this.Current, GlobalRoot.ModelTypeAlias, true);
             }
         }
 
@@ -95,7 +72,12 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                return this.Root.FirstChild<GlobalFolderSites>() ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
+                var folderSite = this.PageHome?.Parent<GlobalFolderSites>() ?? null;
+                if (folderSite == null)
+                {
+                    folderSite = (GlobalFolderSites)GetItemByAlias(this.PageHome, GlobalFolderSites.ModelTypeAlias, true);
+                }
+                return folderSite ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
             }
         }
 
@@ -103,17 +85,21 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
+                if (this.FolderSite.GlobalSettings != null)
+                {
+                    return (GlobalFolderSettings)this.FolderSite.GlobalSettings;
+                }
                 return this.Root.FirstChild<GlobalFolderSettings>() ?? throw new Exception(nameof(GlobalFolderSettings) + " is null");
             }
         }
 
-        public GlobalFolderArchives? FolderArchives
-        {
-            get
-            {
-                return this.Root.FirstChild<GlobalFolderArchives>();
-            }
-        }
+        //public GlobalFolderArchives? FolderArchives
+        //{
+        //    get
+        //    {
+        //        return this.Root.FirstChild<GlobalFolderArchives>();
+        //    }
+        //}
 
         public IPublishedContent? Current
         {
@@ -140,8 +126,9 @@ namespace uTPro.Extension.CurrentSite
                 {
                     return this.GetItemWithDomain() ?? null;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger?.LogError(ex, "Get PageHome error");
                     return null;
                 }
             }
@@ -153,15 +140,16 @@ namespace uTPro.Extension.CurrentSite
                 try
                 {
                     var pageHome = this.PageHome;
-                    if (this.PageHome != null)
+                    if (pageHome != null)
                     {
-                        var pageNotFound = this.PageHome.Value<IPublishedContent>(nameof(GlobalPageNavigationConfigSettingForHomePage.PageNotFound));
+                        var pageNotFound = pageHome.Value<IPublishedContent>(nameof(GlobalPageNavigationConfigSettingForHomePage.PageNotFound));
                         return pageNotFound;
                     }
                     return this.FolderSite.FirstChild<GlobalPageError>() ?? null;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger?.LogError(ex, "Get PageErrors error");
                     return null;
                 }
             }
@@ -177,79 +165,101 @@ namespace uTPro.Extension.CurrentSite
             }
             else//find domain
             {
-                var domains = _currentSite.GetDomains(true).GetAwaiter().GetResult().ToList();
+                var domains = _currentSite.GetDomains(true).GetAwaiter().GetResult();
+                if (domains == null) return null;
                 foreach (var domain in domains)
                 {
-                    if (domain != null)
-                    {
-                        var currentItem = _currentSite.UContext.Content?.GetById(domain.ContentId);
-                        if (currentItem is null)
-                            continue;
-                        else
-                        {
-                            return currentItem;
-                        }
-                    }
+                    if (domain == null) continue;
+                    var currentItem = _currentSite.UContext.Content?.GetById(domain.ContentId);
+                    if (currentItem != null)
+                        return currentItem;
                 }
             }
             return null;
         }
 
-        private IPublishedContent GetItemRoot(IPublishedContent? item)
+        private IPublishedContent GetItemByAlias(IPublishedContent? item, string alias, bool isFirst)
         {
-            if (item == null)
+            // Start from provided item
+            var current = item;
+            if (current == null)
+                throw new Exception("Not found item: " + alias);
+
+            // quick check
+            if (string.Equals(current.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
+                return current;
+
+            // try traversing parents first (cheaper, no parsing)
+            var parent = current.Parent();
+            while (parent != null)
             {
-                item = this.PageHome;
+                if (string.Equals(parent.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
+                    return parent;
+                parent = parent.Parent();
             }
-            string strIdRoot = GetIdRoot(item);
-            if (!string.IsNullOrEmpty(strIdRoot))
+
+            // fallback to path-based traversal (optimized parsing)
+            var (idToken, pathIds) = GetIdParent(current.Path ?? string.Empty, isFirst);
+            while (!string.IsNullOrEmpty(idToken))
             {
-                int idRoot = int.Parse(strIdRoot);
-                item = _currentSite.UContext.Content?.GetById(idRoot);
-                if (item != null)
+                if (int.TryParse(idToken, out var idRoot))
                 {
-                    if (item.ContentType.Alias == GlobalRoot.ModelTypeAlias)
+                    var p = _currentSite.UContext.Content?.GetById(idRoot);
+                    if (p != null)
                     {
-                        return item;
-                    }
-                    else
-                    {
-                        return GetItemRoot(null);
+                        if (string.Equals(p.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
+                            return p;
                     }
                 }
+
+                if (string.IsNullOrEmpty(pathIds))
+                    break;
+
+                (idToken, pathIds) = GetIdParent(pathIds ?? string.Empty, false);
             }
-            throw new Exception("Not found item: Folder Site");
+
+            throw new Exception("Not found item: " + alias);
         }
 
-        private string GetIdRoot(IPublishedContent? item)
-        {
-            if (item == null)
-            {
-                return string.Empty;
-            }
-            return GetId(item.Path);
-        }
-
-        private static string GetId(string pathId)
+        private static (string, string?) GetIdParent(string pathId, bool isRoot = false)
         {
             if (string.IsNullOrEmpty(pathId))
+                return (string.Empty, null);
+
+            string pathIds = pathId;
+
+            if (pathId.StartsWith("-1", StringComparison.Ordinal))
             {
-                return pathId;
+                int firstComma = pathId.IndexOf(',');
+                pathIds = (firstComma >= 0 && firstComma + 1 < pathId.Length) ? pathId.Substring(firstComma + 1) : string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(pathIds))
+                return (string.Empty, pathIds);
+
+            if (isRoot)
+            {
+                int firstComma = pathIds.IndexOf(',');
+                var root = firstComma >= 0 ? pathIds.Substring(0, firstComma) : pathIds;
+                return (root ?? string.Empty, pathIds);
+            }
+
+            int lastComma = pathIds.LastIndexOf(',');
+            if (lastComma < 0)
+            {
+                return (pathIds, null);
+            }
+            int prevComma = pathIds.LastIndexOf(',', lastComma - 1);
+            string parent;
+            if (prevComma >= 0)
+            {
+                parent = pathIds.Substring(prevComma + 1, lastComma - prevComma - 1);
             }
             else
             {
-                if (pathId.StartsWith("-1"))
-                {
-                    int first = pathId.IndexOf(',') + 1;
-                    pathId = pathId.Substring(first);//Remove id CURRENT
-                }
-                if (pathId.IndexOf(',') > 0)
-                {
-                    pathId = pathId.Substring(0, pathId.IndexOf(','));//Get id Parrent
-                }
+                parent = pathIds.Substring(0, lastComma);
             }
-
-            return pathId;
+            return (parent, pathIds);
         }
 
     }
