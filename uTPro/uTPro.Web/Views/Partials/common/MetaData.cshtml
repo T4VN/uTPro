@@ -1,4 +1,4 @@
-﻿@inject Umbraco.Cms.Core.Services.IDomainService _domainService
+@inject Umbraco.Cms.Core.Services.IDomainService _domainService
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     var folderSettings = CurrentSite.GetItem().FolderSettings;
@@ -26,7 +26,8 @@
         }
         if (!string.IsNullOrEmpty(folderSettings.Value<string>(nameof(folderSettings.SiteTitleSuffix))))
         {
-            value = folderSettings.Value<string>(nameof(folderSettings.SiteTitleSuffix))?.Replace("<titlePage>", value)
+            value = folderSettings.Value<string>(nameof(folderSettings.SiteTitleSuffix))?
+            .Replace("<titlePage>", value)
             .Replace("<titleSiteName>", folderSite.SiteName?.Title, StringComparison.OrdinalIgnoreCase);
         }
         return Html.Raw(value ?? string.Empty);
@@ -37,7 +38,7 @@
         string? value = seo?.Description;
         if (string.IsNullOrEmpty(value))
         {
-            value = folderSettings.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription))?.Description;
+            value = folderSite.SiteName?.Description;
         }
         return Html.Raw(value ?? string.Empty);
     }
@@ -47,14 +48,14 @@
         string value = Model.ValueToMediaMobile(nameof(GlobalPageHeadMetaSetting.HeadSocialShareImage));
         if (string.IsNullOrEmpty(value))
         {
-            value = folderSettings.ValueToMediaMobile(nameof(GlobalSiteSettings.SiteSettingsLogo));
+            value = folderSite.ValueToMediaMobile(nameof(GlobalSiteSettings.SiteSettingsLogo));
         }
         return Html.Raw(value);
     }
 
     IHtmlContent GetKeywords()
     {
-        List<string> value = new List<string>(folderSettings.ValueToStringArray(nameof(GlobalPageHeadMetaSetting.HeadKeywords)));
+        List<string> value = new List<string>(folderSite.ValueToStringArray(nameof(GlobalPageHeadMetaSetting.HeadKeywords)));
         value.AddRange(Model.ValueToStringArray(nameof(GlobalPageHeadMetaSetting.HeadKeywords)));
         if (value != null && value.Any())
         {
@@ -139,7 +140,7 @@
             }
             foreach (var item in lstDomain)
             {
-                url = Model.Url(mode: UrlMode.Absolute, culture: item.Culture); 
+                url = Model.Url(mode: UrlMode.Absolute, culture: item.Culture);
                 if (item.Culture != domainDefault?.Culture)
                 {
                     value.Add(string.Format(formatTag, item.Culture?.ToLower(), url));
