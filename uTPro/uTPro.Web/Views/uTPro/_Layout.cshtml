@@ -2,6 +2,7 @@
 @{
     Layout = null;
     var dir = CurrentSite.CurrentCulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
+    var homePage = CurrentSite.GetItem().PageHome;
 }
 <!DOCTYPE html>
 <html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir" language="@CurrentSite.CurrentCulture.DisplayName">
@@ -23,42 +24,8 @@
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
         Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop);
+        await Html.RenderPartialAsync("_Nav.cshtml", homePage);
     }
-    <nav class="navHeader">
-        <ul>
-            <li style="display: none;"><a href="/">Home</a></li>
-            <li><a href="/">About</a></li>
-            <!-- <li>
-                <a href="#">Dropdown</a>
-                <ul>
-                    <li><a href="#">Lorem ipsum</a></li>
-                    <li><a href="#">Magna veroeros</a></li>
-                    <li><a href="#">Etiam nisl</a></li>
-                    <li>
-                        <a href="#">Sed consequat</a>
-                        <ul>
-                            <li><a href="#">Lorem dolor</a></li>
-                            <li><a href="#">Amet consequat</a></li>
-                            <li><a href="#">Magna phasellus</a></li>
-                            <li><a href="#">Etiam nisl</a></li>
-                            <li><a href="#">Sed feugiat</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Nisl tempus</a></li>
-                </ul>
-            </li>
-            <li><a href="left-sidebar.html">Left Sidebar</a></li> -->
-            <li class="nav-logo">
-                <a class="nav-logo-href" href="/">
-                    <img src="/assets/img/logo.svg" alt="UTPro - Umbraco Turbo Pro">
-                </a>
-            </li>
-            <li><a href="/">Security</a></li>
-            <!-- <li><a href="right-sidebar.html">Right Sidebar</a></li>
-            <li><a href="no-sidebar.html">No Sidebar</a></li>
-            <li><a href="no-sidebar.html">No Sidebar</a></li> -->
-        </ul>
-    </nav>
     <main class="page-wrapper">
         @RenderBody()
     </main>

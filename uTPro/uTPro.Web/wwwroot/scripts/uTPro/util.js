@@ -11,21 +11,22 @@
 			b = [];
 
 		$a.each(function () {
-
 			var $this = $(this),
 				indent = Math.max(0, $this.parents('li').length - 1),
 				href = $this.attr('href'),
 				target = $this.attr('target');
 			target_class = $this.attr('class');
 			b.push(
+				'<li class="' + $this.parent('li').attr('class') + '">' +
 				'<a ' +
-				'class="link depth-' + indent + ' ' + target_class + '"' +
+				'class="link depth-' + indent + (typeof target_class !== 'undefined' ? ' ' + target_class : '') + '"' +
 				((typeof target !== 'undefined' && target != '') ? ' target="' + target + '"' : '') +
 				((typeof href !== 'undefined' && href != '') ? ' href="' + href + '"' : '') +
 				'>' +
 				'<span class="indent-' + indent + '"></span>' +
 				$this.text() +
-				'</a>'
+				'</a>' +
+				'</li>'
 			);
 
 		});

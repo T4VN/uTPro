@@ -50,18 +50,18 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		// properties
 
 		///<summary>
-		/// Add "noreferrer" to link
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
-		[ImplementPropertyType("addNoreferrerToLink")]
-		public virtual bool AddNoreferrerToLink => this.Value<bool>(_publishedValueFallback, "addNoreferrerToLink");
-
-		///<summary>
 		/// Add "noopener" to link
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		[ImplementPropertyType("navAddNoopenerToLink")]
 		public virtual bool NavAddNoopenerToLink => this.Value<bool>(_publishedValueFallback, "navAddNoopenerToLink");
+
+		///<summary>
+		/// Add "noreferrer" to link
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
+		[ImplementPropertyType("navAddNoreferrerToLink")]
+		public virtual bool NavAddNoreferrerToLink => this.Value<bool>(_publishedValueFallback, "navAddNoreferrerToLink");
 
 		///<summary>
 		/// Children: For multi-level menus
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockListModel NavChildren => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockListModel>(_publishedValueFallback, "navChildren");
 
 		///<summary>
-		/// Hidden Item: Remove items where umbracoNavHide is true
+		/// Hidden Item
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.4.1+3472ff9")]
 		[ImplementPropertyType("navHiddenItem")]
