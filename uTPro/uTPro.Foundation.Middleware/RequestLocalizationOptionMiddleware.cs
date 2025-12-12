@@ -271,7 +271,7 @@ namespace uTPro.Foundation.Middleware
                     {
                         if (string.Equals(domainHost.Host, redirectUri.Host, StringComparison.OrdinalIgnoreCase))
                         {
-                            return prefixUrl + httpContext.Request.Path + httpContext.Request.QueryString;
+                            return _prefixUrl + httpContext.Request.Path + httpContext.Request.QueryString;
                         }
                     }
                 }
