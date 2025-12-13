@@ -694,7 +694,7 @@ ul.actions {
         display: inline-block;
         border-radius: 0.35em;
         box-shadow: inset 0px 0px 1px 1px rgba(255, 255, 255, 0.25);
-        padding: 0 1em 0 1em;
+        padding: 0 1em 0 0;
     }
 
         .navHeader > ul > li {
@@ -727,9 +727,9 @@ ul.actions {
                 outline: 0;
             }
 
-            .navHeader > ul > li:hover > a {
-                color: #fff;
-            }
+                .navHeader > ul > li > a:hover {
+                    color: #fff;
+                }
 
             #navPanel > nav > li.active > a,
             .navHeader > ul > li.active > a,
@@ -739,7 +739,7 @@ ul.actions {
 
     .navHeader .nav-logo {
         height: 15px;
-        width: 80px;
+        width: 0;
         position: relative;
     }
 
@@ -750,7 +750,7 @@ ul.actions {
             background: rgba(255, 255, 255, 1);
             padding: 15px;
             border-radius: 50%;
-            left: 0;
+            left: -25px;
             top: -25px;
         }
 
