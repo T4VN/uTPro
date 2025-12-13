@@ -1,0 +1,44 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null;
+    var dir = CurrentSite.CurrentCulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
+    var homePage = CurrentSite.GetItem().PageHome;
+}
+<!DOCTYPE html>
+<html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir" language="@CurrentSite.CurrentCulture.DisplayName">
+<head>
+    @{
+        await Html.RenderPartialAsync(PathFileViews.Partials_MetaData);
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderOpeningScripts));
+        @Html.RenderSections(HtmlSectionBlockExtensions.Position.Head)
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderClosingScripts));
+    }
+
+    <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
+    <link rel="stylesheet" href="/css/uTPro/layout.css" />
+    <link rel="stylesheet" href="/css/uTPro/main.css" />
+    @RenderSection("Styles", false)
+
+</head>
+<body class="bodypage is-preload">
+    @{
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
+        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop);
+        await Html.RenderPartialAsync("_Nav.cshtml", homePage);
+    }
+    <main class="page-wrapper">
+        @RenderBody()
+    </main>
+    <script src="/assets/scripts/jquery.min.js"></script>
+    <script src="/assets/scripts/jquery.dropotron.min.js"></script>
+    <script src="/assets/scripts/browser.min.js"></script>
+    <script src="/assets/scripts/breakpoints.min.js"></script>
+    <script src="/scripts/uTPro/util.js"></script>
+    <script src="/scripts/uTPro/main.js"></script>
+    @{
+        RenderSection("Scripts", false);
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
+        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyBottom);
+    }
+</body>
+</html>

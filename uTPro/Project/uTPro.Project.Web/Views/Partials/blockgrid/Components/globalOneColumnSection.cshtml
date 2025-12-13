@@ -1,0 +1,12 @@
+﻿@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<GlobalOneColumnSection>>
+@{
+    var bkgImage = Model.Content.BackgroundImage?.Url() ?? "";
+    var bkgImageCss = string.IsNullOrEmpty(bkgImage) ? "" : $"background-image: url('{bkgImage}');";
+    
+}
+@ColorHelper.HexToRgb(Model.Content.BackgroundColor)
+@Model.Content.BackgroundColor
+<section class="@Model.Content.ContentType.Alias" style="@(bkgImageCss)">
+    @await Html.GetPreviewBlockGridItemAreasHtmlAsync(Model)
+</section>

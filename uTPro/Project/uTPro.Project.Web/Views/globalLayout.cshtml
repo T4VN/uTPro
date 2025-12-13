@@ -1,0 +1,32 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null;
+    var dir = CurrentSite.CurrentCulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
+}
+<!DOCTYPE html>
+<html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir" language="@CurrentSite.CurrentCulture.DisplayName">
+<head>
+    @{
+        await Html.RenderPartialAsync(PathFileViews.Partials_MetaData);
+        @RenderSection("Styles", false);
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderOpeningScripts));
+        @Html.RenderSections(HtmlSectionBlockExtensions.Position.Head)
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderClosingScripts));
+    }
+
+</head>
+<body>
+    @{
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
+        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop);
+    }
+    <main>
+        @RenderBody()
+    </main>
+    @{
+        RenderSection("Scripts", false);
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
+        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyBottom);
+    }
+</body>
+</html>

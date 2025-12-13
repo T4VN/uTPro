@@ -1,0 +1,12 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    if (Model == null)
+    {
+        return;
+    }
+    (var siteName, var fileName) = uTPro.Project.Web.Configure.CustomPathViews.GetSiteAndFileName(Model.GetTemplateAlias(), CurrentSite.GetItem().Root.Name);
+    if (!string.IsNullOrEmpty(siteName))
+    {
+        Layout = $"/Views/{siteName}/{fileName}.cshtml";
+    }
+}
