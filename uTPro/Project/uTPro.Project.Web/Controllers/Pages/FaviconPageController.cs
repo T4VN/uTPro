@@ -4,7 +4,7 @@ using System.Net.Mime;
 using Umbraco.Cms.Web.Common.Controllers;
 using uTPro.Foundation.Favicon;
 
-namespace uTPro.Website.Backoffice.Controllers.Pages
+namespace uTPro.Project.Web.Controllers.Pages
 {
     public class FaviconPageController : UmbracoPageController
     {

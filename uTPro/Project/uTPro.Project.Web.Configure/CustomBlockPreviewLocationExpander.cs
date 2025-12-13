@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Razor;
 using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
 using uTPro.Common.Constants;
 
-namespace uTPro.Configure
+namespace uTPro.Project.Web.Configure
 {
     public sealed class CustomBlockPreviewLocationExpander : IViewLocationExpander
     {

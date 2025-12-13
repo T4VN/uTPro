@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Community.BlockPreview.Extensions;
-using uTPro.Configure;
+using uTPro.Project.Web.Configure;
 using uTPro.Foundation.Middleware;
 using WebMarkupMin.AspNet.Common.Compressors;
 using WebMarkupMin.AspNetCoreLatest;

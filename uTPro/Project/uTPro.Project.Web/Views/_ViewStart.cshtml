@@ -4,7 +4,7 @@
     {
         return;
     }
-    (var siteName, var fileName) = uTPro.Configure.CustomPathViews.GetSiteAndFileName(Model.GetTemplateAlias(), CurrentSite.GetItem().Root.Name);
+    (var siteName, var fileName) = uTPro.Project.Web.Configure.CustomPathViews.GetSiteAndFileName(Model.GetTemplateAlias(), CurrentSite.GetItem().Root.Name);
     if (!string.IsNullOrEmpty(siteName))
     {
         Layout = $"/Views/{siteName}/{fileName}.cshtml";

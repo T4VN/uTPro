@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Composing;
 
-namespace uTPro.Configure
+namespace uTPro.Project.Web.Configure
 {
     class DIICheckPolicy : IComposer
     {

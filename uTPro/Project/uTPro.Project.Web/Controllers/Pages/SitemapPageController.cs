@@ -5,7 +5,7 @@ using System.Text;
 using Umbraco.Cms.Web.Common.Controllers;
 using uTPro.Foundation.Sitemap;
 
-namespace uTPro.Website.Backoffice.Controllers.Pages
+namespace uTPro.Project.Web.Controllers.Pages
 {
     public class SitemapPageController : UmbracoPageController
     {

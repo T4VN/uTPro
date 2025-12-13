@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.PublishedModels;
 using uTPro.Extension.CurrentSite;
 
-namespace uTPro.Configure
+namespace uTPro.Project.Web.Configure
 {
     internal class ActionResultPageError : IActionResult
     {

@@ -14,7 +14,7 @@ using Umbraco.Cms.Web.Website.Controllers;
 using uTPro.Common.Constants;
 using uTPro.Extension.CurrentSite;
 
-namespace uTPro.Configure
+namespace uTPro.Project.Web.Configure
 {
     public static partial class InitConfigure
     {
