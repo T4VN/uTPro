@@ -36,7 +36,7 @@
                    rel="@(((obj.NavAddNoopenerToLink ? "noopener" : "") + " " + (obj.NavAddNoreferrerToLink ? "noreferrer" : "")).Trim())">
                     @if (obj.NavInnerCssClass?.Equals("nav-logo-href") != false)
                     {
-                        <img src="/assets/img/logo.svg" alt="@obj.NavLink?.Name">
+                        <img src="/assets/img/logo.svg" width="70" height="70" alt="@obj.NavLink?.Name">
                     }
                     else
                     {
