@@ -28,9 +28,9 @@
 		<PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.6" />
 		<PackageReference Include="uSync" Version="16.1.0" />
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.20.0" />
+		<ProjectReference Include="..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
+		<ProjectReference Include="..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
 		<ProjectReference Include="..\uTPro.Configure\uTPro.Configure.csproj" />
-		<ProjectReference Include="..\uTPro.Extension\uTPro.Extension.csproj" />
-		<ProjectReference Include="..\uTPro.Foundation\uTPro.Foundation.csproj" />
 		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
 	</ItemGroup>
 

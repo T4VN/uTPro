@@ -107,7 +107,17 @@ builder.Services.Configure<FormOptions>(options =>
     options.Limits.MaxRequestBodySize = long.MaxValue;
 });
 
-builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "umbraco", "Data", "PersistKeysToFileSystem")))
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(
+        new DirectoryInfo(
+            Path.Combine(
+                builder.Environment.ContentRootPath,
+                "umbraco",
+                "Data",
+                "TEMP",
+                "PersistKeys")
+            )
+    )
     .SetApplicationName("uTPro")
     .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
