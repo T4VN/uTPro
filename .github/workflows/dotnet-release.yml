@@ -42,7 +42,7 @@ jobs:
       - name: Build & Publish .NET project
         run: |
           mkdir -p publish_output
-          dotnet publish ./uTPro/uTPro.Web/uTPro.Web.csproj -c Release -o publish_output
+          dotnet publish ./uTPro/Project/uTPro.Web/uTPro.Web.csproj -c Release -o publish_output
 
       - name: Archive publish output
         run: |

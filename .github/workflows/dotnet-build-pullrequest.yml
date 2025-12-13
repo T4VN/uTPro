@@ -26,10 +26,10 @@ jobs:
         dotnet-version: '9.0.x' # Specify your .NET Core version, e.g., 6.x, 7.x
 
     - name: Restore dependencies
-      run: dotnet restore ./uTPro/uTPro.Web/uTPro.Web.csproj
+      run: dotnet restore ./uTPro/Project/uTPro.Web/uTPro.Web.csproj
 
     - name: Build
-      run: dotnet build ./uTPro/uTPro.Web/uTPro.Web.csproj --no-restore
+      run: dotnet build ./uTPro/Project/uTPro.Web/uTPro.Web.csproj --no-restore
 
     #- name: Run tests (Optional)
       #run: dotnet test --no-build # Optional, but recommended for CI
