@@ -3,7 +3,7 @@ name: Build and Create Release
 on:
   push:
     branches:
-      - main
+      - 'v*/release'
       
 permissions:
   contents: read
@@ -19,6 +19,21 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
 
+      # ✅ Lấy tên branch
+      - name: Get branch name
+        id: branch
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      # ✅ Tách prefix (v16 từ v16/release)
+      - name: Extract version prefix
+        id: version_prefix
+        run: |
+          BRANCH="${{ steps.branch.outputs.branch_name }}"
+          PREFIX=$(echo "$BRANCH" | cut -d'/' -f1)
+          echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
+
       - name: Setup .NET 9 SDK
         uses: actions/setup-dotnet@v5
         with:
@@ -27,11 +42,19 @@ jobs:
       - name: Build & Publish .NET project
         run: |
           mkdir -p publish_output
-          dotnet publish ./uTPro/uTPro.Web/uTPro.Web.csproj -c Release -o publish_output
+          dotnet publish ./uTPro/Project/uTPro.Project.Web/uTPro.Project.Web.csproj -c Release -o publish_output
 
       - name: Archive publish output
         run: |
           zip -r publish_output.zip publish_output
+
+      # ✅ Đổi tên file theo prefix (publish_output_v16.zip)
+      - name: Rename output file
+        id: rename
+        run: |
+          NEW_NAME="publish_output_${{ steps.version_prefix.outputs.prefix }}.zip"
+          mv publish_output.zip "$NEW_NAME"
+          echo "file_name=$NEW_NAME" >> $GITHUB_OUTPUT
 
       - name: Set version tag
         id: version
@@ -55,10 +78,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version_tag }}
-          name: Release ${{ steps.version.outputs.version_tag }}
-          body: "Auto-generated release from main branch, build ${{ steps.version.outputs.version_tag }}"
+          name: Release ${{ steps.branch.outputs.branch_name }}
+          body: "Auto-generated release from branch ${{ steps.branch.outputs.branch_name }}, build ${{ steps.version.outputs.version_tag }}"
           draft: true
           prerelease: true
-          files: publish_output.zip
+          files: ${{ steps.rename.outputs.file_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
