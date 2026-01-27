@@ -15,7 +15,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v6
         with:
-          ref: v16/dev
+          ref: main
           fetch-depth: 0
           clean: false
           path: .
@@ -53,7 +53,7 @@ jobs:
             gh pr create \
             --title "Sync wiki - $BRANCH_NAME" \
             --body "Auto-sync wiki to GitHub Pages" \
-            --base v16/dev \
+            --base main \
             --head $BRANCH_NAME
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
