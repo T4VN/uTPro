@@ -1,14 +1,15 @@
 name: Sync Wiki to Pages
 
+permissions:
+  contents: write
+  pull-requests: write
+      
 on:
   workflow_dispatch:
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
       
     steps:
       - name: Checkout main repo
@@ -17,11 +18,11 @@ jobs:
       - name: Clone wiki repo
         run: git clone https://github.com/${{ github.repository }}.wiki.git wiki-source
 
-      - name: Copy git wiki to folder wiki
+      - name: Copy git wiki to folder wiki-docs (clean)
         run: |
           rm -rf wiki-docs
           mkdir -p wiki-docs
-          cp -r wiki-source/* wiki-docs/
+          rsync -av --exclude='.git' wiki-source/ wiki-docs/
           rm -rf wiki-source
           
       - name: Commit changes
@@ -39,8 +40,7 @@ jobs:
           git commit -m "Sync wiki at $(date)" || echo "No changes"
                 
       - name: Push changes to ${{ env.BRANCH_NAME }} branch
-        run: |
-          git push origin $BRANCH_NAME
+        run: git push origin $BRANCH_NAME
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
