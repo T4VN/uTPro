@@ -17,7 +17,8 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-
+          clean: false
+          
       - name: Clone wiki repo
         run: git clone https://github.com/${{ github.repository }}.wiki.git wiki-source
 
