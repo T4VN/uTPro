@@ -15,7 +15,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: v16/release
           fetch-depth: 0
           clean: false
           persist-credentials: false
@@ -54,4 +54,4 @@ jobs:
           branch: ${{ env.BRANCH_NAME }}
           title: "Sync wiki - ${{ env.BRANCH_NAME }}"
           body: "Auto-sync wiki to GitHub Pages"
-          base: main
+          base: v16/release
