@@ -1,28 +1,36 @@
 name: Sync Wiki to Pages
 
+permissions:
+  contents: write
+  pull-requests: write
+      
 on:
   workflow_dispatch:
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
       
     steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v3
-
+      - name: Checkout main branch
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          clean: false
+          path: .
+          
       - name: Clone wiki repo
-        run: git clone https://github.com/${{ github.repository }}.wiki.git wiki
-
-      - name: Copy wiki to docs/wiki
+        run: git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki-source
+        
+      - name: Kiểm tra wiki-source có file không 
+        run: ls -la wiki-source
+        
+      - name: Copy git wiki to folder wikidocs
         run: |
-          rm -rf docs/wiki
-          mkdir -p docs/wiki
-          cp -r wiki/* docs/wiki/
-
+          rsync -av --delete --exclude='.git' wiki-source/ wiki/
+          rm -rf wiki-source
+          
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
@@ -34,17 +42,18 @@ jobs:
       - name: Create new branch and commit
         run: | 
           git checkout -b $BRANCH_NAME 
-          git add docs/wiki 
+          git add wiki
           git commit -m "Sync wiki at $(date)" || echo "No changes"
                 
       - name: Push changes to ${{ env.BRANCH_NAME }} branch
-        run: |
-          git push origin $BRANCH_NAME
+        run: git push origin $BRANCH_NAME
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          branch: ${{ env.BRANCH_NAME }}
-          title: "Sync wiki - ${{ env.BRANCH_NAME }}"
-          body: "Auto-sync wiki to docs folder"
-          base: main
+        run: |
+            gh pr create \
+            --title "Sync wiki - $BRANCH_NAME" \
+            --body "Auto-sync wiki to GitHub Pages" \
+            --base main \
+            --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
