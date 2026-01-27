@@ -29,18 +29,24 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions@github.com"
-          git checkout -b wiki-sync || git checkout wiki-sync
-          git add docs/wiki
-          git commit -m "Sync wiki" || echo "No changes"
+          
+      - name: Generate datetime branch name 
+        run: echo "BRANCH_NAME=wiki-sync-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
-      - name: Push changes to wiki-sync branch
+      - name: Create new branch and commit
+        run: | 
+          git checkout -b $BRANCH_NAME 
+          git add docs/wiki 
+          git commit -m "Sync wiki at $(date)" || echo "No changes"
+                
+      - name: Push changes to ${{ env.BRANCH_NAME }} branch
         run: |
-          git push origin wiki-sync || git push -u origin wiki-sync
+          git push origin $BRANCH_NAME
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: wiki-sync
-          title: "Sync wiki"
+          branch: ${{ env.BRANCH_NAME }}
+          title: "Sync wiki - ${{ env.BRANCH_NAME }}"
           body: "Auto-sync wiki to docs folder"
           base: main
