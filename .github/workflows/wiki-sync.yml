@@ -18,7 +18,6 @@ jobs:
           ref: v16/release
           fetch-depth: 0
           clean: false
-          persist-credentials: false
           path: .
           
       - name: Clone wiki repo
