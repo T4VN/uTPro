@@ -3,12 +3,15 @@ name: Sync Wiki to Pages
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
     steps:
       - name: Checkout main repo
         uses: actions/checkout@v3
@@ -16,7 +19,7 @@ jobs:
       - name: Clone wiki repo
         run: git clone https://github.com/${{ github.repository }}.wiki.git wiki
 
-      - name: Copy wiki to docs
+      - name: Copy wiki to docs/wiki
         run: |
           rm -rf docs/wiki
           mkdir -p docs/wiki
@@ -24,8 +27,20 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config user.name "github-actions"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions@github.com"
+          git checkout -b wiki-sync || git checkout wiki-sync
           git add docs/wiki
           git commit -m "Sync wiki" || echo "No changes"
-          git push
+
+      - name: Push changes to wiki-sync branch
+        run: |
+          git push origin wiki-sync || git push -u origin wiki-sync
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: wiki-sync
+          title: "Sync wiki"
+          body: "Auto-sync wiki to docs folder"
+          base: main
