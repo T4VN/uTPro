@@ -5,6 +5,9 @@ permissions:
   pull-requests: write
       
 on:
+  push:
+    branches:
+      - 'gh-pages'
   workflow_dispatch:
 
 jobs:
@@ -15,7 +18,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v6
         with:
-          ref: main
+          ref: gh-pages
           fetch-depth: 0
           clean: false
           path: .
@@ -37,7 +40,7 @@ jobs:
           git config user.email "github-actions@github.com"
           
       - name: Generate datetime branch name 
-        run: echo "BRANCH_NAME=wiki-sync-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME=gh-pages-wiki-sync-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
       - name: Create new branch and commit
         run: | 
@@ -53,7 +56,7 @@ jobs:
             gh pr create \
             --title "Sync wiki - $BRANCH_NAME" \
             --body "Auto-sync wiki to GitHub Pages" \
-            --base main \
+            --base gh-pages \
             --head $BRANCH_NAME
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
