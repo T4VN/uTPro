@@ -18,6 +18,8 @@ jobs:
           ref: main
           fetch-depth: 0
           clean: false
+          persist-credentials: false
+          path: .
           
       - name: Clone wiki repo
         run: git clone https://github.com/${{ github.repository }}.wiki.git wiki-source
@@ -27,7 +29,8 @@ jobs:
           rm -rf wikidocs
           mkdir -p wikidocs
           rsync -av --exclude='.git' wiki-source/ wikidocs/
-          
+          rm -rf wiki-source
+          rm -rf wiki
           
       - name: Commit changes
         run: |
