@@ -29,9 +29,9 @@ jobs:
       - name: Kiểm tra wiki-source có file không 
         run: ls -la wiki-source
         
-      - name: Copy git wiki to folder wikidocs
+      - name: Copy git wiki to folder docs
         run: |
-          rsync -av --delete --exclude='.git' wiki-source/ wiki/
+          rsync -av --delete --exclude='.git' wiki-source/ docs/
           rm -rf wiki-source
           
       - name: Commit changes
@@ -45,7 +45,7 @@ jobs:
       - name: Create new branch and commit
         run: | 
           git checkout -b $BRANCH_NAME 
-          git add wiki
+          git add docs
           git commit -m "Sync wiki at $(date)" || echo "No changes"
                 
       - name: Push changes to ${{ env.BRANCH_NAME }} branch
