@@ -49,9 +49,11 @@ jobs:
         run: git push origin $BRANCH_NAME
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          branch: ${{ env.BRANCH_NAME }}
-          title: "Sync wiki - ${{ env.BRANCH_NAME }}"
-          body: "Auto-sync wiki to GitHub Pages"
-          base: v16/dev
+        run: |
+            gh pr create \
+            --title "Sync wiki - $BRANCH_NAME" \
+            --body "Auto-sync wiki to GitHub Pages" \
+            --base v16/dev \
+            --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
