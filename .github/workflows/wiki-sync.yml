@@ -15,7 +15,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v3
         with:
-          ref: v16/release
+          ref: v16/dev
           fetch-depth: 0
           clean: false
           path: .
@@ -25,9 +25,7 @@ jobs:
 
       - name: Copy git wiki to folder wikidocs
         run: |
-          rm -rf wikidocs
-          mkdir -p wikidocs
-          rsync -av --exclude='.git' wiki-source/ wikidocs/
+          rsync -av --delete --exclude='.git' wiki-source/ wiki/
           rm -rf wiki-source
           
       - name: Commit changes
@@ -53,4 +51,4 @@ jobs:
           branch: ${{ env.BRANCH_NAME }}
           title: "Sync wiki - ${{ env.BRANCH_NAME }}"
           body: "Auto-sync wiki to GitHub Pages"
-          base: v16/release
+          base: v16/dev
