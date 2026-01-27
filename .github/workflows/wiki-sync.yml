@@ -1,0 +1,62 @@
+name: Sync Wiki to Pages
+
+permissions:
+  contents: write
+  pull-requests: write
+      
+on:
+  push:
+    branches:
+      - 'gh-pages'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+      
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+          clean: false
+          path: .
+          
+      - name: Clone wiki repo
+        run: git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki-source
+        
+      - name: Kiểm tra wiki-source có file không 
+        run: ls -la wiki-source
+        
+      - name: Copy git wiki to folder wikidocs
+        run: |
+          rsync -av --delete --exclude='.git' wiki-source/ wiki/
+          rm -rf wiki-source
+          
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions@github.com"
+          
+      - name: Generate datetime branch name 
+        run: echo "BRANCH_NAME=gh-pages-wiki-sync-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
+      - name: Create new branch and commit
+        run: | 
+          git checkout -b $BRANCH_NAME 
+          git add wiki
+          git commit -m "Sync wiki at $(date)" || echo "No changes"
+                
+      - name: Push changes to ${{ env.BRANCH_NAME }} branch
+        run: git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        run: |
+            gh pr create \
+            --title "Sync wiki - $BRANCH_NAME" \
+            --body "Auto-sync wiki to GitHub Pages" \
+            --base gh-pages \
+            --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
