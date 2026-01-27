@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
       
     steps:
-      - name: Checkout gh-pages branch
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
-          ref: gh-pages
+          ref: main
           fetch-depth: 0
 
       - name: Clone wiki repo
@@ -51,4 +51,4 @@ jobs:
           branch: ${{ env.BRANCH_NAME }}
           title: "Sync wiki - ${{ env.BRANCH_NAME }}"
           body: "Auto-sync wiki to GitHub Pages"
-          base: gh-pages
+          base: main
