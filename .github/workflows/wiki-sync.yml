@@ -13,7 +13,7 @@ jobs:
       
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: v16/dev
           fetch-depth: 0
@@ -21,8 +21,11 @@ jobs:
           path: .
           
       - name: Clone wiki repo
-        run: git clone https://github.com/${{ github.repository }}.wiki.git wiki-source
-
+        run: git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki-source
+        
+      - name: Kiểm tra wiki-source có file không 
+        run: ls -la wiki-source
+        
       - name: Copy git wiki to folder wikidocs
         run: |
           rsync -av --delete --exclude='.git' wiki-source/ wiki/
