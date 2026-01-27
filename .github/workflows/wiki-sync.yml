@@ -22,12 +22,12 @@ jobs:
       - name: Clone wiki repo
         run: git clone https://github.com/${{ github.repository }}.wiki.git wiki-source
 
-      - name: Copy git wiki to folder wiki-docs
+      - name: Copy git wiki to folder wikidocs
         run: |
-          rm -rf wiki-docs
-          mkdir -p wiki-docs
-          rsync -av --exclude='.git' wiki-source/ wiki-docs/
-          rm -rf wiki-source
+          rm -rf wikidocs
+          mkdir -p wikidocs
+          rsync -av --exclude='.git' wiki-source/ wikidocs/
+          
           
       - name: Commit changes
         run: |
@@ -40,7 +40,7 @@ jobs:
       - name: Create new branch and commit
         run: | 
           git checkout -b $BRANCH_NAME 
-          git add wiki-docs 
+          git add wikidocs 
           git commit -m "Sync wiki at $(date)" || echo "No changes"
                 
       - name: Push changes to ${{ env.BRANCH_NAME }} branch
