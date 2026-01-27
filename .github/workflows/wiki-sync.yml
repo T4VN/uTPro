@@ -12,13 +12,16 @@ jobs:
     runs-on: ubuntu-latest
       
     steps:
-      - name: Checkout main repo
+      - name: Checkout gh-pages branch
         uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          fetch-depth: 0
 
       - name: Clone wiki repo
         run: git clone https://github.com/${{ github.repository }}.wiki.git wiki-source
 
-      - name: Copy git wiki to folder wiki-docs (clean)
+      - name: Copy git wiki to folder wiki-docs
         run: |
           rm -rf wiki-docs
           mkdir -p wiki-docs
@@ -47,5 +50,5 @@ jobs:
         with:
           branch: ${{ env.BRANCH_NAME }}
           title: "Sync wiki - ${{ env.BRANCH_NAME }}"
-          body: "Auto-sync wiki to docs folder"
-          base: main
+          body: "Auto-sync wiki to GitHub Pages"
+          base: gh-pages
