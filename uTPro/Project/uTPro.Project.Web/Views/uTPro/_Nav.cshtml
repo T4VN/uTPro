@@ -1,0 +1,80 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<UTpro__PageHome>
+@{
+    if (Model == null || Model.NavigationLink == null)
+    {
+        return;
+    }
+    var navItems = (GlobalFolderNavigationLinkForSite)Model.NavigationLink;
+
+    bool ActiveMenu(GlobalNavigationItem item)
+    {
+        if (item != null)
+        {
+            var guid = item.NavLink?.Udi?.ToGuid();
+            if (guid != null)
+            {
+                return Model.Key == guid ? true : Umbraco.Content(guid)?.IsAncestorOrSelf(Model) ?? false;
+            }
+        }
+        return false;
+    }
+}
+<nav class="navHeader">
+    <ul>
+        @foreach (var item in navItems.NavigationItems!)
+        {
+            var obj = (GlobalNavigationItem)item.Content;
+            if (obj == null || obj.NavHiddenItem)
+            {
+                continue;
+            }
+            <li class="@obj.NavOuterCssclass @(ActiveMenu(obj) ? "active" : "")">
+                <a class="@obj.NavInnerCssClass @(ActiveMenu(obj) ? "active" : "")"
+                   href="@obj.NavLink?.LinkToString()"
+                   target="@obj.NavLink?.Target"
+                   rel="@(((obj.NavAddNoopenerToLink ? "noopener" : "") + " " + (obj.NavAddNoreferrerToLink ? "noreferrer" : "")).Trim())">
+                    @if (obj.NavInnerCssClass?.Equals("nav-logo-href") != false)
+                    {
+                        <img src="/assets/img/logo.svg" width="70" height="70" alt="@obj.NavLink?.Name">
+                    }
+                    else
+                    {
+                        @Html.Raw(!obj.NavHideLabel ? obj.NavLink?.Name : string.Empty)
+                    }
+                </a>
+            </li>
+        }
+        @* <li style="display: none;"><a href="/">Home</a></li>
+        <li><a href="/">About</a></li>
+        <!-- <li>
+            <a href="#">Dropdown</a>
+            <ul>
+                <li><a href="#">Lorem ipsum</a></li>
+                <li><a href="#">Magna veroeros</a></li>
+                <li><a href="#">Etiam nisl</a></li>
+                <li>
+                    <a href="#">Sed consequat</a>
+                    <ul>
+                        <li><a href="#">Lorem dolor</a></li>
+                        <li><a href="#">Amet consequat</a></li>
+                        <li><a href="#">Magna phasellus</a></li>
+                        <li><a href="#">Etiam nisl</a></li>
+                        <li><a href="#">Sed feugiat</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Nisl tempus</a></li>
+            </ul>
+        </li>
+        <li><a href="left-sidebar.html">Left Sidebar</a></li> -->
+        <li class="nav-logo">
+            <a class="nav-logo-href" href="/">
+                <img src="/assets/img/logo.svg" alt="UTPro - Umbraco Turbo Pro">
+            </a>
+        </li>
+        <li><a href="/">Security</a></li>
+        <!-- <li><a href="right-sidebar.html">Right Sidebar</a></li>
+        <li><a href="no-sidebar.html">No Sidebar</a></li>
+        <li><a href="no-sidebar.html">No Sidebar</a></li> --> *@
+    </ul>
+</nav>

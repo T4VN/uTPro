@@ -3,31 +3,37 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35728.132
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Web", "uTPro.Web\uTPro.Web.csproj", "{879135C7-F935-4DD9-B0D9-0DA4473434FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Project.Web", "Project\uTPro.Project.Web\uTPro.Project.Web.csproj", "{879135C7-F935-4DD9-B0D9-0DA4473434FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Configure", "uTPro.Configure\uTPro.Configure.csproj", "{C21BC922-C155-443B-A6C9-773154D68655}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Project.Web.Configure", "Project\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj", "{C21BC922-C155-443B-A6C9-773154D68655}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{FA4082ED-8008-43AA-85E0-503BDA5B28C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Extension", "uTPro.Extension\uTPro.Extension.csproj", "{C733CF85-1EF8-4E9B-938C-C289C6D457FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Extension", "Extension\uTPro.Extension\uTPro.Extension.csproj", "{C733CF85-1EF8-4E9B-938C-C289C6D457FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Extension.CurrentSite", "uTPro.Extension.CurrentSite\uTPro.Extension.CurrentSite.csproj", "{D6B1FBC3-AA27-408C-9EAB-DA4342243B1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Extension.CurrentSite", "Extension\uTPro.Extension.CurrentSite\uTPro.Extension.CurrentSite.csproj", "{D6B1FBC3-AA27-408C-9EAB-DA4342243B1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Common", "uTPro.Common\uTPro.Common.csproj", "{76AB44FC-2A28-48D4-BBDF-7D8E0CD1034A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Common", "Common\uTPro.Common\uTPro.Common.csproj", "{76AB44FC-2A28-48D4-BBDF-7D8E0CD1034A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{9FBBC929-615A-4A02-AC9E-426A607ECE10}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Foundation", "Foundation", "{C47DDDB1-58C4-4FEC-BB0C-1E452FB526E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation", "uTPro.Foundation\uTPro.Foundation.csproj", "{EF2F6E2B-BBDC-4805-B804-C816E90BC09C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation", "Foundation\uTPro.Foundation\uTPro.Foundation.csproj", "{EF2F6E2B-BBDC-4805-B804-C816E90BC09C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Sitemap", "uTPro.Foundation.Sitemap\uTPro.Foundation.Sitemap.csproj", "{0AC65E28-B693-4D06-A00C-7E9B716C9804}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Sitemap", "Foundation\uTPro.Foundation.Sitemap\uTPro.Foundation.Sitemap.csproj", "{0AC65E28-B693-4D06-A00C-7E9B716C9804}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Robots", "uTPro.Foundation.Robots\uTPro.Foundation.Robots.csproj", "{6D0EB8DD-D697-4381-A4DD-B29468734209}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Robots", "Foundation\uTPro.Foundation.Robots\uTPro.Foundation.Robots.csproj", "{6D0EB8DD-D697-4381-A4DD-B29468734209}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Favicon", "uTPro.Foundation.Favicon\uTPro.Foundation.Favicon.csproj", "{2017A7B3-BBB0-4F75-86CA-1280432764A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Favicon", "Foundation\uTPro.Foundation.Favicon\uTPro.Foundation.Favicon.csproj", "{2017A7B3-BBB0-4F75-86CA-1280432764A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Middleware", "uTPro.Foundation.Middleware\uTPro.Foundation.Middleware.csproj", "{B4167671-FAAC-45F5-AF04-04FF196046FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Foundation.Middleware", "Foundation\uTPro.Foundation.Middleware\uTPro.Foundation.Middleware.csproj", "{B4167671-FAAC-45F5-AF04-04FF196046FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Feature", "Feature", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Feature", "Feature\uTPro.Feature\uTPro.Feature.csproj", "{E606C629-3B37-458C-9C80-D555A762E28E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project", "Project", "{9C8C527F-5B16-429C-8B61-D129E2D5A503}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,11 +81,17 @@ Global
 		{B4167671-FAAC-45F5-AF04-04FF196046FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4167671-FAAC-45F5-AF04-04FF196046FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4167671-FAAC-45F5-AF04-04FF196046FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E606C629-3B37-458C-9C80-D555A762E28E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E606C629-3B37-458C-9C80-D555A762E28E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E606C629-3B37-458C-9C80-D555A762E28E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E606C629-3B37-458C-9C80-D555A762E28E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{879135C7-F935-4DD9-B0D9-0DA4473434FD} = {9C8C527F-5B16-429C-8B61-D129E2D5A503}
+		{C21BC922-C155-443B-A6C9-773154D68655} = {9C8C527F-5B16-429C-8B61-D129E2D5A503}
 		{C733CF85-1EF8-4E9B-938C-C289C6D457FE} = {FA4082ED-8008-43AA-85E0-503BDA5B28C2}
 		{D6B1FBC3-AA27-408C-9EAB-DA4342243B1F} = {FA4082ED-8008-43AA-85E0-503BDA5B28C2}
 		{76AB44FC-2A28-48D4-BBDF-7D8E0CD1034A} = {9FBBC929-615A-4A02-AC9E-426A607ECE10}
@@ -88,5 +100,9 @@ Global
 		{6D0EB8DD-D697-4381-A4DD-B29468734209} = {C47DDDB1-58C4-4FEC-BB0C-1E452FB526E1}
 		{2017A7B3-BBB0-4F75-86CA-1280432764A2} = {C47DDDB1-58C4-4FEC-BB0C-1E452FB526E1}
 		{B4167671-FAAC-45F5-AF04-04FF196046FB} = {C47DDDB1-58C4-4FEC-BB0C-1E452FB526E1}
+		{E606C629-3B37-458C-9C80-D555A762E28E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EEF559D3-C416-4C76-A0BD-CD923A2994F8}
 	EndGlobalSection
 EndGlobal
