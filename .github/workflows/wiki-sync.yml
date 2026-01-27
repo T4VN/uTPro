@@ -30,7 +30,6 @@ jobs:
           mkdir -p wikidocs
           rsync -av --exclude='.git' wiki-source/ wikidocs/
           rm -rf wiki-source
-          rm -rf wiki
           
       - name: Commit changes
         run: |
