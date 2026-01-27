@@ -13,21 +13,22 @@ jobs:
       
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
-          ref: v16/release
+          ref: main
           fetch-depth: 0
           clean: false
           path: .
           
       - name: Clone wiki repo
-        run: git clone https://github.com/${{ github.repository }}.wiki.git wiki-source
-
+        run: git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki-source
+        
+      - name: Kiểm tra wiki-source có file không 
+        run: ls -la wiki-source
+        
       - name: Copy git wiki to folder wikidocs
         run: |
-          rm -rf wikidocs
-          mkdir -p wikidocs
-          rsync -av --exclude='.git' wiki-source/ wikidocs/
+          rsync -av --delete --exclude='.git' wiki-source/ wiki/
           rm -rf wiki-source
           
       - name: Commit changes
@@ -41,16 +42,18 @@ jobs:
       - name: Create new branch and commit
         run: | 
           git checkout -b $BRANCH_NAME 
-          git add wikidocs 
+          git add wiki
           git commit -m "Sync wiki at $(date)" || echo "No changes"
                 
       - name: Push changes to ${{ env.BRANCH_NAME }} branch
         run: git push origin $BRANCH_NAME
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          branch: ${{ env.BRANCH_NAME }}
-          title: "Sync wiki - ${{ env.BRANCH_NAME }}"
-          body: "Auto-sync wiki to GitHub Pages"
-          base: v16/release
+        run: |
+            gh pr create \
+            --title "Sync wiki - $BRANCH_NAME" \
+            --body "Auto-sync wiki to GitHub Pages" \
+            --base main \
+            --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
