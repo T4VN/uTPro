@@ -22,7 +22,8 @@ jobs:
           rm -rf wiki
           mkdir -p wiki
           cp -r wiki-source/* wiki/
-
+          rm -rf wiki-source
+          
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
