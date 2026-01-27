@@ -39,7 +39,7 @@ jobs:
       - name: Create new branch and commit
         run: | 
           git checkout -b $BRANCH_NAME 
-          git add wikidocs 
+          git add wiki
           git commit -m "Sync wiki at $(date)" || echo "No changes"
                 
       - name: Push changes to ${{ env.BRANCH_NAME }} branch
