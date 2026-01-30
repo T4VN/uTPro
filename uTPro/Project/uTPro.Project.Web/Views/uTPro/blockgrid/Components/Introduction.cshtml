@@ -1,13 +1,13 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Introduction>>
 @{
 }
-<section id="intro" class="wrapper style1">
+<section class="intro style1 wrapper">
     <div class="title">@Model.Content.Title</div>
     <div class="container">
         <div class="style1">
             <div class="richtext">@Model.Content.Description</div>
             <p></p>
-            <p class="style2">@Model.Content.Highlight</p>
+            <div class="style2">@Model.Content.Highlight</div>
             <p></p>
             <div class="style3">@Model.Content.Special</div>
         </div>

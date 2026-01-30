@@ -807,17 +807,12 @@ ul.actions {
 
 /* Intro */
 
-#intro {
+.intro {
     padding-bottom: 8em;
     text-align: center;
 }
 
-    #intro p.style1 {
-        font-size: 1.5em;
-        letter-spacing: 0.075em;
-    }
-
-    #intro p.style2 {
+    .intro .style2 {
         font-weight: 700;
         color: #fff;
         border-radius: 0.35em;
@@ -829,12 +824,12 @@ ul.actions {
         margin-bottom: 1em;
     }
 
-        #intro p.style2 a {
+        .intro .style2 a {
             color: inherit;
             text-decoration: none;
         }
 
-    #intro .style3 {
+    .intro .style3 {
         font-size: 1.1em;
         width: 48em;
         margin: 0 auto;
@@ -1061,15 +1056,11 @@ ul.actions {
 
     /* Intro */
 
-    #intro {
+    .intro {
         padding-bottom: 7em;
     }
 
-        #intro p.style1 {
-            font-size: 1.25em;
-        }
-
-        #intro p.style2 {
+        .intro .style2 {
             font-size: 2.25em;
         }
 
@@ -1151,7 +1142,7 @@ ul.actions {
 
     /* Intro */
 
-    #intro .style3 {
+    .intro .style3 {
         width: auto;
     }
 
@@ -1539,7 +1530,7 @@ ul.actions {
 
     /* Intro */
 
-    #intro {
+    .intro {
         text-align: center;
         padding-right: 2em;
         padding-left: 2em;
@@ -1547,11 +1538,11 @@ ul.actions {
         margin: 0 auto;
     }
 
-        #intro p.style1 {
+        .intro .style1 {
             margin-bottom: 1.5em;
         }
 
-        #intro p.style2 {
+        .intro .style2 {
             font-size: 1.5em;
             letter-spacing: 0.05em;
             line-height: 1.25em;

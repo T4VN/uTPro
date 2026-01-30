@@ -71,5 +71,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
 		[ImplementPropertyType("backgroundOpacity")]
 		public virtual decimal BackgroundOpacity => this.Value<decimal>(_publishedValueFallback, "backgroundOpacity");
+
+		///<summary>
+		/// Text color
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("textColor")]
+		public virtual string TextColor => this.Value<string>(_publishedValueFallback, "textColor");
 	}
 }
