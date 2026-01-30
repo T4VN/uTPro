@@ -597,11 +597,13 @@ ul.actions {
         }
 
     .wrapper.style3 {
-        background: #f3f3f3 url("/assets/img/overlay.png");
+        /*background: #f3f3f3 url("/assets/img/overlay.png");*/
+        background-color: var(--section-bg-color);
     }
 
         .wrapper.style3 .title {
-            background: #f3f3f3 url("/assets/img/overlay.png");
+            background-color: var(--section-bg-color);
+            /*background: #f3f3f3 url("/assets/img/overlay.png");*/
             color: #484d55;
         }
 
@@ -847,11 +849,11 @@ ul.actions {
 
 /* Highlights */
 
-#highlights .highlight {
+.highlights .highlight {
     text-align: center;
 }
 
-    #highlights .highlight h3 {
+    .highlights .highlight h3 {
         color: #f6821f;
         margin: 0 0 0.75em 0;
         font-size: 1.15em;
@@ -1148,7 +1150,7 @@ ul.actions {
 
     /* Highlights */
 
-    #highlights .highlight {
+    .highlights .highlight {
         max-width: 40em;
         margin-left: auto;
         margin-right: auto;
