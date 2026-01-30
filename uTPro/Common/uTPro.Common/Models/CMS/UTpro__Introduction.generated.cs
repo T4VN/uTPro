@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
 {
-	/// <summary>Global - Responsive Image Settings</summary>
-	[PublishedModel("globalResponsiveImageSettings")]
-	public partial class GlobalResponsiveImageSettings : PublishedContentModel
+	/// <summary>uTPro - Introduction</summary>
+	[PublishedModel("uTPro__Introduction")]
+	public partial class UTpro__Introduction : PublishedElementModel
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
-		public new const string ModelTypeAlias = "globalResponsiveImageSettings";
+		public new const string ModelTypeAlias = "uTPro__Introduction";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
@@ -34,14 +34,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<GlobalResponsiveImageSettings, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<UTpro__Introduction, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public GlobalResponsiveImageSettings(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
+		public UTpro__Introduction(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,39 +50,43 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		// properties
 
 		///<summary>
-		/// Extend Sizes SrcSet: Additional dimensions used for the img tag's srcset data If not entered, default will only take 3 sizes for srcset
+		/// Call to Action
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("repImgExtendSizesSrcSet")]
-		public virtual global::System.Collections.Generic.IEnumerable<string> RepImgExtendSizesSrcSet => this.Value<global::System.Collections.Generic.IEnumerable<string>>(_publishedValueFallback, "repImgExtendSizesSrcSet");
+		[ImplementPropertyType("callToAction")]
+		public virtual global::Umbraco.Cms.Core.Models.Link CallToAction => this.Value<global::Umbraco.Cms.Core.Models.Link>(_publishedValueFallback, "callToAction");
 
 		///<summary>
-		/// Max Width Desktop (px): Default: 1920px
+		/// Description
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
-		[ImplementPropertyType("repImgMaxWidthDesktop")]
-		public virtual int RepImgMaxWidthDesktop => this.Value<int>(_publishedValueFallback, "repImgMaxWidthDesktop");
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("description")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Description => this.Value<global::Umbraco.Cms.Core.Strings.IHtmlEncodedString>(_publishedValueFallback, "description");
 
 		///<summary>
-		/// Max Width Mobile (px): Default: 768px
+		/// Highlight
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
-		[ImplementPropertyType("repImgMaxWidthMobile")]
-		public virtual int RepImgMaxWidthMobile => this.Value<int>(_publishedValueFallback, "repImgMaxWidthMobile");
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("highlight")]
+		public virtual string Highlight => this.Value<string>(_publishedValueFallback, "highlight");
 
 		///<summary>
-		/// Max Width Table (px): Default: 1024px
+		/// Special
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
-		[ImplementPropertyType("repImgMaxWidthTable")]
-		public virtual int RepImgMaxWidthTable => this.Value<int>(_publishedValueFallback, "repImgMaxWidthTable");
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("special")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Special => this.Value<global::Umbraco.Cms.Core.Strings.IHtmlEncodedString>(_publishedValueFallback, "special");
 
 		///<summary>
-		/// Turn Off Responsive Image: Turn on: Image url links will be resized and converted to .webp format.
+		/// Title
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
-		[ImplementPropertyType("repImgTurnOffResponsiveImage")]
-		public virtual bool RepImgTurnOffResponsiveImage => this.Value<bool>(_publishedValueFallback, "repImgTurnOffResponsiveImage");
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("title")]
+		public virtual string Title => this.Value<string>(_publishedValueFallback, "title");
 	}
 }

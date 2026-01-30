@@ -232,7 +232,7 @@ button,
     input[type="reset"].style1,
     button.style1,
     .button.style1 {
-        background: #f6821f url("/assets/img/overlay.png");
+        background-color: var(--section-bg-color);
         color: #fff;
     }
 
@@ -565,13 +565,13 @@ ul.actions {
         }
 
     .wrapper.style1 {
-        background: #f6821f url("/assets/img/overlay.png");
+        background-color: var(--section-bg-color);
         color: #eee;
         color: rgba(255, 255, 255, 0.75);
     }
 
         .wrapper.style1 .title {
-            background: #f6821f url("/assets/img/overlay.png");
+            background-color: var(--section-bg-color);
             color: #fff;
         }
 
@@ -632,7 +632,7 @@ ul.actions {
     justify-content: center;
     position: relative;
     height: 24em;
-    background: url("/assets/img/bkg-login.jpg") bottom center;
+    /*background: url("/assets/img/bkg-login.jpg") bottom center;*/
     background-size: cover;
     padding: 0;
 }
@@ -644,7 +644,7 @@ ul.actions {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(36, 38, 40, .5);
+        /*background: rgba(36, 38, 40, .5);*/
     }
 
 .bodypage .header {
@@ -834,7 +834,7 @@ ul.actions {
             text-decoration: none;
         }
 
-    #intro p.style3 {
+    #intro .style3 {
         font-size: 1.1em;
         width: 48em;
         margin: 0 auto;
@@ -1151,7 +1151,7 @@ ul.actions {
 
     /* Intro */
 
-    #intro p.style3 {
+    #intro .style3 {
         width: auto;
     }
 

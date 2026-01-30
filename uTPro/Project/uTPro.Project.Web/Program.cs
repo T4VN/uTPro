@@ -19,7 +19,10 @@ var umbracoBuilder = builder.CreateUmbracoBuilder()
     .AddBlockPreview(options =>
     {
         options.BlockGrid.Enabled = true;
-        options.BlockGrid.Stylesheet = "/assets/css/blockgridlayout-backoffice.css";
+        options.BlockGrid.Stylesheets = new() {
+            "/assets/css/blockgridlayout-backoffice.css",
+            "/css/uTPro/main.css"
+        };
     });
 
 umbracoBuilder.Build();
