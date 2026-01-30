@@ -588,11 +588,11 @@ ul.actions {
         }
 
     .wrapper.style2 {
-        background: #fff;
+        background-color: var(--section-bg-color);
     }
 
         .wrapper.style2 .title {
-            background: #fff;
+            background-color: var(--section-bg-color);
             color: #484d55;
         }
 

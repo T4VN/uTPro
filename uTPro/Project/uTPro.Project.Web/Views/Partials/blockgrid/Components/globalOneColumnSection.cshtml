@@ -47,7 +47,7 @@ background-color:var(--section-bg-color);";
         }
     }
 
-    var textColor = $@"--section-text-color:{Model.Content.TextColor ?? "#000"};";
+    var textColor = $@"--section-text-color:{(!string.IsNullOrEmpty(Model.Content.TextColor) ? Model.Content.TextColor : "#000")};";
 }
 <section class="@Model.Content.ContentType.Alias" style="@(bkg + textColor)">
     @await Html.GetPreviewBlockGridItemAreasHtmlAsync(Model)
