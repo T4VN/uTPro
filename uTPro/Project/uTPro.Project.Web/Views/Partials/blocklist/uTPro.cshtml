@@ -7,7 +7,9 @@
     {
         if (block?.ContentKey == null) { continue; }
         var data = block.Content;
-
-        @await Html.PartialAsync("blocklist/components/" + data.ContentType.Alias, block)
+        var partialViewName = uTPro.Project.Web.Configure.CustomPathViews.GetPathViewBlockListPreview(data.ContentType.Alias, CurrentSite.GetItem().Root.Name);
+        @data.ContentType.Alias
+        @partialViewName
+        @* @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block) *@
     }
 </div>

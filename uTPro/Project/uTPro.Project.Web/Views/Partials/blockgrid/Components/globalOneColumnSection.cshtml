@@ -1,5 +1,6 @@
 ﻿@using Umbraco.Cms.Core.Models.Blocks
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<GlobalOneColumnSection>>
+@inject Microsoft.AspNetCore.Mvc.ViewEngines.ICompositeViewEngine ViewEngine
 @{
     var bkg = string.Empty;
     var bkgImg = Model.Content.BackgroundImage?.Url() ?? "";
@@ -13,7 +14,7 @@
             {
                 bkg = $@"
 --section-bg-color:rgba({color.Value.R}, {color.Value.G}, {color.Value.B}, {Model.Content.BackgroundOpacity.ToString(System.Globalization.CultureInfo.InvariantCulture)});
---section-bg-url:url('{bkgImg}'); 
+--section-bg-url:url('{bkgImg}');
 background-image:linear-gradient(var(--section-bg-color), var(--section-bg-color)), var(--section-bg-url);
 background-position: bottom center;";
 
@@ -50,5 +51,5 @@ background-color:var(--section-bg-color);";
     var textColor = $@"--section-text-color:{(!string.IsNullOrEmpty(Model.Content.TextColor) ? Model.Content.TextColor : "#000")};";
 }
 <section class="@Model.Content.ContentType.Alias" style="@(bkg + textColor)">
-    @await Html.GetPreviewBlockGridItemAreasHtmlAsync(Model)
+    @await Html.GetPreviewBlockGridItemAreasHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}areas")
 </section>
