@@ -5,16 +5,14 @@
     <div class="title">@Model.Content.Title</div>
     <div class="container">
 
-        <!-- Image -->
-        <div class="image featured">
-            @if (Model.Content.Image != null)
-            {
+        @if (Model.Content.Image != null)
+        {
+            <div class="image featured">
                 <img src="@Model.Content.Image.MediaUrl()" alt="@Model.Content.Header" />
-            }
-        </div>
+            </div>
+        }
 
-        <!-- Features -->
-        <section id="features">
+        <section class="features">
             <header class="style1">
                 <h2>@Model.Content.Header</h2>
                 <p>@Model.Content.Description</p>
