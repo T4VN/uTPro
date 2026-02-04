@@ -1,3 +1,6 @@
+.richtext p {
+    margin: 0;
+}
 .umb-block-grid__layout-container {
     position: relative;
     display: grid;
@@ -57,7 +60,7 @@
     --umb-block-grid--areas-column-gap: 60px;
     --umb-block-grid--areas-row-gap: 60px;
     --umb-block-grid--column-gap: 60px;
-    --umb-block-grid--row-gap: 60px;
+    --umb-block-grid--row-gap: 0px;
     --my-container-max-width: 1200px;
     --my-container-padding: 0 20px;
 }

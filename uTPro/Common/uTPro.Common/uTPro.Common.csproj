@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
-    <PackageReference Include="Umbraco.Cms" Version="16.4.1" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.0.2" />
+    <PackageReference Include="Umbraco.Cms" Version="16.5.0" />
+    <PackageReference Include="Umbraco.Community.BlockPreview" Version="4.1.1" />
     <PackageReference Include="UmbracoSeoVisualizer" Version="16.0.1" />
   </ItemGroup>
 

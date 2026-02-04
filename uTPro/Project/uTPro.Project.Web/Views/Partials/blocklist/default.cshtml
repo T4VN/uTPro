@@ -8,6 +8,6 @@
         if (block?.ContentKey == null) { continue; }
         var data = block.Content;
 
-        @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block)
+        @await Html.PartialAsync("blocklist/components/" + data.ContentType.Alias, block)
     }
 </div>
