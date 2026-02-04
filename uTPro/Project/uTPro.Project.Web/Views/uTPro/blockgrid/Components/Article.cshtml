@@ -2,17 +2,24 @@
 @{
 }
 <div class="wrapper style2">
-    <div class="title">@Model.Content.Title</div>
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <div class="title">@Model.Content.Title</div>
+    }
     <div class="container">
 
         <!-- Content -->
         <div id="content">
             <article class="box post">
                 <header class="style1">
-                    <h2>
-                        @Model.Content.Header
-                    </h2>
-                    <p>@Model.Content.Description</p>
+                    @if (string.IsNullOrEmpty(Model.Content.Header))
+                    {
+                        <h2>@Model.Content.Header</h2>
+                    }
+                    @if (string.IsNullOrEmpty(Model.Content.Description))
+                    {
+                        <p>@Model.Content.Description</p>
+                    }
                 </header>
                 @if (Model.Content.Thumbnail != null)
                 {

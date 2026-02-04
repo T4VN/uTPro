@@ -2,4 +2,4 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
 }
-@await Html.GetBlockGridHtmlAsync(Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content"))
+@await Html.GetBlockGridHtmlAsync(Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content"), CurrentSite.GetItem().Root.Name)

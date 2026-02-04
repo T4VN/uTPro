@@ -2,7 +2,10 @@
 @{
 }
 <section class="highlights wrapper style3">
-    <div class="title">@Model.Content.Title</div>
+    @if (!string.IsNullOrEmpty(@Model.Content.Title))
+    {
+        <div class="title">@Model.Content.Title</div>
+    }
     <div class="container">
         @if (Model.Content.Highlight != null && Model.Content.Highlight.Any())
         {

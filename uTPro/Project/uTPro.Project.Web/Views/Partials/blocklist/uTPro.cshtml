@@ -8,8 +8,17 @@
         if (block?.ContentKey == null) { continue; }
         var data = block.Content;
         var partialViewName = uTPro.Project.Web.Configure.CustomPathViews.GetPathViewBlockListPreview(data.ContentType.Alias, CurrentSite.GetItem().Root.Name);
-        @data.ContentType.Alias
-        @partialViewName
-        @* @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block) *@
+        try
+        {
+            @await Html.PartialAsync(partialViewName, block)
+        }
+        catch (InvalidOperationException)
+        {
+            <p>
+                <strong>Could not render component of type: @(data.ContentType.Alias)</strong>
+                <br />
+                This likely happened because the partial view <em>@partialViewName</em> could not be found.
+            </p>
+        }
     }
 </div>

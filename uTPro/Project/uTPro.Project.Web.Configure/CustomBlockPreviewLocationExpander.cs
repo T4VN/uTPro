@@ -1,12 +1,71 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Community.BlockPreview;
+using Umbraco.Community.BlockPreview.Interfaces;
+using Umbraco.Community.BlockPreview.Services;
 using uTPro.Common.Constants;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace uTPro.Project.Web.Configure
 {
+    public class CustomBlockPreviewService : BlockPreviewService
+    {
+        IRazorViewEngine _razorViewEngine;
+        public CustomBlockPreviewService(
+            ITempDataProvider tempDataProvider,
+            IViewComponentHelperWrapper viewComponentHelperWrapper,
+            IRazorViewEngine razorViewEngine,
+            ITypeFinder typeFinder,
+            BlockEditorConverter blockEditorConverter,
+            IViewComponentSelector viewComponentSelector,
+            IPublishedValueFallback publishedValueFallback,
+            IOptions<BlockPreviewOptions> options,
+            IJsonSerializer jsonSerializer,
+            IContentTypeService contentTypeService,
+            IDataTypeService dataTypeService,
+            AppCaches appCaches,
+            IWebHostEnvironment webHostEnvironment,
+            IBlockEditorElementTypeCache elementTypeCache,
+            ILogger<BlockPreviewService> logger)
+            : base(tempDataProvider, viewComponentHelperWrapper, razorViewEngine, typeFinder, blockEditorConverter, viewComponentSelector, publishedValueFallback, options, jsonSerializer, contentTypeService, dataTypeService, appCaches, webHostEnvironment, elementTypeCache, logger)
+        {
+            _razorViewEngine = razorViewEngine;
+        }
+        protected override ViewEngineResult? GetViewResult(BlockPreviewContext context)
+        {
+            var blockGrid = CustomPathViews.GetPathViewBlockGridPreview("~/Views/Partials/blockgrid/Components/" + context.ContentAlias, isCheckSiteName: false);
+            if (!string.IsNullOrEmpty(blockGrid))
+            {
+                if (string.IsNullOrEmpty(Path.GetExtension(blockGrid)))
+                {
+                    return _razorViewEngine.GetView("", viewPath: blockGrid + ".cshtml", isMainPage: false);
+                }
+                else
+                {
+                    return _razorViewEngine.GetView("", viewPath: blockGrid, isMainPage: false);
+                }
+            }
+            return base.GetViewResult(context);
+        }
+    }
+
     public sealed class CustomBlockPreviewLocationExpander : IViewLocationExpander
     {
         public void PopulateValues(ViewLocationExpanderContext context)
@@ -113,7 +172,10 @@ namespace uTPro.Project.Web.Configure
                     {
                         fileName = Path.GetFileName(fileName);
                     }
-
+                    if (site.Contains(blockType + "/Components", StringComparison.OrdinalIgnoreCase))
+                    {
+                        site = Path.GetFileName(site);
+                    }
                     if (!string.IsNullOrEmpty(fileName))
                     {
                         result = $"~/Views/{site}/{blockType}/{type}/{string.Join("/", fileName.Split(Prefix.PrefixData))}.cshtml";
