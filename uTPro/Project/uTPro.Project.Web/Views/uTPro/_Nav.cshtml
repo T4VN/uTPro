@@ -45,6 +45,12 @@
                 </a>
             </li>
         }
+        <li class="language custom-select">
+            <select name="language" class="language-select" onchange="this.options[this.selectedIndex].value&amp;&amp;(window.location=this.options[this.selectedIndex].value)">
+                <option value='/vi/' selected>Tiếng Việt</option>
+                <option value='/en/'>Tiếng Anh</option>
+            </select>
+        </li>
         @* <li style="display: none;"><a href="/">Home</a></li>
         <li><a href="/">About</a></li>
         <!-- <li>
