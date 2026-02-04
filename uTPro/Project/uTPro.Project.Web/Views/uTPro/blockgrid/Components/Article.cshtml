@@ -9,14 +9,14 @@
     <div class="container">
 
         <!-- Content -->
-        <div id="content">
+        <div class="content">
             <article class="box post">
                 <header class="style1">
-                    @if (string.IsNullOrEmpty(Model.Content.Header))
+                    @if (!string.IsNullOrEmpty(Model.Content.Header))
                     {
                         <h2>@Model.Content.Header</h2>
                     }
-                    @if (string.IsNullOrEmpty(Model.Content.Description))
+                    @if (!string.IsNullOrEmpty(Model.Content.Description))
                     {
                         <p>@Model.Content.Description</p>
                     }
