@@ -4,6 +4,8 @@
 **uTPro** is a powerful **Starter Kit Template** built to **accelerate website development on the Umbraco platform**.  
 It enables developers to create **enterprise‑grade websites** faster, more reliably, and with a professional structure from day one.  
 
+<img width="1200" height="297" alt="image" src="https://github.com/user-attachments/assets/41cd2a67-8bc1-40ca-a689-3db1bcee1b24" />
+
 ---
 
 ## 🔑 Core Principles
