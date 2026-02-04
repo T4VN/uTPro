@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Community.BlockPreview;
 using Umbraco.Community.BlockPreview.Extensions;
-using uTPro.Project.Web.Configure;
+using Umbraco.Community.BlockPreview.Interfaces;
 using uTPro.Foundation.Middleware;
+using uTPro.Project.Web.Configure;
 using WebMarkupMin.AspNet.Common.Compressors;
 using WebMarkupMin.AspNetCoreLatest;
 using WebMarkupMin.Core;
@@ -89,7 +92,7 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
 {
     options.ViewLocationExpanders.Add(new CustomBlockPreviewLocationExpander());
 });
-
+builder.Services.AddTransient<IBlockPreviewService, CustomBlockPreviewService>();
 // Form + IIS + Kestrel config
 builder.Services.Configure<FormOptions>(options =>
 {

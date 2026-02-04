@@ -2,14 +2,17 @@
 @{
 }
 <section class="highlights wrapper style3">
-    <div class="title">@Model.Content.Title</div>
+    @if (!string.IsNullOrEmpty(@Model.Content.Title))
+    {
+        <div class="title">@Model.Content.Title</div>
+    }
     <div class="container">
         @if (Model.Content.Highlight != null && Model.Content.Highlight.Any())
         {
             <div class="row aln-center">
                 @foreach (var item in Model.Content.Highlight)
                 {
-                    var content = item.Content as UTproEndorsementsHighlight;
+                    var content = item.Content as UTpro__Endorsements__Highlight;
                     if (content != null)
                     {
                         <div class="col-4 col-12-medium">
@@ -17,9 +20,9 @@
                                 <a href="@content.Link?.Url" target="_blank" class="image featured"><img src="@content.Image?.Url()" alt="@content.Title" /></a>
                                 <h3><a href="@content.Link?.Url" target="_blank">@content.Title</a></h3>
                                 <p>@content.Description</p>
-                                <ul class="actions">
-                                    <li><a href="@content.Link?.Url" class="button style3">Learn More</a></li>
-                                </ul>
+                                @* <ul class="actions">
+                                    <li><a href="@content.Link?.Url" target="_blank" class="button style3">Learn More</a></li>
+                                </ul> *@
                             </section>
                         </div>
                     }

@@ -2,19 +2,20 @@
 @{
 }
 <section class="wrapper style2">
-    <div class="title">@Model.Content.Title</div>
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <div class="title">@Model.Content.Title</div>
+    }
     <div class="container">
 
-        <!-- Image -->
-        <div class="image featured">
-            @if (Model.Content.Image != null)
-            {
+        @if (Model.Content.Image != null)
+        {
+            <div class="image featured">
                 <img src="@Model.Content.Image.MediaUrl()" alt="@Model.Content.Header" />
-            }
-        </div>
+            </div>
+        }
 
-        <!-- Features -->
-        <section id="features">
+        <section class="features">
             <header class="style1">
                 <h2>@Model.Content.Header</h2>
                 <p>@Model.Content.Description</p>
@@ -25,15 +26,28 @@
                     <div class="row">
                         @foreach (var item in Model.Content.ListFeature)
                         {
-                            var content = item.Content as UTproIntroductionDetailFeature;
+                            var content = item.Content as UTpro__IntroductionDetail__Feature;
                             if (content != null)
                             {
                                 <div class="col-6 col-12-medium">
                                     <section>
                                         <h3 class="icon solid @content.ClassIcon">@content.Title</h3>
-                                        @if (content.List != null && content.List.Any())
+                                        @if (Context.Request.IsBlockPreviewRequest())
                                         {
-                                            <p>@string.Join("<br />", content.List).ToHtml()</p>
+                                            var fullString = content.List.FirstOrDefault();
+                                            var items = fullString.Replace("\",\"", "~").Replace("[\"", "").Replace("\"]", "").Split("~");
+                                            foreach (var itemList in items)
+                                            {
+                                                <div>@itemList</div>
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            @if (content.List != null && content.List.Any())
+                                            {
+                                                <p>@string.Join("<br />", content.List).ToHtml()</p>
+                                            }
                                         }
                                     </section>
                                 </div>

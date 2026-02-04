@@ -839,11 +839,11 @@ ul.actions {
 
 /* Features */
 
-#features header.style1 {
+.features header.style1 {
     padding-bottom: 5em;
 }
 
-#features ul.actions {
+.features ul.actions {
     margin-top: 5em;
 }
 
@@ -1553,11 +1553,11 @@ ul.actions {
 
     /* Features */
 
-    #features header.style1 {
+    .features header.style1 {
         padding-bottom: 4em;
     }
 
-    #features ul.actions {
+    .features ul.actions {
         margin-top: 4em;
     }
 
