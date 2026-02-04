@@ -232,7 +232,7 @@ button,
     input[type="reset"].style1,
     button.style1,
     .button.style1 {
-        background: #f6821f url("/assets/img/overlay.png");
+        background-color: var(--section-bg-color);
         color: #fff;
     }
 
@@ -565,13 +565,13 @@ ul.actions {
         }
 
     .wrapper.style1 {
-        background: #f6821f url("/assets/img/overlay.png");
+        background-color: var(--section-bg-color);
         color: #eee;
         color: rgba(255, 255, 255, 0.75);
     }
 
         .wrapper.style1 .title {
-            background: #f6821f url("/assets/img/overlay.png");
+            background-color: var(--section-bg-color);
             color: #fff;
         }
 
@@ -588,20 +588,22 @@ ul.actions {
         }
 
     .wrapper.style2 {
-        background: #fff;
+        background-color: var(--section-bg-color);
     }
 
         .wrapper.style2 .title {
-            background: #fff;
+            background-color: var(--section-bg-color);
             color: #484d55;
         }
 
     .wrapper.style3 {
-        background: #f3f3f3 url("/assets/img/overlay.png");
+        /*background: #f3f3f3 url("/assets/img/overlay.png");*/
+        background-color: var(--section-bg-color);
     }
 
         .wrapper.style3 .title {
-            background: #f3f3f3 url("/assets/img/overlay.png");
+            background-color: var(--section-bg-color);
+            /*background: #f3f3f3 url("/assets/img/overlay.png");*/
             color: #484d55;
         }
 
@@ -632,7 +634,7 @@ ul.actions {
     justify-content: center;
     position: relative;
     height: 24em;
-    background: url("/assets/img/bkg-login.jpg") bottom center;
+    /*background: url("/assets/img/bkg-login.jpg") bottom center;*/
     background-size: cover;
     padding: 0;
 }
@@ -644,7 +646,7 @@ ul.actions {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(36, 38, 40, .5);
+        /*background: rgba(36, 38, 40, .5);*/
     }
 
 .bodypage .header {
@@ -807,17 +809,12 @@ ul.actions {
 
 /* Intro */
 
-#intro {
+.intro {
     padding-bottom: 8em;
     text-align: center;
 }
 
-    #intro p.style1 {
-        font-size: 1.5em;
-        letter-spacing: 0.075em;
-    }
-
-    #intro p.style2 {
+    .intro .style2 {
         font-weight: 700;
         color: #fff;
         border-radius: 0.35em;
@@ -829,12 +826,12 @@ ul.actions {
         margin-bottom: 1em;
     }
 
-        #intro p.style2 a {
+        .intro .style2 a {
             color: inherit;
             text-decoration: none;
         }
 
-    #intro p.style3 {
+    .intro .style3 {
         font-size: 1.1em;
         width: 48em;
         margin: 0 auto;
@@ -842,21 +839,21 @@ ul.actions {
 
 /* Features */
 
-#features header.style1 {
+.features header.style1 {
     padding-bottom: 5em;
 }
 
-#features ul.actions {
+.features ul.actions {
     margin-top: 5em;
 }
 
 /* Highlights */
 
-#highlights .highlight {
+.highlights .highlight {
     text-align: center;
 }
 
-    #highlights .highlight h3 {
+    .highlights .highlight h3 {
         color: #f6821f;
         margin: 0 0 0.75em 0;
         font-size: 1.15em;
@@ -1061,15 +1058,11 @@ ul.actions {
 
     /* Intro */
 
-    #intro {
+    .intro {
         padding-bottom: 7em;
     }
 
-        #intro p.style1 {
-            font-size: 1.25em;
-        }
-
-        #intro p.style2 {
+        .intro .style2 {
             font-size: 2.25em;
         }
 
@@ -1151,13 +1144,13 @@ ul.actions {
 
     /* Intro */
 
-    #intro p.style3 {
+    .intro .style3 {
         width: auto;
     }
 
     /* Highlights */
 
-    #highlights .highlight {
+    .highlights .highlight {
         max-width: 40em;
         margin-left: auto;
         margin-right: auto;
@@ -1539,7 +1532,7 @@ ul.actions {
 
     /* Intro */
 
-    #intro {
+    .intro {
         text-align: center;
         padding-right: 2em;
         padding-left: 2em;
@@ -1547,11 +1540,11 @@ ul.actions {
         margin: 0 auto;
     }
 
-        #intro p.style1 {
+        .intro .style1 {
             margin-bottom: 1.5em;
         }
 
-        #intro p.style2 {
+        .intro .style2 {
             font-size: 1.5em;
             letter-spacing: 0.05em;
             line-height: 1.25em;
@@ -1560,11 +1553,11 @@ ul.actions {
 
     /* Features */
 
-    #features header.style1 {
+    .features header.style1 {
         padding-bottom: 4em;
     }
 
-    #features ul.actions {
+    .features ul.actions {
         margin-top: 4em;
     }
 

@@ -10,19 +10,21 @@
 @{
     Layout = null;
 
-    var titlePage = string.IsNullOrWhiteSpace(Context.Items["titlePage"]?.ToString())
+    var titlePage = string.IsNullOrWhiteSpace(Context?.Items["titlePage"]?.ToString())
         ? "Page Not Found"
-        : Context.Items["titlePage"]!.ToString();
+        : Context?.Items["titlePage"]?.ToString();
 
-    var logo = string.IsNullOrWhiteSpace(Context.Items["logo"]?.ToString())
+    var logo = string.IsNullOrWhiteSpace(Context?.Items["logo"]?.ToString())
         ? "/assets/img/logo.svg"
-        : Context.Items["logo"]!.ToString();
+        : Context?.Items["logo"]?.ToString();
 
-    var title = string.IsNullOrWhiteSpace(Context.Items["title"]?.ToString())
+    var title = string.IsNullOrWhiteSpace(Context?.Items["title"]?.ToString())
         ? titlePage
-        : Context.Items["title"]!.ToString();
+        : Context?.Items["title"]?.ToString();
 
-    var message = Context.Items["message"]!.ToString();
+    var message = string.IsNullOrWhiteSpace(Context?.Items["title"]?.ToString())
+        ? String.Empty
+        : Context?.Items["message"]?.ToString();
 }
 <!doctype html>
 <html>
