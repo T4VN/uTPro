@@ -1,4 +1,5 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+﻿@using System.Text
+@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<UTpro__PageHome>
 @{
     if (Model == null || Model.NavigationLink == null)
@@ -7,6 +8,7 @@
     }
     var culs = CurrentSite.GetCultures();
     var navItems = (GlobalFolderNavigationLinkForSite)Model.NavigationLink;
+    var (optionHtml, hrefHtml) = BuildLanguageHtml();
 
     bool ActiveMenu(GlobalNavigationItem item)
     {
@@ -21,30 +23,43 @@
         return false;
     }
 
-    IHtmlContent GetOptionLangauge()
+    (IHtmlContent optionHtml, IHtmlContent hrefHtml) BuildLanguageHtml()
     {
-        string result = string.Empty;
-        foreach (var item in culs)
+        if (culs.Any() && culs.Count() > 1)
         {
-            var selected = CurrentSite.CurrentCulture.Name.Equals(item.Culture, StringComparison.OrdinalIgnoreCase);
-            string strSelect = string.Empty;
-            if (selected)
-            {
-                strSelect = "selected";
-            }
-            var url = Model.Url(item.Culture);
-            if (url == "#" || string.IsNullOrEmpty(url))
-            {
-                url = CurrentSite.GetItem().PageHome?.Url(@item.Culture);
-            }
-            if (!string.IsNullOrEmpty(url))
-            {
-                result += $@"<option value='{url}' {strSelect}>{item.Culture.ToUpper()}</option>";
-            }
-        }
-        return Html.Raw(result);
-    }
+            var optionBuilder = new StringBuilder();
+            var hrefBuilder = new StringBuilder();
 
+            foreach (var item in culs)
+            {
+                bool isSelected = CurrentSite.CurrentCulture.Name.Equals(item.Culture, StringComparison.OrdinalIgnoreCase);
+
+                var url = Model.Url(item.Culture);
+                if (url == "#" || string.IsNullOrEmpty(url))
+                {
+                    url = CurrentSite.GetItem().PageHome?.Url(item.Culture);
+                }
+                if (string.IsNullOrEmpty(url))
+                    continue;
+
+                // option
+                optionBuilder.Append(
+                    $"<option value='{url}' {(isSelected ? "selected" : "")}>{item.Culture.ToUpper()}</option>"
+                );
+
+                // href list (chỉ add nếu không phải ngôn ngữ hiện tại)
+                if (!isSelected)
+                {
+                    hrefBuilder.Append(
+                        $"<li><a href='{url}'>{item.Culture.ToUpper()}</a></li>"
+                    );
+                }
+            }
+
+            return (Html.Raw(optionBuilder.ToString()), Html.Raw(hrefBuilder.ToString()));
+        }
+        return (Html.Raw(string.Empty), Html.Raw(string.Empty));
+    }
 }
 <nav class="navHeader">
     <ul>
@@ -71,12 +86,18 @@
                 </a>
             </li>
         }
-        @if (culs.Any() && culs.Count() > 1)
+        @if (!string.IsNullOrWhiteSpace(optionHtml.ToString()) && !string.IsNullOrWhiteSpace(hrefHtml.ToString()))
         {
             <li class="language custom-select">
                 <select name="language" class="language-select" onchange="this.options[this.selectedIndex].value&amp;&amp;(window.location=this.options[this.selectedIndex].value)">
-                    @GetOptionLangauge()
+                    @optionHtml
                 </select>
+            </li>
+            <li class="nav-show-mobile">
+                <a href="#">Language</a>
+                <ul>
+                    @hrefHtml
+                </ul>
             </li>
         }
         @* <li style="display: none;"><a href="/">Home</a></li>
