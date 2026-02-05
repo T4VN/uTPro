@@ -138,7 +138,7 @@ namespace uTPro.Extension.CurrentSite
 
         public IEnumerable<PublishedCultureInfo> GetCultures()
         {
-            var culs = this.GetItem().Root.Cultures;
+            var culs = this.GetItem().PageHome?.Cultures;
             if (culs == null || culs.Count == 1)
             {
                 yield return new PublishedCultureInfo(DefaultCulture, DefaultCulture, null, DateTime.Now);

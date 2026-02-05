@@ -16,6 +16,9 @@ for (i = 0; i < l; i++) {
     for (j = 0; j < ll; j++) {
         /*for each option in the original select element,
         create a new DIV that will act as an option item:*/
+        if (selElmnt.options[j].selected) {
+            continue;
+        }
         c = document.createElement("DIV");
         c.innerHTML = selElmnt.options[j].innerHTML;
         c.addEventListener("click", function (e) {

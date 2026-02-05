@@ -5,6 +5,7 @@
     {
         return;
     }
+    var culs = CurrentSite.GetCultures();
     var navItems = (GlobalFolderNavigationLinkForSite)Model.NavigationLink;
 
     bool ActiveMenu(GlobalNavigationItem item)
@@ -19,6 +20,31 @@
         }
         return false;
     }
+
+    IHtmlContent GetOptionLangauge()
+    {
+        string result = string.Empty;
+        foreach (var item in culs)
+        {
+            var selected = CurrentSite.CurrentCulture.Name.Equals(item.Culture, StringComparison.OrdinalIgnoreCase);
+            string strSelect = string.Empty;
+            if (selected)
+            {
+                strSelect = "selected";
+            }
+            var url = Model.Url(item.Culture);
+            if (url == "#" || string.IsNullOrEmpty(url))
+            {
+                url = CurrentSite.GetItem().PageHome?.Url(@item.Culture);
+            }
+            if (!string.IsNullOrEmpty(url))
+            {
+                result += $@"<option value='{url}' {strSelect}>{item.Culture.ToUpper()}</option>";
+            }
+        }
+        return Html.Raw(result);
+    }
+
 }
 <nav class="navHeader">
     <ul>
@@ -45,12 +71,14 @@
                 </a>
             </li>
         }
-        <li class="language custom-select">
-            <select name="language" class="language-select" onchange="this.options[this.selectedIndex].value&amp;&amp;(window.location=this.options[this.selectedIndex].value)">
-                <option value='/vi/' selected>Tiếng Việt</option>
-                <option value='/en/'>Tiếng Anh</option>
-            </select>
-        </li>
+        @if (culs.Any() && culs.Count() > 1)
+        {
+            <li class="language custom-select">
+                <select name="language" class="language-select" onchange="this.options[this.selectedIndex].value&amp;&amp;(window.location=this.options[this.selectedIndex].value)">
+                    @GetOptionLangauge()
+                </select>
+            </li>
+        }
         @* <li style="display: none;"><a href="/">Home</a></li>
         <li><a href="/">About</a></li>
         <!-- <li>
