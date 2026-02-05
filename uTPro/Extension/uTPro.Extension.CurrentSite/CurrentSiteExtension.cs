@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -35,6 +36,7 @@ namespace uTPro.Extension.CurrentSite
         void SetCurrentCulture(CultureInfo cul);
         ICurrentItemExtension GetItem();
         Task<IEnumerable<Domain>> GetDomains(bool isGetAll);
+        string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default);
     }
 
     internal class CurrentSiteExtension : ICurrentSiteExtension
@@ -138,7 +140,7 @@ namespace uTPro.Extension.CurrentSite
 
         public IEnumerable<PublishedCultureInfo> GetCultures()
         {
-            var culs = this.GetItem().Root.Cultures;
+            var culs = this.GetItem().PageHome?.Cultures;
             if (culs == null || culs.Count == 1)
             {
                 yield return new PublishedCultureInfo(DefaultCulture, DefaultCulture, null, DateTime.Now);
@@ -194,5 +196,37 @@ namespace uTPro.Extension.CurrentSite
         }
 
         public void SetCurrentCulture(CultureInfo cul) => this._currentCulture = cul;
+
+        public string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default)
+        {
+            var url = content.Url(culture ?? this.CurrentCulture.Name, mode);
+
+            var domain = this.GetDomains(true).GetAwaiter().GetResult().FirstOrDefault(x => x.Culture?.Equals(culture, StringComparison.OrdinalIgnoreCase) ?? false);
+
+            if (domain != null)
+            {
+                var domainUrl = domain.Name.StartsWith("/") 
+                    || domain.Name.StartsWith("http://", StringComparison.OrdinalIgnoreCase) 
+                    || domain.Name.StartsWith("https://", StringComparison.OrdinalIgnoreCase) 
+                    ? domain.Name 
+                    : "https://" + domain.Name;
+
+                var uri = new Uri(domainUrl, UriKind.RelativeOrAbsolute);
+                var segment = uri.AbsolutePath.Trim('/');
+
+                if (!string.IsNullOrWhiteSpace(segment))
+                {
+                    if (!url.StartsWith($"/{segment}", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (url == "/")
+                            return $"/{segment}";
+
+                        return $"/{segment}{url}";
+                    }
+                }
+            }
+
+            return url;
+        }
     }
 }
