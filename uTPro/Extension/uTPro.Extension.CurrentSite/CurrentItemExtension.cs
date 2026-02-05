@@ -24,7 +24,10 @@ namespace uTPro.Extension.CurrentSite
         IPublishedContent? PageHome { get; }
         IPublishedContent? PageErrors { get; }
     }
-    internal class CurrentItemExtension : ICurrentItemExtension, IDisposable
+    internal class CurrentItemExtension(
+        ILogger<CurrentItemExtension> logger,
+        ICurrentSiteExtension currentSite
+        ) : ICurrentItemExtension, IDisposable
     {
         ~CurrentItemExtension()
         {
@@ -46,19 +49,8 @@ namespace uTPro.Extension.CurrentSite
             // free native resources if there are any.
         }
 
-        readonly ICurrentSiteExtension _currentSite;
-        readonly ILogger<CurrentItemExtension> _logger;
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public CurrentItemExtension(
-            ILogger<CurrentItemExtension> logger,
-            ICurrentSiteExtension currentSite)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        {
-            _logger = logger;
-            _currentSite = currentSite;
-
-        }
+        readonly ICurrentSiteExtension _currentSite = currentSite;
+        readonly ILogger<CurrentItemExtension> _logger = logger;
 
         public GlobalRoot Root
         {
@@ -73,10 +65,7 @@ namespace uTPro.Extension.CurrentSite
             get
             {
                 var folderSite = this.PageHome?.Parent<GlobalFolderSites>() ?? null;
-                if (folderSite == null)
-                {
-                    folderSite = (GlobalFolderSites)GetItemByAlias(this.PageHome, GlobalFolderSites.ModelTypeAlias, true);
-                }
+                folderSite ??= (GlobalFolderSites)GetItemByAlias(this.PageHome, GlobalFolderSites.ModelTypeAlias, true);
                 return folderSite ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
             }
         }
@@ -105,18 +94,11 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                IPublishedContent? currentItem = null;
-                if (_currentSite.UContext.PublishedRequest?.PublishedContent != null)
-                {
-                    currentItem = _currentSite.UContext.PublishedRequest?.PublishedContent;
-                }
-                else
-                {
-                    currentItem = this.PageHome;
-                }
-                return currentItem;
+                var published = _currentSite.UContext.PublishedRequest?.PublishedContent;
+                return published ?? this.PageHome;
             }
         }
+
 
         public IPublishedContent? PageHome
         {
@@ -181,9 +163,7 @@ namespace uTPro.Extension.CurrentSite
         private IPublishedContent GetItemByAlias(IPublishedContent? item, string alias, bool isFirst)
         {
             // Start from provided item
-            var current = item;
-            if (current == null)
-                throw new Exception("Not found item: " + alias);
+            var current = item ?? throw new Exception("Not found item: " + alias);
 
             // quick check
             if (string.Equals(current.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
@@ -231,7 +211,7 @@ namespace uTPro.Extension.CurrentSite
             if (pathId.StartsWith("-1", StringComparison.Ordinal))
             {
                 int firstComma = pathId.IndexOf(',');
-                pathIds = (firstComma >= 0 && firstComma + 1 < pathId.Length) ? pathId.Substring(firstComma + 1) : string.Empty;
+                pathIds = (firstComma >= 0 && firstComma + 1 < pathId.Length) ? pathId[(firstComma + 1)..] : string.Empty;
             }
 
             if (string.IsNullOrEmpty(pathIds))
@@ -240,7 +220,7 @@ namespace uTPro.Extension.CurrentSite
             if (isRoot)
             {
                 int firstComma = pathIds.IndexOf(',');
-                var root = firstComma >= 0 ? pathIds.Substring(0, firstComma) : pathIds;
+                var root = firstComma >= 0 ? pathIds[..firstComma] : pathIds;
                 return (root ?? string.Empty, pathIds);
             }
 
@@ -257,7 +237,7 @@ namespace uTPro.Extension.CurrentSite
             }
             else
             {
-                parent = pathIds.Substring(0, lastComma);
+                parent = pathIds[..lastComma];
             }
             return (parent, pathIds);
         }
