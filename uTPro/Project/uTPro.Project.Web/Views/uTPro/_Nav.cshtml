@@ -34,10 +34,10 @@
             {
                 bool isSelected = CurrentSite.CurrentCulture.Name.Equals(item.Culture, StringComparison.OrdinalIgnoreCase);
 
-                var url = CurrentSite.GetUrl(Model, item.Culture, UrlMode.Auto);
+                var url = CurrentSite.GetUrlWithCulture(Model, item.Culture, UrlMode.Auto);
                 if (url == "#" || string.IsNullOrEmpty(url))
                 {
-                    url = CurrentSite.GetUrl(CurrentSite.GetItem().PageHome, item.Culture, UrlMode.Auto);
+                    url = CurrentSite.GetUrlWithCulture(CurrentSite.GetItem().PageHome, item.Culture, UrlMode.Auto);
                 }
                 if (string.IsNullOrEmpty(url))
                     continue;

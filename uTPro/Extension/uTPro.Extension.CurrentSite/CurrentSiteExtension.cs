@@ -36,7 +36,7 @@ namespace uTPro.Extension.CurrentSite
         void SetCurrentCulture(CultureInfo cul);
         ICurrentItemExtension GetItem();
         Task<IEnumerable<Domain>> GetDomains(bool isGetAll);
-        string GetUrl(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default);
+        string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default);
     }
 
     internal class CurrentSiteExtension : ICurrentSiteExtension
