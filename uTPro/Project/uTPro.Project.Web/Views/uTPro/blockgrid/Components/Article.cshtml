@@ -1,9 +1,17 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Article>>
 @{
 }
-@using (Html.SetSection(Model.GetType().ToString(), HtmlSectionBlockExtensions.Position.BodyBottom))
+
+@if (Context.Request.IsBlockPreviewRequest())
 {
     <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Article.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString(), HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Article.css" />
+    }
 }
 <div class="container">
     <div class="content">

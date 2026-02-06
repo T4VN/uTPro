@@ -1,10 +1,16 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Introduction>>
 @{
 }
-
-@using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+@if (Context.Request.IsBlockPreviewRequest())
 {
     <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Introduction.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Introduction.css" />
+    }
 }
 <div class="intro container">
     <div class="style-content">

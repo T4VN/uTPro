@@ -1,9 +1,16 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Endorsements>>
 @{
 }
-@using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+@if (Context.Request.IsBlockPreviewRequest())
 {
     <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Endorsements.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Endorsements.css" />
+    }
 }
 <div class="highlights container">
     @if (!string.IsNullOrEmpty(@Model.Content.Title))

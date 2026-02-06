@@ -2,9 +2,18 @@
 @{
 }
 
-@using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+@if (Context.Request.IsBlockPreviewRequest())
 {
     <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/IntroductionDetail.css" />
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/IntroductionDetail_List.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/IntroductionDetail.css" />
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/IntroductionDetail_List.css" />
+    }
 }
 <div class="container">
     @if (Model.Content.Image != null)
@@ -20,10 +29,6 @@
         </header>
         @if (Model.Content.ListFeature != null && Model.Content.ListFeature.Any())
         {
-            @using (Html.SetSection(Model.GetType().ToString() + "ListFeature", HtmlSectionBlockExtensions.Position.BodyBottom))
-            {
-                <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/IntroductionDetail_List.css" />
-            }
             <div class="feature-list">
                 <div class="row">
                     @foreach (var item in Model.Content.ListFeature)
