@@ -4,6 +4,9 @@ x = document.getElementsByClassName("language");
 l = x.length;
 for (i = 0; i < l; i++) {
     selElmnt = x[i].getElementsByTagName("select")[0];
+    if (!selElmnt) {
+        continue;
+    }
     ll = selElmnt.length;
     /*for each element, create a new DIV that will act as the selected item:*/
     a = document.createElement("DIV");
