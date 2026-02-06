@@ -711,7 +711,7 @@ ul.actions {
             }
 
             .navHeader > ul > li > a,
-            .navHeader > ul > li > span {
+            .navHeader > ul > li > * {
                 display: block;
                 color: #eee;
                 color: rgba(255, 255, 255, 0.75);
@@ -1563,11 +1563,11 @@ ul.actions {
 
     /* Content */
 
-    #content {
+    .content {
         padding: 0 0 2em 0;
     }
 
-        #content header.style1 {
+        .content header.style1 {
             padding-bottom: 2.5em;
         }
 
@@ -1611,4 +1611,73 @@ ul.actions {
                 #copyright ul li:first-child {
                     margin-top: 0;
                 }
+}
+
+.custom-select {
+    position: relative;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+    .custom-select .note {
+        min-width: -moz-fit-content;
+        min-width: fit-content;
+    }
+
+    .custom-select select, .custom-select .select-hide {
+        display: none !important;
+    }
+
+    .custom-select .select-selected:after {
+        position: absolute;
+        content: "";
+        top: 40%;
+        right: -15px;
+        width: 0;
+        height: 0;
+        border: 6px solid transparent;
+        border-color: rgba(255,255,255,.25) transparent transparent transparent;
+    }
+
+@media only screen and (max-width: 768px) {
+    .custom-select .select-selected:after {
+        right: 9px;
+    }
+}
+
+.custom-select .select-selected.select-arrow-active:after {
+    border-color: transparent transparent rgba(255,255,255,.25) transparent;
+    top: 35%;
+}
+
+.custom-select .select-items {
+    position: absolute;
+    left: 0;
+    z-index: 99;
+    border-radius: .35em;
+    border: 1px solid rgba(255,255,255,.25);
+    height: auto;
+    width: 100%;
+    overflow: auto;
+}
+
+@media only screen and (max-width: 768px) {
+    .custom-select .select-items {
+        bottom: 48px;
+    }
+}
+
+.custom-select .select-items div, .select-selected {
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media only screen and (max-width: 768px) {
+    .custom-select .select-items div, .select-selected {
+        padding: 5px 27px 5px 7px;
+    }
 }

@@ -2,11 +2,34 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>
 @{
     if (Model?.Any() != true) { return; }
+    var currentPage = Umbraco.AssignedContentItem;
+    var top = currentPage?.GetInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("topComponent");
+    var bottom = currentPage?.GetInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("bottomComponent");
 }
 
-<div class="umb-block-grid"
-     data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
-     style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
-    @* @await Html.GetBlockGridItemsHtmlAsync(Model) *@
-    @await Html.GetPreviewBlockGridItemsHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
-</div>
+@if (top != null)
+{
+    <div class="umb-block-grid"
+         data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
+         style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
+        @await Html.GetPreviewBlockGridItemsHtmlAsync(top, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
+    </div>
+}
+@if (Model != null)
+{
+    <div class="umb-block-grid"
+         data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
+         style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
+        @* @await Html.GetBlockGridItemsHtmlAsync(Model) *@
+        @await Html.GetPreviewBlockGridItemsHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
+    </div>
+
+}
+@if (bottom != null)
+{
+    <div class="umb-block-grid"
+         data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
+         style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
+        @await Html.GetPreviewBlockGridItemsHtmlAsync(bottom, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
+    </div>
+}

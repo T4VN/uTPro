@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Page Home</summary>
 	[PublishedModel("uTPro__PageHome")]
-	public partial class UTpro__PageHome : PublishedContentModel, IGlobalPageHeadMetaSetting, IGlobalPageHeadSocialMetaSetting, IGlobalPageNavigationConfigSettingForHomePage, IGlobalPageNavigationSetting, IGlobalPageScriptSetting, IGlobalPageSitemapSetting
+	public partial class UTpro__PageHome : PublishedContentModel, IGlobalPageHeadMetaSetting, IGlobalPageHeadSocialMetaSetting, IGlobalPageNavigationConfigSettingForHomePage, IGlobalPageNavigationSetting, IGlobalPageScriptSetting, IGlobalPageSitemapSetting, IUTpro__ContentLayout
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -284,5 +284,21 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
 		[ImplementPropertyType("sitemapXmlPriority")]
 		public virtual decimal SitemapXmlPriority => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPageSitemapSetting.GetSitemapXmlPriority(this, _publishedValueFallback);
+
+		///<summary>
+		/// Bottom Component
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("bottomComponent")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel BottomComponent => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__ContentLayout.GetBottomComponent(this, _publishedValueFallback);
+
+		///<summary>
+		/// Top Component
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.5.0+8b2c22a")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("topComponent")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel TopComponent => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__ContentLayout.GetTopComponent(this, _publishedValueFallback);
 	}
 }

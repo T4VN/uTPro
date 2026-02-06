@@ -25,29 +25,25 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace uTPro.Project.Web.Configure
 {
-    public class CustomBlockPreviewService : BlockPreviewService
+    public class CustomBlockPreviewService(
+        ITempDataProvider tempDataProvider,
+        IViewComponentHelperWrapper viewComponentHelperWrapper,
+        IRazorViewEngine razorViewEngine,
+        ITypeFinder typeFinder,
+        BlockEditorConverter blockEditorConverter,
+        IViewComponentSelector viewComponentSelector,
+        IPublishedValueFallback publishedValueFallback,
+        IOptions<BlockPreviewOptions> options,
+        IJsonSerializer jsonSerializer,
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        AppCaches appCaches,
+        IWebHostEnvironment webHostEnvironment,
+        IBlockEditorElementTypeCache elementTypeCache,
+        ILogger<BlockPreviewService> logger) : BlockPreviewService(tempDataProvider, viewComponentHelperWrapper, razorViewEngine, typeFinder, blockEditorConverter, viewComponentSelector, publishedValueFallback, options, jsonSerializer, contentTypeService, dataTypeService, appCaches, webHostEnvironment, elementTypeCache, logger)
     {
-        IRazorViewEngine _razorViewEngine;
-        public CustomBlockPreviewService(
-            ITempDataProvider tempDataProvider,
-            IViewComponentHelperWrapper viewComponentHelperWrapper,
-            IRazorViewEngine razorViewEngine,
-            ITypeFinder typeFinder,
-            BlockEditorConverter blockEditorConverter,
-            IViewComponentSelector viewComponentSelector,
-            IPublishedValueFallback publishedValueFallback,
-            IOptions<BlockPreviewOptions> options,
-            IJsonSerializer jsonSerializer,
-            IContentTypeService contentTypeService,
-            IDataTypeService dataTypeService,
-            AppCaches appCaches,
-            IWebHostEnvironment webHostEnvironment,
-            IBlockEditorElementTypeCache elementTypeCache,
-            ILogger<BlockPreviewService> logger)
-            : base(tempDataProvider, viewComponentHelperWrapper, razorViewEngine, typeFinder, blockEditorConverter, viewComponentSelector, publishedValueFallback, options, jsonSerializer, contentTypeService, dataTypeService, appCaches, webHostEnvironment, elementTypeCache, logger)
-        {
-            _razorViewEngine = razorViewEngine;
-        }
+        readonly IRazorViewEngine _razorViewEngine = razorViewEngine;
+
         protected override ViewEngineResult? GetViewResult(BlockPreviewContext context)
         {
             var blockGrid = CustomPathViews.GetPathViewBlockGridPreview("~/Views/Partials/blockgrid/Components/" + context.ContentAlias, isCheckSiteName: false);
@@ -168,7 +164,7 @@ namespace uTPro.Project.Web.Configure
                 {
                     // Basic sanitization: remove leading slashes and keep only filename part to avoid traversal
                     fileName = fileName.TrimStart('/', '\\');
-                    if (fileName.IndexOfAny(new[] { '\\', '/' }) >= 0)
+                    if (fileName.IndexOfAny(['\\', '/']) >= 0)
                     {
                         fileName = Path.GetFileName(fileName);
                     }
@@ -217,8 +213,8 @@ namespace uTPro.Project.Web.Configure
             var idx = viewName.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
             if (idx > 0)
             {
-                var parsedSite = viewName.Substring(0, idx);
-                var parsedFile = idx + prefix.Length < viewName.Length ? viewName.Substring(idx + prefix.Length) : string.Empty;
+                var parsedSite = viewName[..idx];
+                var parsedFile = idx + prefix.Length < viewName.Length ? viewName[(idx + prefix.Length)..] : string.Empty;
 
                 if (isCheckSiteName)
                 {

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -35,6 +36,7 @@ namespace uTPro.Extension.CurrentSite
         void SetCurrentCulture(CultureInfo cul);
         ICurrentItemExtension GetItem();
         Task<IEnumerable<Domain>> GetDomains(bool isGetAll);
+        string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default);
     }
 
     internal class CurrentSiteExtension : ICurrentSiteExtension
@@ -75,10 +77,7 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                if (this._currentCulture == null)
-                {
-                    this._currentCulture = Thread.CurrentThread.CurrentCulture;
-                }
+                this._currentCulture ??= Thread.CurrentThread.CurrentCulture;
                 return this._currentCulture;
             }
         }
@@ -127,10 +126,7 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                if (this._umbracoContext == null)
-                {
-                    this._umbracoContext = _umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
-                }
+                this._umbracoContext ??= _umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
 
                 return this._umbracoContext ?? throw new Exception("UmbracoContext is null");
             }
@@ -138,7 +134,7 @@ namespace uTPro.Extension.CurrentSite
 
         public IEnumerable<PublishedCultureInfo> GetCultures()
         {
-            var culs = this.GetItem().Root.Cultures;
+            var culs = this.GetItem().PageHome?.Cultures;
             if (culs == null || culs.Count == 1)
             {
                 yield return new PublishedCultureInfo(DefaultCulture, DefaultCulture, null, DateTime.Now);
@@ -164,8 +160,8 @@ namespace uTPro.Extension.CurrentSite
         }
 
         // Simple in-memory cache for all domains to reduce repeated UContext access
-        private static readonly object _domainsLock = new object();
-        private static IEnumerable<Domain> _cachedAllDomains = Enumerable.Empty<Domain>();
+        private static readonly Lock _domainsLock = new();
+        private static IEnumerable<Domain> _cachedAllDomains = [];
         private static DateTime _cachedAllDomainsExpires = DateTime.MinValue;
         private const int CachedAllDomainsSeconds = 60;
 
@@ -179,7 +175,7 @@ namespace uTPro.Extension.CurrentSite
                     return Task.FromResult(_cachedAllDomains);
                 }
 
-                var all = UContext?.Domains?.GetAll(true) ?? new List<Domain>();
+                var all = UContext?.Domains?.GetAll(true) ?? [];
                 lock (_domainsLock)
                 {
                     _cachedAllDomains = all;
@@ -190,9 +186,41 @@ namespace uTPro.Extension.CurrentSite
 
             var idItem = this.GetItem().Current?.Id;
             var domain = UContext?.Domains?.GetAssigned(idItem ?? 0, true);
-            return Task.FromResult(domain ?? new List<Domain>());
+            return Task.FromResult(domain ?? []);
         }
 
         public void SetCurrentCulture(CultureInfo cul) => this._currentCulture = cul;
+
+        public string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default)
+        {
+            var url = content.Url(culture ?? this.CurrentCulture.Name, mode);
+
+            var domain = this.GetDomains(true).GetAwaiter().GetResult().FirstOrDefault(x => x.Culture?.Equals(culture, StringComparison.OrdinalIgnoreCase) ?? false);
+
+            if (domain != null)
+            {
+                var domainUrl = !(domain.Name.StartsWith('/')
+                    || domain.Name.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                    || domain.Name.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    ? "https://" + domain.Name 
+                    : domain.Name;
+
+                var uri = new Uri(domainUrl, UriKind.RelativeOrAbsolute);
+                var segment = uri.AbsolutePath.Trim('/');
+
+                if (!string.IsNullOrWhiteSpace(segment))
+                {
+                    if (!url.StartsWith($"/{segment}", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (url == "/")
+                            return $"/{segment}";
+
+                        return $"/{segment}{url}";
+                    }
+                }
+            }
+
+            return url;
+        }
     }
 }
