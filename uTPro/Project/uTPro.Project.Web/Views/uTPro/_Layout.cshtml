@@ -10,20 +10,21 @@
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_MetaData);
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderOpeningScripts));
-        @Html.RenderSections(HtmlSectionBlockExtensions.Position.Head)
-        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderClosingScripts));
     }
-
     <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
     <link rel="stylesheet" href="/css/uTPro/layout.css" />
     <link rel="stylesheet" href="/css/uTPro/main.css" />
+    <link rel="stylesheet" href="/css/uTPro/icon.css" />
     @RenderSection("Styles", false)
-
+    @Html.RenderSections(HtmlSectionBlockExtensions.Position.Head)
+    @{
+        await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderClosingScripts));
+    }
 </head>
 <body class="bodypage is-preload">
+    @Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop)
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
-        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop);
         await Html.RenderPartialAsync("_Nav.cshtml", homePage);
     }
     <main class="page-wrapper">
@@ -36,10 +37,10 @@
     <script src="/scripts/uTPro/util.js"></script>
     <script src="/scripts/uTPro/main.js"></script>
     <script src="/scripts/uTPro/select-language.js"></script>
+    @RenderSection("Scripts", false)
     @{
-        RenderSection("Scripts", false);
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
-        Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyBottom);
     }
+    @Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyBottom)
 </body>
 </html>

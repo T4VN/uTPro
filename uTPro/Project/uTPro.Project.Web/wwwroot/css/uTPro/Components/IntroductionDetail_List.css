@@ -1,0 +1,90 @@
+.feature-list {
+    max-width: 58em;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: 0.75em;
+}
+
+    .feature-list section {
+        border-top: solid 1px #eee;
+        padding-top: 3em;
+        padding-left: 5em;
+        position: relative;
+    }
+
+.feature-list h3 {
+    color: #f6821f !important;
+    margin: -0.35em 0 0.75em 0;
+    font-size: 1.15em;
+    letter-spacing: 0.05em;
+    background: #282b34;
+    border-radius: 0.35em;
+    padding: .25em;
+}
+
+    .feature-list h3:before {
+        display: block;
+        color: #fff;
+        background: #2f333b url("/assets/img/overlay.png");
+        border-radius: 2.5em;
+        text-align: center;
+        width: 2.5em;
+        height: 2.5em;
+        line-height: 2.5em;
+        margin-right: 0.75em;
+        position: absolute;
+        left: 0;
+        margin-top: -0.5em;
+    }
+
+.feature-list.small section {
+    padding-left: 3.5em;
+}
+
+.feature-list.small h3:before {
+    font-size: 0.8em;
+}
+
+
+.feature-list .icon > .label {
+    display: none;
+}
+
+.feature-list .icon.solid:before {
+    font-weight: 900;
+}
+
+@media screen and (min-width: 981px) {
+    .feature-list > .row > :nth-child(-n + 2) > section {
+        border-top: 0;
+        padding-top: 0;
+    }
+}
+
+@media screen and (max-width: 980px) {
+    .feature-list {
+        max-width: 40em;
+    }
+
+        .feature-list section {
+            padding-top: 4em;
+        }
+
+        .feature-list > .row > :first-child > section {
+            border-top: 0;
+            padding-top: 0;
+        }
+}
+
+
+@media screen and (max-width: 736px) {
+    .feature-list section {
+        padding-top: 2em;
+        padding-left: 4em;
+    }
+
+    .feature-list h3:before {
+        font-size: 0.9em;
+    }
+}

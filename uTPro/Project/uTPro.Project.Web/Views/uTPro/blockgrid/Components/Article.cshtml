@@ -1,38 +1,41 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Article>>
 @{
 }
-<div class="wrapper style2">
-    @if (!string.IsNullOrEmpty(Model.Content.Title))
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Article.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString(), HtmlSectionBlockExtensions.Position.BodyBottom))
     {
-        <div class="title">@Model.Content.Title</div>
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Article.css" />
     }
-    <div class="container">
-
-        <!-- Content -->
-        <div class="content">
-            <article class="box post">
-                <header class="style1">
-                    @if (!string.IsNullOrEmpty(Model.Content.Header))
-                    {
-                        <h2>@Model.Content.Header</h2>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.Content.Description))
-                    {
-                        <p>@Model.Content.Description</p>
-                    }
-                </header>
-                @if (Model.Content.Thumbnail != null)
+}
+<div class="container">
+    <div class="content">
+        <article class="box post">
+            <header class="style1">
+                @if (!string.IsNullOrEmpty(Model.Content.Title))
                 {
-                    <div class="image featured">
-                        <img src="@Model.Content.Thumbnail.Url()" alt="@Model.Content.Title" />
-                    </div>
+                    <h2>@Model.Content.Title</h2>
                 }
-                @if (Model.Content.Content != null)
+                @if (!string.IsNullOrEmpty(Model.Content.Description))
                 {
-                    @await Html.GetBlockListHtmlAsync(Model.Content.Content, CurrentSite.GetItem().Root.Name)
+                    <p>@Model.Content.Description</p>
                 }
-            </article>
-        </div>
-
+            </header>
+            @if (Model.Content.Thumbnail != null)
+            {
+                <div class="image featured">
+                    <img src="@Model.Content.Thumbnail.Url()" alt="@Model.Content.Title" />
+                </div>
+            }
+            @if (Model.Content.Content != null)
+            {
+                @await Html.GetBlockListHtmlAsync(Model.Content.Content, CurrentSite.GetItem().Root.Name)
+            }
+        </article>
     </div>
 </div>

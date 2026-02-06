@@ -237,7 +237,7 @@ a:hover {
 strong,
 b {
 	font-weight: 700;
-	color: #484d55;
+	color: inherit;
 }
 
 blockquote {

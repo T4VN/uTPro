@@ -1,0 +1,95 @@
+.banner-header {
+    display: -moz-flex;
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -moz-align-items: center;
+    -webkit-align-items: center;
+    -ms-align-items: center;
+    align-items: center;
+    -moz-justify-content: center;
+    -webkit-justify-content: center;
+    -ms-justify-content: center;
+    justify-content: center;
+    position: relative;
+    height: 24em;
+    /*background: url("/assets/img/bkg-login.jpg") bottom center;*/
+    background-size: cover;
+    padding: 0;
+    height: 35em;
+}
+
+    .banner-header:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /*background: rgba(36, 38, 40, .5);*/
+    }
+
+    .banner-header .text {
+        width: 100%;
+        text-align: center;
+        position: relative;
+        top: 1.5em;
+    }
+
+        .banner-header .text h1 {
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #ff9e40;
+            font-size: 2em;
+            letter-spacing: 0.25em;
+        }
+
+        .banner-header .text p {
+            color: #eee;
+            color: rgba(255, 255, 255, 0.75);
+            text-transform: uppercase;
+            margin: 1.25em 0 0 0;
+            display: block;
+            letter-spacing: 0.2em;
+            font-size: 0.9em;
+        }
+
+@media screen and (max-width: 1280px) {
+    .banner-header .text {
+        margin-top: -0.5em !important;
+    }
+
+        .banner-header .text h1 {
+            font-size: 1.75em;
+        }
+}
+
+@media screen and (max-width: 980px) {
+    .banner-header .text {
+        top: 0;
+    }
+}
+
+@media screen and (max-width: 736px) {
+    .banner-header {
+        height: 20em;
+    }
+
+        .banner-header .text {
+            text-align: center;
+            padding-left: 2em;
+            padding-right: 2em;
+        }
+
+            .banner-header .text h1 {
+                font-size: 1.5em;
+                letter-spacing: 0.2em;
+            }
+
+            .banner-header .text p {
+                margin: 1.25em 0 0 0;
+                display: block;
+                letter-spacing: 0.2em;
+                font-size: 0.9em;
+            }
+}

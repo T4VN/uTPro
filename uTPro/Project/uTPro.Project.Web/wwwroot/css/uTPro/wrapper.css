@@ -1,0 +1,93 @@
+
+/* Wrapper */
+
+.wrapper {
+    position: relative;
+    padding: 6em 0 9em 0;
+    background-color: var(--section-bg-color);
+    color: var(--section-text-color)
+}
+
+    .wrapper * {
+        color: var(--section-text-color)
+    }
+
+
+    .wrapper .image {
+        border: solid 10px #fff;
+    }
+
+    .wrapper .title {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        text-align: center;
+        text-transform: uppercase;
+        display: block;
+        font-weight: 700;
+        letter-spacing: 0.25em;
+        font-size: 0.9em;
+        width: 25em;
+        height: 3.25em;
+        top: -3.25em;
+        line-height: 3.25em;
+        margin-bottom: -3.25em;
+        margin-left: -12.5em;
+        padding-top: 0.5em;
+        background: var(--section-bg-color);
+    }
+
+        .wrapper .title:before {
+            content: '';
+            position: absolute;
+            bottom: -38px;
+            left: -35px;
+            width: 35px;
+            height: 38px;
+            background: url("/assets/img/shadow.png");
+        }
+
+        .wrapper .title:after {
+            -moz-transform: scaleX(-1);
+            -webkit-transform: scaleX(-1);
+            -ms-transform: scaleX(-1);
+            transform: scaleX(-1);
+            content: '';
+            position: absolute;
+            bottom: -38px;
+            right: -35px;
+            width: 35px;
+            height: 38px;
+            background: url("/assets/img/shadow.png");
+        }
+
+@media screen and (max-width: 1280px) {
+    .wrapper {
+        padding: 4em 0 7em 0;
+    }
+}
+
+@media screen and (max-width: 736px) {
+    .wrapper {
+        padding: 3em 0 6em 0;
+    }
+
+        .wrapper .title {
+            font-size: 0.9em;
+            width: 18em;
+            height: 2.5em;
+            top: -2.5em;
+            line-height: 2.5em;
+            margin-bottom: -2.5em;
+            margin-left: -9em;
+            padding-top: 0.5em;
+        }
+
+            .wrapper .title:before,
+            .wrapper .title:after {
+                height: 15px;
+                bottom: -15px;
+                background-size: 100% 100%;
+            }
+
+}
