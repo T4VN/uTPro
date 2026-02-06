@@ -1,26 +1,25 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Introduction>>
 @{
 }
-<section class="intro style1 wrapper">
-    @if (!string.IsNullOrEmpty(Model.Content.Title))
-    {
-        <div class="title">@Model.Content.Title</div>
-    }
-    <div class="container">
-        <div class="style1">
-            <div class="richtext">@Model.Content.Description</div>
-            <p></p>
-            <div class="style2">@Model.Content.Highlight</div>
-            <p></p>
-            <div class="style3">@Model.Content.Special</div>
-        </div>
-        @if (Model.Content.CallToAction != null)
-        {
-            <ul class="actions">
-                <li>
-                    <a href="@Model.Content.CallToAction.LinkToString()" class="button large" target="@Model.Content.CallToAction.Target">@Model.Content.CallToAction.Name</a>
-                </li>
-            </ul>
-        }
+
+@using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Introduction.css" />
+}
+<div class="intro container">
+    <div class="style-content">
+        <div class="richtext">@Model.Content.Description</div>
+        <p></p>
+        <div class="style-content2">@Model.Content.Highlight</div>
+        <p></p>
+        <div class="style-content3">@Model.Content.Special</div>
     </div>
-</section>
+    @if (Model.Content.CallToAction != null)
+    {
+        <ul class="actions">
+            <li>
+                <a href="@Model.Content.CallToAction.LinkToString()" class="button large" target="@Model.Content.CallToAction.Target">@Model.Content.CallToAction.Name</a>
+            </li>
+        </ul>
+    }
+</div>

@@ -1,77 +1,77 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__IntroductionDetail>>
 @{
 }
-<section class="wrapper style2">
-    @if (!string.IsNullOrEmpty(Model.Content.Title))
-    {
-        <div class="title">@Model.Content.Title</div>
-    }
-    <div class="container">
 
-        @if (Model.Content.Image != null)
+@using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/IntroductionDetail.css" />
+}
+<div class="container">
+    @if (Model.Content.Image != null)
+    {
+        <div class="image featured">
+            <img src="@Model.Content.Image.MediaUrl()" alt="@Model.Content.Title" />
+        </div>
+    }
+    <section class="features">
+        <header class="style1">
+            <h2>@Model.Content.Title</h2>
+            <p>@Model.Content.Description</p>
+        </header>
+        @if (Model.Content.ListFeature != null && Model.Content.ListFeature.Any())
         {
-            <div class="image featured">
-                <img src="@Model.Content.Image.MediaUrl()" alt="@Model.Content.Header" />
+            @using (Html.SetSection(Model.GetType().ToString() + "ListFeature", HtmlSectionBlockExtensions.Position.BodyBottom))
+            {
+                <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/IntroductionDetail_List.css" />
+            }
+            <div class="feature-list">
+                <div class="row">
+                    @foreach (var item in Model.Content.ListFeature)
+                    {
+                        var content = item.Content as UTpro__IntroductionDetail__Feature;
+                        if (content != null)
+                        {
+                            <div class="col-6 col-12-medium">
+                                <section>
+                                    <h3 class="icon solid @content.ClassIcon">@content.Title</h3>
+                                    @if (Context.Request.IsBlockPreviewRequest())
+                                    {
+                                        var fullString = content.List.FirstOrDefault();
+                                        var items = fullString.Replace("\",\"", "~").Replace("[\"", "").Replace("\"]", "").Split("~");
+                                        foreach (var itemList in items)
+                                        {
+                                            <div>@itemList</div>
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                        @if (content.List != null && content.List.Any())
+                                        {
+                                            <p>@string.Join("<br />", content.List).ToHtml()</p>
+                                        }
+                                    }
+                                </section>
+                            </div>
+                        }
+                    }
+                </div>
             </div>
         }
 
-        <section class="features">
-            <header class="style1">
-                <h2>@Model.Content.Header</h2>
-                <p>@Model.Content.Description</p>
-            </header>
-            @if (Model.Content.ListFeature != null && Model.Content.ListFeature.Any())
+        <ul class="actions special">
+            @if (Model.Content.CallToActionGetStarted != null)
             {
-                <div class="feature-list">
-                    <div class="row">
-                        @foreach (var item in Model.Content.ListFeature)
-                        {
-                            var content = item.Content as UTpro__IntroductionDetail__Feature;
-                            if (content != null)
-                            {
-                                <div class="col-6 col-12-medium">
-                                    <section>
-                                        <h3 class="icon solid @content.ClassIcon">@content.Title</h3>
-                                        @if (Context.Request.IsBlockPreviewRequest())
-                                        {
-                                            var fullString = content.List.FirstOrDefault();
-                                            var items = fullString.Replace("\",\"", "~").Replace("[\"", "").Replace("\"]", "").Split("~");
-                                            foreach (var itemList in items)
-                                            {
-                                                <div>@itemList</div>
-                                            }
-                                        }
-                                        else
-                                        {
-
-                                            @if (content.List != null && content.List.Any())
-                                            {
-                                                <p>@string.Join("<br />", content.List).ToHtml()</p>
-                                            }
-                                        }
-                                    </section>
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
+                <li>
+                    <a href="@Model.Content.CallToActionGetStarted.LinkToString()" class="button style3 large" target="@Model.Content.CallToActionGetStarted.Target">@Model.Content.CallToActionGetStarted.Name</a>
+                </li>
             }
-
-            <ul class="actions special">
-                @if (Model.Content.CallToActionGetStarted != null)
-                {
-                    <li>
-                        <a href="@Model.Content.CallToActionGetStarted.LinkToString()" class="button style3 large" target="@Model.Content.CallToActionGetStarted.Target">@Model.Content.CallToActionGetStarted.Name</a>
-                    </li>
-                }
-                @if (Model.Content.CallToActionMoreInfo != null)
-                {
-                    <li>
-                        <a href="@Model.Content.CallToActionMoreInfo.LinkToString()" class="button style2 large" target="@Model.Content.CallToActionMoreInfo.Target">@Model.Content.CallToActionMoreInfo.Name</a>
-                    </li>
-                }
-            </ul>
-        </section>
-
-    </div>
-</section>
+            @if (Model.Content.CallToActionMoreInfo != null)
+            {
+                <li>
+                    <a href="@Model.Content.CallToActionMoreInfo.LinkToString()" class="button style2 large" target="@Model.Content.CallToActionMoreInfo.Target">@Model.Content.CallToActionMoreInfo.Name</a>
+                </li>
+            }
+        </ul>
+    </section>
+</div>
