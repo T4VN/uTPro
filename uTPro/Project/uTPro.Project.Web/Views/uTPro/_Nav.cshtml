@@ -65,6 +65,10 @@
         return (Html.Raw(string.Empty), Html.Raw(string.Empty));
     }
 }
+@using (Html.SetSection(Model.GetType().ToString(), HtmlSectionBlockExtensions.Position.BodyBottom))
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/navHeader.css" />
+}
 <nav class="navHeader">
     <ul>
         @foreach (var item in navItems.NavigationItems!)

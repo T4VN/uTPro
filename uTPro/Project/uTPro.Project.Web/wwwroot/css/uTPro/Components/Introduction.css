@@ -1,0 +1,64 @@
+.intro {
+    padding-bottom: 8em;
+    text-align: center;
+    color: var(--section-text-color);
+}
+
+    .intro a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .intro .style-content2 {
+        font-weight: 700;
+        border-radius: 0.35em;
+        box-shadow: inset 0px 0px 1px 1px rgba(255, 255, 255, 0.25);
+        font-size: 2.75em;
+        letter-spacing: 0.075em;
+        line-height: 1.35em;
+        padding: 1em 0 1em 0;
+        margin-bottom: 1em;
+    }
+
+    .intro .style-content3 {
+        font-size: 1.1em;
+        width: 48em;
+        margin: 0 auto;
+    }
+
+@media screen and (max-width: 1280px) {
+    .intro {
+        padding-bottom: 7em;
+    }
+
+        .intro .style-content2 {
+            font-size: 2.25em;
+        }
+}
+
+@media screen and (max-width: 980px) {
+    .intro .style-content3 {
+        width: auto;
+    }
+}
+
+@media screen and (max-width: 736px) {
+    .intro {
+        text-align: center;
+        padding-right: 2em;
+        padding-left: 2em;
+        padding-bottom: 5em;
+        margin: 0 auto;
+    }
+
+        .intro .style-content {
+            margin-bottom: 1.5em;
+        }
+
+        .intro .style-content2 {
+            font-size: 1.5em;
+            letter-spacing: 0.05em;
+            line-height: 1.25em;
+            padding: 1.25em;
+        }
+}

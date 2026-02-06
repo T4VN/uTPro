@@ -1,0 +1,48 @@
+
+.box header {
+    margin: 0 0 1.5em 0;
+}
+
+    .box header.style1 {
+        position: relative;
+        margin: -0.5em 0 0 0;
+        padding-top: 0;
+    }
+
+.box h2 {
+    margin: 0 0 0.75em 0;
+    font-size: 1.15em;
+    letter-spacing: 0.05em;
+}
+
+.box h3 {
+    margin: 0 0 0.5em 0;
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.box.post-excerpt .image.left {
+    position: relative;
+    top: 0.5em;
+    width: 5em;
+}
+
+.box.post-excerpt h3,
+.box.post-excerpt p {
+    margin-left: 7em;
+}
+
+@media screen and (max-width: 736px) {
+    .box.post-excerpt .image.left {
+        position: relative;
+        top: 0.25em;
+        width: 25%;
+        margin: 0;
+    }
+
+    .box.post-excerpt h3,
+    .box.post-excerpt p {
+        margin-left: 32.5%;
+    }
+}

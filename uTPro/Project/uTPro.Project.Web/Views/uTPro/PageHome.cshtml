@@ -1,5 +1,11 @@
 ﻿@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
+    var currentPage = Umbraco.AssignedContentItem;
+    var top = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("topComponent");
+    var bottom = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("bottomComponent");
+    var content = Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content");
 }
-@await Html.GetBlockGridHtmlAsync(Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content"), CurrentSite.GetItem().Root.Name)
+@await Html.GetBlockGridHtmlAsync(top, CurrentSite.GetItem().Root.Name)
+@await Html.GetBlockGridHtmlAsync(content, CurrentSite.GetItem().Root.Name)
+@await Html.GetBlockGridHtmlAsync(bottom, CurrentSite.GetItem().Root.Name)
