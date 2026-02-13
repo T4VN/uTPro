@@ -1,46 +1,29 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
+﻿using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Cache.PropertyEditors;
-using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Community.BlockPreview;
 using Umbraco.Community.BlockPreview.Interfaces;
 using Umbraco.Community.BlockPreview.Services;
 using uTPro.Common.Constants;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace uTPro.Project.Web.Configure
 {
     public class CustomBlockPreviewService(
-        ITempDataProvider tempDataProvider,
-        IViewComponentHelperWrapper viewComponentHelperWrapper,
         IRazorViewEngine razorViewEngine,
-        ITypeFinder typeFinder,
+        IPublishedModelFactory publishedModelFactory,
         BlockEditorConverter blockEditorConverter,
-        IViewComponentSelector viewComponentSelector,
-        IPublishedValueFallback publishedValueFallback,
         IOptions<BlockPreviewOptions> options,
         IJsonSerializer jsonSerializer,
-        IContentTypeService contentTypeService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IWebHostEnvironment webHostEnvironment,
-        IBlockEditorElementTypeCache elementTypeCache,
-        ILogger<BlockPreviewService> logger) : BlockPreviewService(tempDataProvider, viewComponentHelperWrapper, razorViewEngine, typeFinder, blockEditorConverter, viewComponentSelector, publishedValueFallback, options, jsonSerializer, contentTypeService, dataTypeService, appCaches, webHostEnvironment, elementTypeCache, logger)
+        IBlockModelFactory blockModelFactory,
+        IBlockViewRenderer blockViewRenderer,
+        IBlockDataConverter blockDataConverter,
+        IBlockTypeCacheService blockTypeCacheService,
+        IBlockPreviewViewResolver viewResolver)
+    : BlockPreviewService(publishedModelFactory, blockEditorConverter, options, jsonSerializer, blockModelFactory, blockViewRenderer, blockDataConverter, blockTypeCacheService, viewResolver)
     {
         readonly IRazorViewEngine _razorViewEngine = razorViewEngine;
 
