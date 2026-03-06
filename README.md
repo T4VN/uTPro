@@ -62,3 +62,7 @@ uTPro is **completely free and open source**, giving developers the freedom to *
 ## Share Component (Top/Bottom Component for layout):
 
 <img width="1404" height="566" alt="image" src="https://github.com/user-attachments/assets/2127053b-3081-4c1e-b86f-53c1333ea051" />
+
+## Include CSS/JS only when the component is rendered
+
+<img width="1031" height="417" alt="image" src="https://github.com/user-attachments/assets/37206453-3593-4c07-ac50-66334d0544de" />
