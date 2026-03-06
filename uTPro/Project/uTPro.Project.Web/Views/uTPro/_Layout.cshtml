@@ -29,6 +29,21 @@
     }
     <main class="page-wrapper">
         @RenderBody()
+
+        @using (Html.SetSection(CurrentSite.GetItem().Root.Name + "copyright", HtmlSectionBlockExtensions.Position.BodyBottom))
+        {
+            <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/copyright.css" />
+        }
+        <div style="background-color: #282b34">
+            <div class="container">
+                <div id="copyright">
+                    <ul>
+                        <li>© T4VN</li>
+                        <li>Design: <a target="_blank" href="http://html5up.net">HTML5 UP</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </main>
     <script src="/assets/scripts/jquery.min.js"></script>
     <script src="/assets/scripts/jquery.dropotron.min.js"></script>
