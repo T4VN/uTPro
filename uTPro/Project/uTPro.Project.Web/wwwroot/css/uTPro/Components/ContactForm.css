@@ -1,0 +1,106 @@
+﻿
+.contactform form input[type="text"],
+.contactform form input[type="email"],
+.contactform form input[type="password"],
+.contactform form select,
+.contactform form textarea {
+    /*background: #ccc;*/
+    color: #484d55;
+    box-shadow: none;
+}
+
+    .contactform form input[type="text"]:focus,
+    .contactform form input[type="email"]:focus,
+    .contactform form input[type="password"]:focus,
+    .contactform form select:focus,
+    .contactform form textarea:focus {
+        background: #ccc;
+    }
+
+.contactform input[type="button"],
+.contactform input[type="submit"],
+.contactform input[type="reset"],
+.contactform button,
+.contactform .button {
+    color: #fff;
+    box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.5);
+}
+
+    .contactform input[type="button"]:hover,
+    .contactform input[type="submit"]:hover,
+    .contactform input[type="reset"]:hover,
+    .contactform button:hover,
+    .contactform .button:hover {
+        color: #fff;
+        box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.65);
+    }
+
+    .contactform input[type="button"]:active,
+    .contactform input[type="submit"]:active,
+    .contactform input[type="reset"]:active,
+    .contactform button:active,
+    .contactform .button:active {
+        box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.75);
+    }
+
+    .contactform input[type="button"].style2:active,
+    .contactform input[type="submit"].style2:active,
+    .contactform input[type="reset"].style2:active,
+    .contactform button.style2:active,
+    .contactform .button.style2:active {
+        box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.75);
+    }
+
+.contactform .feature-list {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: 0.75em;
+}
+
+    .contactform .feature-list section {
+        border-top: solid 1px #eee;
+        padding-top: 3em;
+        padding-left: 5em;
+        position: relative;
+    }
+
+
+    .contactform .feature-list.small section {
+        padding-left: 3.5em;
+        border-top-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .contactform .feature-list h3:before {
+        background: #3d4249 url("/assets/img/overlay.png");
+    }
+
+@media screen and (max-width: 980px) {
+    .contactform .feature-list {
+        border-top: solid 1px rgba(255, 255, 255, 0.05);
+        padding-top: 4em;
+    }
+}
+
+@media screen and (max-width: 980px) and (min-width: 737px) {
+
+    .contactform .feature-list > .row > :nth-child(2) > section {
+        border-top: 0;
+        padding-top: 0;
+    }
+}
+
+@media screen and (max-width: 736px) {
+    .contactform .feature-list {
+        border-top: 0;
+        padding-top: 0;
+    }
+}
+
+@media screen and (min-width: 981px) {
+    .contactform .feature-list > .row > :nth-child(-n + 2) > section {
+        border-top: 0;
+        padding-top: 0;
+    }
+}

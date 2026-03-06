@@ -39,22 +39,9 @@ else
                             <div class="col-6 col-12-medium">
                                 <section>
                                     <h3 class="icon solid @content.ClassIcon">@content.Title</h3>
-                                    @if (Context.Request.IsBlockPreviewRequest())
+                                    @if (content.List?.Any() == true)
                                     {
-                                        var fullString = content.List.FirstOrDefault();
-                                        var items = fullString.Replace("\",\"", "~").Replace("[\"", "").Replace("\"]", "").Split("~");
-                                        foreach (var itemList in items)
-                                        {
-                                            <div>@itemList</div>
-                                        }
-                                    }
-                                    else
-                                    {
-
-                                        @if (content.List != null && content.List.Any())
-                                        {
-                                            <p>@string.Join("<br />", content.List).ToHtml()</p>
-                                        }
+                                        <p>@string.Join("<br />", content.List).ToHtml()</p>
                                     }
                                 </section>
                             </div>
