@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+		<PackageReference Include="ArroSimpleForm" Version="16.0.0" />
 		<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />
 		<PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
 		<PackageReference Include="uSync" Version="16.1.0" />
