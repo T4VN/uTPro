@@ -16,23 +16,19 @@ namespace uTPro.Extension
 
         public static IDisposable SetSection(this IHtmlHelper helper, string key, Position position)
         {
-            if (helper is null)
-            {
-                throw new ArgumentNullException(nameof(helper));
-            }
-            return new SectionBlock(helper, key, position);
+            return helper is null ? throw new ArgumentNullException(nameof(helper)) : (IDisposable)new SectionBlock(helper, key, position);
         }
 
         public static IHtmlContent RenderSections(this IHtmlHelper helper, Position position)
         {
-            if (helper is null)
+            if (helper is not null)
             {
-                throw new ArgumentNullException(nameof(helper));
+                var getsection = GetSectionsList(helper, position);
+                var strResult = string.Join(Environment.NewLine, getsection);
+                var strInline = strResult.ToInline();
+                return new HtmlString(strInline);
             }
-            var getsection = GetSectionsList(helper, position);
-            var strResult = string.Join(Environment.NewLine, getsection);
-            var strInline = strResult.ToInline();
-            return new HtmlString(strInline);
+            throw new ArgumentNullException(nameof(helper));
         }
 
         private static IEnumerable<string> GetSectionsList(IHtmlHelper helper, Position position)

@@ -22,11 +22,11 @@ var umbracoBuilder = builder.CreateUmbracoBuilder()
     .AddBlockPreview(options =>
     {
         options.BlockGrid.Enabled = true;
-        options.BlockGrid.Stylesheets = new() {
+        options.BlockGrid.Stylesheets = [
             "/assets/css/blockgridlayout-backoffice.css",
             "/css/uTPro/layout.css",
             "/css/uTPro/main.css"
-        };
+        ];
     });
 
 umbracoBuilder.Build();
@@ -70,12 +70,12 @@ builder.Services.AddWebMarkupMin(options =>
     options.MinificationSettings.AttributeQuotesRemovalMode = HtmlAttributeQuotesRemovalMode.KeepQuotes;
 }).AddXmlMinification().AddXhtmlMinification().AddHttpCompression(options =>
 {
-    options.CompressorFactories = new List<ICompressorFactory>
-    {
+    options.CompressorFactories =
+    [
         new GZipCompressorFactory(),
         new BuiltInBrotliCompressorFactory(),
         new DeflateCompressorFactory()
-    };
+    ];
 });
 
 builder.Services.AddRenderingDefaults();
