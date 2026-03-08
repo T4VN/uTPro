@@ -97,7 +97,9 @@
         @if (!string.IsNullOrWhiteSpace(optionHtml.ToString()) && !string.IsNullOrWhiteSpace(hrefHtml.ToString()))
         {
             <li class="language custom-select">
-                <select name="language" class="language-select" onchange="this.options[this.selectedIndex].value&amp;&amp;(window.location=this.options[this.selectedIndex].value)">
+                <select name="language"
+                        class="language-select"
+                        onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)">
                     @optionHtml
                 </select>
             </li>
