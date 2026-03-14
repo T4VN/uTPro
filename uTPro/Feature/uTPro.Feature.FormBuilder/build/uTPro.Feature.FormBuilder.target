@@ -1,0 +1,39 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- Source: Feature project -->
+    <uTProFormContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\uTProForm\**\*.*</uTProFormContentFilesPath>
+    <uTProFormViewsPath>$(MSBuildThisFileDirectory)..\Views\Partials\**\*.*</uTProFormViewsPath>
+  </PropertyGroup>
+
+  <Target Name="uTProFormCopyAssets" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <uTProFormContentFiles Include="$(uTProFormContentFilesPath)" />
+      <uTProFormViewFiles Include="$(uTProFormViewsPath)" />
+    </ItemGroup>
+
+    <Message Text="Copying uTProForm Content from $(uTProFormContentFilesPath) - #@(uTProFormContentFiles->Count()) files" Importance="high" />
+    <Message Text="Copying uTProForm Views from $(uTProFormViewsPath) - #@(uTProFormViewFiles->Count()) files" Importance="high" />
+
+    <!-- Destination: Web project -->
+    <Copy
+      SourceFiles="@(uTProFormContentFiles)"
+      DestinationFiles="@(uTProFormContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\uTProForm\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+
+    <Copy
+      SourceFiles="@(uTProFormViewFiles)"
+      DestinationFiles="@(uTProFormViewFiles->'$(MSBuildProjectDirectory)\Views\Partials\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="uTProFormClearAssets" BeforeTargets="Clean">
+    <ItemGroup>
+      <uTProFormDir Include="$(MSBuildProjectDirectory)\App_Plugins\uTProForm\" />
+    </ItemGroup>
+
+    <Message Text="Clearing old uTProForm assets in Web project" Importance="high" />
+    <RemoveDir Directories="@(uTProFormDir)" />
+  </Target>
+
+</Project>

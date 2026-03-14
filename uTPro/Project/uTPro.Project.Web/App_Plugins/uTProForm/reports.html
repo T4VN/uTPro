@@ -1,0 +1,92 @@
+<![CDATA[<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Form Reports</title>
+    <style>
+        .reports-container {
+            padding: 20px;
+        }
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .reports-table th, .reports-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .reports-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .reports-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .pagination button:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .pagination button:hover:not(:disabled) {
+            background-color: #f0f0f0;
+        }
+        .page-info {
+            margin: 0 15px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <arro-reports></arro-reports>
+
+    <template id="arro-reports-template">
+        <div class="reports-container">
+            <h2>Form Submissions Report</h2>
+            
+            <div id="loading" class="loading" style="display: none;">
+                Loading...
+            </div>
+
+            <table class="reports-table">
+                <thead>
+                    <tr>
+                        <th>Form Name</th>
+                        <th>Website URL</th>
+                        <th>Form Page URL</th>
+                        <th>IP Address</th>
+                        <th>Browser</th>
+                        <th>Device Type</th>
+                        <th>Submitted Date</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button id="prevBtn" disabled>Previous</button>
+                <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                <button id="nextBtn" disabled>Next</button>
+            </div>
+        </div>
+    </template>
+</body>
+</html>]]>

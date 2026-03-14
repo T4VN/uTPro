@@ -1,0 +1,23 @@
+@model dynamic
+@using ArroSimpleForm.Controllers
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Extensions;
+@using ArroSimpleForm.Extensions;
+@inject Umbraco.Cms.Infrastructure.Scoping.IScopeProvider ScopeProvider
+
+@{
+    Layout = null;
+    string? formName;
+    if (Model == null)
+        return;
+    else
+        formName = Model.ToString();
+}
+
+@using (Html.BeginUmbracoForm<FormViewController>(nameof(FormViewController.Submit), new { enctype = "multipart/form-data" }, FormMethod.Post))
+{
+    <div class="simple-form-container">
+
+        @Html.GetSimpleForm(formName, ScopeProvider)
+    </div>
+}

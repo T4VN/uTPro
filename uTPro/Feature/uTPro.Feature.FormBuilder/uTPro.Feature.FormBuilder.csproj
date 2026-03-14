@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Views\Partials\uTProFormView.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Partials\uTProFormView.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\uTPro.Common\uTPro.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="App_Plugins\uTProForm\arroforms.element.js" />
+    <None Include="App_Plugins\uTProForm\arronewform.element.js" />
+    <None Include="App_Plugins\uTProForm\assets\lang\en-US.json" />
+    <None Include="App_Plugins\uTProForm\assets\lang\en-US.lang" />
+    <None Include="App_Plugins\uTProForm\assets\lang\en-US.text" />
+    <None Include="App_Plugins\uTProForm\dashboard.element.js" />
+    <None Include="App_Plugins\uTProForm\formbuilder.html" />
+    <None Include="App_Plugins\uTProForm\js\form-builder.min.js" />
+    <None Include="App_Plugins\uTProForm\js\jquery-ui.min.js" />
+    <None Include="App_Plugins\uTProForm\js\jquery.min.js" />
+    <None Include="App_Plugins\uTProForm\js\webform.js" />
+    <None Include="App_Plugins\uTProForm\reports.element.js" />
+    <None Include="App_Plugins\uTProForm\reports.html" />
+    <None Include="App_Plugins\uTProForm\umbraco-package.json" />
+  </ItemGroup>
+</Project>

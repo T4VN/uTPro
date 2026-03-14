@@ -1,0 +1,67 @@
+{
+  "id": "ArroSimpleForm",
+  "name": "ArroSimpleForm",
+  "allowPackageTelemetry": true,
+   "extensions": [
+    {
+      "type": "section",
+      "alias": "arroSimpleFormSection",
+      "name": "Arro Simple FormSection",
+      "meta": {
+        "label": "Arro Simple Form",
+        "pathname": "ArroSimpleForm"
+      }
+    },
+    {
+      "type": "dashboard",
+      "alias": "ArroSimpleFormDashboard",
+      "name": "SimpleFormDashboard",
+      "element": "/App_Plugins/ArroSimpleForm/dashboard.element.js",
+      "weight": 10,
+      "meta": {
+        "label": "Dashboard",
+        "pathname": "ArroSimpleForm-dashboard"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "arroSimpleFormSection"
+        }
+      ]
+    },
+    {
+      "type": "sectionView",
+      "alias": "arroFormsView",
+      "name": "ArroForms",
+      "element": "/App_Plugins/ArroSimpleForm/arroforms.element.js",
+      "meta": {
+        "label": "Forms",
+        "icon": "icon-list",
+        "pathname": "arroforms"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "arroSimpleFormSection"
+        }
+      ]
+    },
+    {
+      "type": "sectionView",
+      "alias": "arroReportsView",
+      "name": "ArroReports",
+      "element": "/App_Plugins/ArroSimpleForm/reports.element.js",
+      "meta": {
+        "label": "Reports",
+        "icon": "icon-chart-curve",
+        "pathname": "reports"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "arroSimpleFormSection"
+        }
+      ]
+    }
+  ]
+}

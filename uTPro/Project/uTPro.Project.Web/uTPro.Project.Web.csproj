@@ -29,6 +29,7 @@
 		<PackageReference Include="uSync" Version="16.1.0" />
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.20.2" />
 		<ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
+		<ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
 		<ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
 		<ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
 		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
@@ -42,5 +43,5 @@
 		<RazorCompileOnPublish>true</RazorCompileOnPublish>
 	</PropertyGroup>
 
-
+  <Import Project="..\..\Feature\uTPro.Feature.FormBuilder\build\UTPro.Feature.FormBuilder.target" />
 </Project>
