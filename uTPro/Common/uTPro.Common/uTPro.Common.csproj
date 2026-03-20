@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.3.3" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.4.0" />
     <PackageReference Include="MimeKit" Version="4.15.1" />
     <PackageReference Include="Umbraco.Cms" Version="16.5.1" />
     <PackageReference Include="Umbraco.Community.BlockPreview" Version="4.2.2" />
