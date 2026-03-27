@@ -6,6 +6,7 @@ using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Community.BlockPreview;
 using Umbraco.Community.BlockPreview.Extensions;
 using Umbraco.Community.BlockPreview.Interfaces;
+using uTPro.Common.Constants;
 using uTPro.Foundation.Middleware;
 using uTPro.Project.Web.Configure;
 using WebMarkupMin.AspNet.Common.Compressors;
@@ -33,7 +34,13 @@ umbracoBuilder.Build();
 
 // Razor + runtime compilation
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+});
 
 // WebOptimizer (CSS/JS/HTML minify)
 builder.Services.AddWebOptimizer(pipeline =>
@@ -63,7 +70,7 @@ builder.Services.AddWebMarkupMin(options =>
     options.DisablePoweredByHttpHeaders = true;
     options.DisableMinification = false;
     options.DefaultEncoding = System.Text.Encoding.UTF8;
-    options.MaxResponseSize = int.MaxValue;
+    options.MaxResponseSize = 10 * 1024 * 1024; // 10MB max for minification
 }).AddHtmlMinification(options =>
 {
     options.GenerateStatistics = true;
@@ -97,21 +104,21 @@ builder.Services.AddTransient<IBlockPreviewService, CustomBlockPreviewService>()
 builder.Services.Configure<FormOptions>(options =>
 {
     options.BufferBody = true;
-    options.ValueCountLimit = int.MaxValue;
-    options.ValueLengthLimit = int.MaxValue;
-    options.MultipartBoundaryLengthLimit = int.MaxValue;
-    options.MultipartHeadersCountLimit = int.MaxValue;
-    options.MultipartHeadersLengthLimit = int.MaxValue;
-    options.MultipartBodyLengthLimit = long.MaxValue;
-    options.BufferBodyLengthLimit = 4L * 1024L * 1024L * 1024L;
+    options.ValueCountLimit = 10240;
+    options.ValueLengthLimit = 4 * 1024 * 1024; // 4MB per value
+    options.MultipartBoundaryLengthLimit = 128;
+    options.MultipartHeadersCountLimit = 32;
+    options.MultipartHeadersLengthLimit = 32768;
+    options.MultipartBodyLengthLimit = 128L * 1024L * 1024L; // 128MB max upload
+    options.BufferBodyLengthLimit = 128L * 1024L * 1024L;
 }).Configure<IISServerOptions>(options =>
 {
     options.AllowSynchronousIO = true;
-    options.MaxRequestBodySize = long.MaxValue;
+    options.MaxRequestBodySize = 128L * 1024L * 1024L; // 128MB
 }).Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
 {
     options.AddServerHeader = false;
-    options.Limits.MaxRequestBodySize = long.MaxValue;
+    options.Limits.MaxRequestBodySize = 128L * 1024L * 1024L; // 128MB
 });
 
 builder.Services.AddDataProtection()
@@ -138,6 +145,11 @@ app.UseHttpsRedirection();
 if (!env.IsDevelopment())
 {
     app.UseHsts();
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+        await next();
+    });
 }
 
 app.UseWebOptimizer();
@@ -164,17 +176,36 @@ builderUm.WithEndpoints(u =>
 
 app.MapControllers();
 
-// Custom error handler
+// Custom error handler + security headers
 app.Use(async (context, next) =>
 {
-    //context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-    //context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000");
-    //context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-    //context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+    // Security headers
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+
     await next();
-    if (context.Response.StatusCode == 404)
+
+    // Only redirect 404 for website page requests (not backoffice domain, not static files, not API)
+    if (context.Response.StatusCode == 404
+        && !context.Response.HasStarted
+        && !context.Request.Path.Value!.Contains('.'))
     {
-        context.Response.Redirect("/error");
+        // Check if this is the backoffice domain — skip redirect for backoffice
+        var boEnabled = builder.Configuration.GetValue<bool>(ConfigSettingUTPro.Backoffice.Enabled);
+        var boDomain = builder.Configuration.GetValue<string>(ConfigSettingUTPro.Backoffice.Domain) ?? "";
+        var host = context.Request.Host.Host;
+
+        var isBackoffice = boEnabled
+            && !string.IsNullOrEmpty(boDomain)
+            && boDomain.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Any(d => host.Equals(d.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (!isBackoffice)
+        {
+            context.Response.Redirect("/error");
+        }
     }
 });
 
