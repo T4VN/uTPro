@@ -1,0 +1,33 @@
+{
+  "name": "uTPro.AuditLog",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "uTPro.AuditLog.Dashboard",
+      "name": "Audit Log Dashboard",
+      "element": "/App_Plugins/audit-log/index.js",
+      "elementName": "utpro-audit-log-dashboard",
+      "weight": 20,
+      "meta": {
+        "label": "#auditLog_dashboardTitle",
+        "pathname": "audit-log"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Settings"
+        }
+      ]
+    },
+    {
+      "type": "localization",
+      "alias": "uTPro.AuditLog.Localize.EnUS",
+      "name": "Audit Log English",
+      "js": "/App_Plugins/audit-log/lang/en-us.js",
+      "meta": {
+        "culture": "en-US"
+      }
+    }
+  ]
+}
