@@ -1,0 +1,33 @@
+{
+  "name": "uTPro.FileManager",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "uTPro.FileManager.Dashboard",
+      "name": "File Manager Dashboard",
+      "element": "/App_Plugins/file-manager/index.js",
+      "elementName": "utpro-file-manager-dashboard",
+      "weight": 10,
+      "meta": {
+        "label": "#fileManager_title",
+        "pathname": "file-manager"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Settings"
+        }
+      ]
+    },
+    {
+      "type": "localization",
+      "alias": "uTPro.FileManager.Localize.EnUS",
+      "name": "File Manager English",
+      "js": "/App_Plugins/file-manager/lang/en-us.js",
+      "meta": {
+        "culture": "en-US"
+      }
+    }
+  ]
+}

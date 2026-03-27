@@ -19,6 +19,9 @@
 	  <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
 	  <Content Include="App_Plugins\cms-screen\style.css" />
 	  <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
+	  <Content Include="App_Plugins\file-manager\index.js" />
+	  <Content Include="App_Plugins\file-manager\umbraco-package.json" />
+	  <Content Include="App_Plugins\file-manager\lang\en-us.js" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -28,6 +31,7 @@
 		<PackageReference Include="uSync" Version="16.1.0" />
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.21.0" />
 		<ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
+		<ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
 		<ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
 		<ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
 		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />

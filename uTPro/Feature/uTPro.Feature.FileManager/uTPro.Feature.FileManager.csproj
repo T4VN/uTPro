@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\uTPro.Feature.FileManager\uTPro.Feature.FileManager.csproj" />
+    <ProjectReference Include="..\..\Common\uTPro.Common\uTPro.Common.csproj" />
   </ItemGroup>
 
 </Project>
