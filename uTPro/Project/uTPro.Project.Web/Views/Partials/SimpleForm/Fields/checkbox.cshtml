@@ -1,0 +1,31 @@
+@model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
+@{
+    var formId = ViewData["FormId"] as string ?? "sf";
+    var fieldId = formId + "-" + Model.Name;
+}
+
+@if (Model.Options != null && Model.Options.Any())
+{
+    <label>
+        @Model.Label
+        @if (Model.Required) { <span class="sf-required">*</span> }
+    </label>
+    <div class="sf-options">
+        @foreach (var opt in Model.Options)
+        {
+            var cbId = fieldId + "-" + opt.Value;
+            <label class="sf-option">
+                <input type="checkbox" id="@cbId" name="@Model.Name" value="@opt.Value" />
+                @opt.Text
+            </label>
+        }
+    </div>
+}
+else
+{
+    <label class="sf-option">
+        <input type="checkbox" id="@fieldId" name="@Model.Name" value="true" />
+        @Model.Label
+    </label>
+}
+<span class="sf-error" data-for="@Model.Name"></span>

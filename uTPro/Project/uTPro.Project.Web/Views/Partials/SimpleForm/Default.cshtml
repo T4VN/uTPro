@@ -1,0 +1,165 @@
+@model uTPro.Feature.SimpleForm.Models.FormViewModel
+@{
+    var formId = "sf-" + Model.Alias;
+    var cssClass = ViewBag.FormCssClass as string ?? "";
+    var btnText = ViewBag.SubmitBtnText as string ?? "SEND";
+    var showReset = ViewBag.ShowReset as bool? ?? true;
+    var resetText = ViewBag.ResetBtnText as string ?? "RESET";
+}
+
+<form id="@formId" class="sf @cssClass" novalidate>
+    <input type="hidden" name="__alias" value="@Model.Alias" />
+
+    <div class="sf-grid">
+        @foreach (var field in Model.Fields.OrderBy(f => f.SortOrder))
+        {
+            var span = field.ColSpan >= 2 ? "sf-col-full" : "sf-col-half";
+            var fieldCss = field.CssClass ?? "";
+
+            <div class="sf-cell @span @fieldCss">
+                @{
+                    // Try custom partial first: Fields/{Type}.cshtml
+                    // Fallback to Fields/_Default.cshtml
+                    var customPartial = $"~/Views/Partials/SimpleForm/Fields/{field.Type}.cshtml";
+                    var fallbackPartial = "~/Views/Partials/SimpleForm/Fields/_Default.cshtml";
+                }
+                @if (System.IO.File.Exists(
+                    System.IO.Path.Combine(
+                        ViewContext.HttpContext.RequestServices
+                            .GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>()
+                            .ContentRootPath,
+                        customPartial.Replace("~/", "").Replace("/", System.IO.Path.DirectorySeparatorChar.ToString()))))
+                {
+                    @await Html.PartialAsync(customPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId } })
+                }
+                else
+                {
+                    @await Html.PartialAsync(fallbackPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId } })
+                }
+            </div>
+        }
+    </div>
+
+    <div class="sf-actions">
+        <button type="submit" class="sf-btn sf-btn-submit">@btnText</button>
+        @if (showReset)
+        {
+            <button type="reset" class="sf-btn sf-btn-reset">@resetText</button>
+        }
+    </div>
+    <div class="sf-message" style="display:none;"></div>
+</form>
+
+<script>
+(function() {
+    var form = document.getElementById('@formId');
+    if (!form) return;
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var msgEl = form.querySelector('.sf-message');
+        var btn = form.querySelector('.sf-btn-submit');
+        form.querySelectorAll('.sf-error').forEach(function(el) { el.textContent = ''; });
+        msgEl.style.display = 'none';
+
+        var data = {};
+        var valid = true;
+        var inputs = form.querySelectorAll('[name]');
+        inputs.forEach(function(input) {
+            if (input.name === '__alias') return;
+            var name = input.name;
+            if (input.type === 'checkbox') {
+                var checked = form.querySelectorAll('input[name="' + name + '"]:checked');
+                if (checked.length > 0) data[name] = Array.from(checked).map(function(c) { return c.value; }).join(', ');
+            } else if (input.type === 'radio') {
+                var sel = form.querySelector('input[name="' + name + '"]:checked');
+                if (sel) data[name] = sel.value;
+            } else if (input.type !== 'file') {
+                data[name] = input.value;
+            }
+            if (input.hasAttribute('required') && !data[name]) {
+                var errEl = form.querySelector('.sf-error[data-for="' + name + '"]');
+                if (errEl) errEl.textContent = input.dataset.msg || 'Required';
+                valid = false;
+            }
+            if (input.pattern && data[name]) {
+                if (!new RegExp(input.pattern).test(data[name])) {
+                    var errEl2 = form.querySelector('.sf-error[data-for="' + name + '"]');
+                    if (errEl2) errEl2.textContent = input.dataset.msg || 'Invalid';
+                    valid = false;
+                }
+            }
+        });
+
+        // Hook: allow custom field types to inject validation/data
+        if (window.__sfBeforeSubmit) {
+            var hookResult = await window.__sfBeforeSubmit('@Model.Alias', data, form);
+            if (hookResult === false) return;
+            if (typeof hookResult === 'object') Object.assign(data, hookResult);
+        }
+
+        if (!valid) return;
+        btn.disabled = true; btn.textContent = 'Sending...';
+        try {
+            var resp = await fetch('/api/utpro/simple-form/submit', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ alias: '@Model.Alias', data: data })
+            });
+            var result = await resp.json();
+            if (resp.ok) {
+                @if (!string.IsNullOrEmpty(Model.RedirectUrl))
+                {
+                    @:window.location.href = '@Model.RedirectUrl'; return;
+                }
+                msgEl.className = 'sf-message sf-success'; msgEl.textContent = result.message || 'Thank you!';
+                msgEl.style.display = 'block'; form.reset();
+                if (window.__sfAfterSubmit) window.__sfAfterSubmit('@Model.Alias', true, result);
+            } else {
+                msgEl.className = 'sf-message sf-fail'; msgEl.textContent = result.message || 'Error';
+                msgEl.style.display = 'block';
+            }
+        } catch (err) {
+            msgEl.className = 'sf-message sf-fail'; msgEl.textContent = 'Network error'; msgEl.style.display = 'block';
+        }
+        btn.disabled = false; btn.textContent = '@btnText';
+    });
+})();
+</script>
+
+<style>
+.sf { max-width: 100%; }
+.sf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sf-col-half { grid-column: span 1; }
+.sf-col-full { grid-column: span 2; }
+.sf label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 0.9rem; }
+.sf input[type="text"], .sf input[type="email"], .sf input[type="tel"],
+.sf input[type="number"], .sf input[type="date"], .sf input[type="url"],
+.sf input[type="password"], .sf textarea, .sf select {
+    width: 100%; padding: 12px 16px; border: 1px solid #ccc; border-radius: 6px;
+    font-size: 15px; box-sizing: border-box; background: #f0ede8; color: #333;
+    transition: border-color 0.2s;
+}
+.sf input:focus, .sf textarea:focus, .sf select:focus { border-color: #888; outline: none; }
+.sf textarea { resize: vertical; min-height: 120px; }
+.sf .sf-error { color: #e53935; font-size: 0.8rem; display: block; min-height: 16px; }
+.sf .sf-required { color: #e53935; }
+.sf .sf-options { display: flex; flex-wrap: wrap; gap: 12px; }
+.sf .sf-option { display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; }
+.sf-actions { display: flex; gap: 12px; margin-top: 20px; }
+.sf-btn {
+    padding: 14px 40px; font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; border: 2px solid #555; border-radius: 4px; cursor: pointer;
+    transition: all 0.2s;
+}
+.sf-btn-submit { background: #2d3748; color: #fff; border-color: #2d3748; }
+.sf-btn-submit:hover { background: #4a5568; }
+.sf-btn-reset { background: #2d3748; color: #fff; border-color: #555; }
+.sf-btn-reset:hover { background: #4a5568; }
+.sf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sf-message { margin-top: 16px; padding: 12px; border-radius: 4px; }
+.sf-success { background: #e8fde8; color: #27ae60; }
+.sf-fail { background: #fde8e8; color: #c0392b; }
+@@media (max-width: 640px) {
+    .sf-grid { grid-template-columns: 1fr; }
+    .sf-col-half, .sf-col-full { grid-column: span 1; }
+}
+</style>

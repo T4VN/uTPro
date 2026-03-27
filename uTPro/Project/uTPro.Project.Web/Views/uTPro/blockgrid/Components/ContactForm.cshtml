@@ -19,6 +19,8 @@ else
 
             <!-- Contact Form -->
             <section>
+                @await Component.InvokeAsync("SimpleForm", new { alias = "contact-us" })
+
                 <form method="post" action="#">
                     <div class="row gtr-50">
                         <div class="col-6 col-12-small">

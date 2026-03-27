@@ -1,0 +1,17 @@
+@model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
+@{
+    var formId = ViewData["FormId"] as string ?? "sf";
+    var fieldId = formId + "-" + Model.Name;
+    var rows = Model.Attributes?.GetValueOrDefault("rows") ?? "4";
+}
+
+<label for="@fieldId">
+    @Model.Label
+    @if (Model.Required) { <span class="sf-required">*</span> }
+</label>
+<textarea id="@fieldId" name="@Model.Name"
+          placeholder="@Model.Placeholder"
+          @(Model.Required ? "required" : "")
+          rows="@rows"
+          data-msg="@Model.ValidationMessage">@Model.DefaultValue</textarea>
+<span class="sf-error" data-for="@Model.Name"></span>
