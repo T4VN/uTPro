@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.16.0" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.4.0" />
-    <PackageReference Include="MimeKit" Version="4.15.1" />
+    <PackageReference Include="MimeKit" Version="4.16.0" />
     <PackageReference Include="Umbraco.Cms" Version="16.5.1" />
     <PackageReference Include="Umbraco.Community.BlockPreview" Version="4.2.2" />
     <PackageReference Include="UmbracoSeoVisualizer" Version="16.0.1" />
