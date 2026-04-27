@@ -23,6 +23,18 @@ public class SimpleFormSubmitController(ISimpleFormService formService) : Contro
     {
         var form = formService.GetFormByAlias(alias);
         if (form == null || !form.IsEnabled) return NotFound(new { message = "Form not found" });
+        if (!form.EnableRenderApi) return NotFound(new { message = "Render API is disabled for this form" });
         return Ok(form);
+    }
+
+    [HttpGet("entries/{alias}")]
+    public IActionResult PublicEntries(string alias, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+    {
+        var form = formService.GetFormByAlias(alias);
+        if (form == null || !form.IsEnabled) return NotFound(new { message = "Form not found" });
+        if (!form.EnableEntriesApi) return NotFound(new { message = "Entries API is disabled for this form" });
+        // Public API: sensitive data is always masked
+        var result = formService.GetEntries(form.Id, skip, take, canViewSensitive: false);
+        return Ok(result);
     }
 }

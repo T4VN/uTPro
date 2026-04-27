@@ -23,6 +23,14 @@
 	  <Content Include="App_Plugins\simple-form\umbraco-package.json" />
 	  <Content Include="App_Plugins\simple-form\lang\en-us.js" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Include="App_Plugins\simple-form\api.js" />
+	  <None Include="App_Plugins\simple-form\styles.js" />
+	  <None Include="App_Plugins\simple-form\views\detail-view.js" />
+	  <None Include="App_Plugins\simple-form\views\editor-view.js" />
+	  <None Include="App_Plugins\simple-form\views\entries-view.js" />
+	  <None Include="App_Plugins\simple-form\views\list-view.js" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->

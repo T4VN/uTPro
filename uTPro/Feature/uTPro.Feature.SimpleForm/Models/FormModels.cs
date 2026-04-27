@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using NPoco;
 
 namespace uTPro.Feature.SimpleForm.Models;
@@ -16,15 +17,18 @@ public class SimpleFormDto
     public string? RedirectUrl { get; set; }
     public string? EmailTo { get; set; }
     public string? EmailSubject { get; set; }
-    public bool StoreSubmissions { get; set; } = true;
+    public bool StoreEntries { get; set; } = true;
     public bool IsEnabled { get; set; } = true;
+    public string? VisibleColumnsJson { get; set; }
+    public bool EnableRenderApi { get; set; }
+    public bool EnableEntriesApi { get; set; }
     public DateTime CreatedUtc { get; set; }
     public DateTime UpdatedUtc { get; set; }
 }
 
-[TableName("utpro_SimpleFormSubmission")]
+[TableName("utpro_SimpleFormEntry")]
 [PrimaryKey("Id", AutoIncrement = true)]
-public class SimpleFormSubmissionDto
+public class SimpleFormEntryDto
 {
     public int Id { get; set; }
     public int FormId { get; set; }
@@ -46,8 +50,11 @@ public class FormViewModel
     public string? RedirectUrl { get; set; }
     public string? EmailTo { get; set; }
     public string? EmailSubject { get; set; }
-    public bool StoreSubmissions { get; set; } = true;
+    public bool StoreEntries { get; set; } = true;
     public bool IsEnabled { get; set; } = true;
+    public List<string>? VisibleColumns { get; set; }
+    public bool EnableRenderApi { get; set; }
+    public bool EnableEntriesApi { get; set; }
     public DateTime CreatedUtc { get; set; }
     public DateTime UpdatedUtc { get; set; }
 }
@@ -64,10 +71,13 @@ public class FormFieldViewModel
     public string? Validation { get; set; }
     public string? ValidationMessage { get; set; }
     public string? DefaultValue { get; set; }
+    /// <summary>When true, the field value is encrypted before storage and masked in the backoffice
+    /// unless the user has the Sensitive Data permission. Defaults to true for "password" type.</summary>
+    public bool IsSensitive { get; set; }
     public List<OptionItem>? Options { get; set; }
     public int SortOrder { get; set; }
-    /// <summary>1 = half width (default), 2 = full width in 2-col layout</summary>
-    public int ColSpan { get; set; } = 1;
+    /// <summary>When true, the field is temporarily hidden from the frontend form but kept in the configuration.</summary>
+    public bool IsHidden { get; set; }
     /// <summary>Extra attributes JSON for custom field types (e.g. {"siteKey":"xxx"} for turnstile)</summary>
     public Dictionary<string, string>? Attributes { get; set; }
 }
@@ -88,8 +98,11 @@ public class SaveFormRequest
     public string? RedirectUrl { get; set; }
     public string? EmailTo { get; set; }
     public string? EmailSubject { get; set; }
-    public bool StoreSubmissions { get; set; } = true;
+    public bool StoreEntries { get; set; } = true;
     public bool IsEnabled { get; set; } = true;
+    public List<string>? VisibleColumns { get; set; }
+    public bool EnableRenderApi { get; set; }
+    public bool EnableEntriesApi { get; set; }
 }
 
 public class DeleteFormRequest
@@ -108,7 +121,7 @@ public class SubmitFormRequest
     public Dictionary<string, string> Data { get; set; } = [];
 }
 
-public class SubmissionViewModel
+public class EntryViewModel
 {
     public int Id { get; set; }
     public int FormId { get; set; }
@@ -117,11 +130,14 @@ public class SubmissionViewModel
     public DateTime CreatedUtc { get; set; }
 }
 
-public class SubmissionListRequest
+public class EntryListRequest
 {
     public int FormId { get; set; }
     public int Skip { get; set; } = 0;
     public int Take { get; set; } = 20;
+    public string? Search { get; set; }
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
 }
 
 public class PagedResult<T>

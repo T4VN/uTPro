@@ -1,0 +1,20 @@
+@* Time picker *@
+@model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
+@{
+    var formId = ViewData["FormId"] as string ?? "sf";
+    var fieldId = formId + "-" + Model.Name;
+    var min = Model.Attributes?.GetValueOrDefault("min") ?? "";
+    var max = Model.Attributes?.GetValueOrDefault("max") ?? "";
+}
+
+<label for="@fieldId">
+    @Model.Label
+    @if (Model.Required) { <span class="sf-required">*</span> }
+</label>
+<input type="time" id="@fieldId" name="@Model.Name"
+       value="@Model.DefaultValue"
+       @(Model.Required ? "required" : "")
+       @(!string.IsNullOrEmpty(min) ? $"min=\"{min}\"" : "")
+       @(!string.IsNullOrEmpty(max) ? $"max=\"{max}\"" : "")
+       data-msg="@Model.ValidationMessage" />
+<span class="sf-error" data-for="@Model.Name"></span>

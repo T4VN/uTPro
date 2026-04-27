@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
@@ -21,13 +22,21 @@ public interface ISimpleFormService
     (bool Success, string Message, int Id) SaveForm(SaveFormRequest request);
     (bool Success, string Message) DeleteForm(int id);
     (bool Success, string Message) SubmitForm(string alias, Dictionary<string, string> data, string? ip, string? ua);
-    PagedResult<SubmissionViewModel> GetSubmissions(int formId, int skip, int take);
-    (bool Success, string Message) DeleteSubmission(int id);
+    PagedResult<EntryViewModel> GetEntries(int formId, int skip, int take, bool canViewSensitive = false, string? search = null, DateTime? dateFrom = null, DateTime? dateTo = null);
+    (bool Success, string Message) DeleteEntry(int id);
 }
 
-internal class SimpleFormService(IScopeProvider scopeProvider, ILogger<SimpleFormService> logger) : ISimpleFormService
+internal class SimpleFormService(
+    IScopeProvider scopeProvider,
+    ILogger<SimpleFormService> logger,
+    IDataProtectionProvider dataProtectionProvider) : ISimpleFormService
 {
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    private const string ProtectorPurpose = "uTPro.SimpleForm.SensitiveField";
+    private const string EncryptedPrefix = "🔒:";
+    private const string MaskedValue = "*****";
+
+    private IDataProtector Protector => dataProtectionProvider.CreateProtector(ProtectorPurpose);
 
     public List<FormViewModel> GetAllForms()
     {
@@ -71,8 +80,12 @@ internal class SimpleFormService(IScopeProvider scopeProvider, ILogger<SimpleFor
                 existing.RedirectUrl = request.RedirectUrl;
                 existing.EmailTo = request.EmailTo;
                 existing.EmailSubject = request.EmailSubject;
-                existing.StoreSubmissions = request.StoreSubmissions;
+                existing.StoreEntries = request.StoreEntries;
                 existing.IsEnabled = request.IsEnabled;
+                existing.VisibleColumnsJson = request.VisibleColumns != null
+                    ? JsonSerializer.Serialize(request.VisibleColumns, JsonOpts) : null;
+                existing.EnableRenderApi = request.EnableRenderApi;
+                existing.EnableEntriesApi = request.EnableEntriesApi;
                 existing.UpdatedUtc = now;
                 db.Update(existing);
                 return (true, "Form updated", existing.Id);
@@ -91,8 +104,12 @@ internal class SimpleFormService(IScopeProvider scopeProvider, ILogger<SimpleFor
                     RedirectUrl = request.RedirectUrl,
                     EmailTo = request.EmailTo,
                     EmailSubject = request.EmailSubject,
-                    StoreSubmissions = request.StoreSubmissions,
+                    StoreEntries = request.StoreEntries,
                     IsEnabled = request.IsEnabled,
+                    VisibleColumnsJson = request.VisibleColumns != null
+                        ? JsonSerializer.Serialize(request.VisibleColumns, JsonOpts) : null,
+                    EnableRenderApi = request.EnableRenderApi,
+                    EnableEntriesApi = request.EnableEntriesApi,
                     CreatedUtc = now,
                     UpdatedUtc = now
                 };
@@ -112,7 +129,7 @@ internal class SimpleFormService(IScopeProvider scopeProvider, ILogger<SimpleFor
         try
         {
             using var scope = scopeProvider.CreateScope(autoComplete: true);
-            scope.Database.Execute("DELETE FROM utpro_SimpleFormSubmission WHERE FormId = @0", id);
+            scope.Database.Execute("DELETE FROM utpro_SimpleFormEntry WHERE FormId = @0", id);
             scope.Database.Execute("DELETE FROM utpro_SimpleForm WHERE Id = @0", id);
             return (true, "Deleted");
         }
@@ -132,27 +149,42 @@ internal class SimpleFormService(IScopeProvider scopeProvider, ILogger<SimpleFor
             if (form == null) return (false, "Form not found");
             if (!form.IsEnabled) return (false, "Form is disabled");
 
-            // Validate required fields
             var fields = string.IsNullOrEmpty(form.FieldsJson)
                 ? [] : JsonSerializer.Deserialize<List<FormFieldViewModel>>(form.FieldsJson, JsonOpts) ?? [];
 
-            foreach (var f in fields.Where(f => f.Required))
+            foreach (var f in fields.Where(f => f.Required && !f.IsHidden))
             {
                 if (!data.TryGetValue(f.Name, out var val) || string.IsNullOrWhiteSpace(val))
                     return (false, $"Field '{f.Label}' is required");
             }
 
-            if (form.StoreSubmissions)
+            // Encrypt sensitive fields
+            var sensitiveNames = fields
+                .Where(f => f.IsSensitive || f.Type == "password")
+                .Select(f => f.Name)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var storageData = new Dictionary<string, string>(data);
+            foreach (var key in storageData.Keys.Where(k => sensitiveNames.Contains(k)).ToList())
             {
-                var sub = new SimpleFormSubmissionDto
+                var raw = storageData[key];
+                if (!string.IsNullOrEmpty(raw))
+                {
+                    storageData[key] = EncryptedPrefix + Protector.Protect(raw);
+                }
+            }
+
+            if (form.StoreEntries)
+            {
+                var entry = new SimpleFormEntryDto
                 {
                     FormId = form.Id,
-                    DataJson = JsonSerializer.Serialize(data, JsonOpts),
+                    DataJson = JsonSerializer.Serialize(storageData, JsonOpts),
                     IpAddress = ip,
                     UserAgent = ua?.Length > 500 ? ua[..500] : ua,
                     CreatedUtc = DateTime.UtcNow
                 };
-                scope.Database.Insert(sub);
+                scope.Database.Insert(entry);
             }
 
             return (true, form.SuccessMessage ?? "Thank you for your submission!");
@@ -164,34 +196,42 @@ internal class SimpleFormService(IScopeProvider scopeProvider, ILogger<SimpleFor
         }
     }
 
-    public PagedResult<SubmissionViewModel> GetSubmissions(int formId, int skip, int take)
+    public PagedResult<EntryViewModel> GetEntries(int formId, int skip, int take, bool canViewSensitive = false, string? search = null, DateTime? dateFrom = null, DateTime? dateTo = null)
     {
         using var scope = scopeProvider.CreateScope(autoComplete: true);
         var db = scope.Database;
         var sql = scope.SqlContext.Sql()
-            .Select("*").From("utpro_SimpleFormSubmission")
-            .Where("FormId = @0", formId)
-            .OrderByDescending("CreatedUtc");
+            .Select("*").From("utpro_SimpleFormEntry")
+            .Where("FormId = @0", formId);
 
-        var page = db.Page<SimpleFormSubmissionDto>(skip / Math.Max(take, 1) + 1, take, sql);
-        return new PagedResult<SubmissionViewModel>
+        if (dateFrom.HasValue)
+            sql = sql.Where("CreatedUtc >= @0", dateFrom.Value.Date);
+        if (dateTo.HasValue)
+            sql = sql.Where("CreatedUtc < @0", dateTo.Value.Date.AddDays(1));
+        if (!string.IsNullOrWhiteSpace(search))
+            sql = sql.Where("(DataJson LIKE @0 OR IpAddress LIKE @0)", $"%{search}%");
+
+        sql = sql.OrderByDescending("CreatedUtc");
+
+        var page = db.Page<SimpleFormEntryDto>(skip / Math.Max(take, 1) + 1, take, sql);
+        return new PagedResult<EntryViewModel>
         {
-            Items = page.Items.Select(MapSubmission),
+            Items = page.Items.Select(s => MapEntry(s, canViewSensitive)),
             Total = page.TotalItems
         };
     }
 
-    public (bool Success, string Message) DeleteSubmission(int id)
+    public (bool Success, string Message) DeleteEntry(int id)
     {
         try
         {
             using var scope = scopeProvider.CreateScope(autoComplete: true);
-            scope.Database.Execute("DELETE FROM utpro_SimpleFormSubmission WHERE Id = @0", id);
+            scope.Database.Execute("DELETE FROM utpro_SimpleFormEntry WHERE Id = @0", id);
             return (true, "Deleted");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting submission {Id}", id);
+            logger.LogError(ex, "Error deleting entry {Id}", id);
             return (false, ex.Message);
         }
     }
@@ -203,15 +243,39 @@ internal class SimpleFormService(IScopeProvider scopeProvider, ILogger<SimpleFor
             ? [] : JsonSerializer.Deserialize<List<FormFieldViewModel>>(dto.FieldsJson, JsonOpts) ?? [],
         SuccessMessage = dto.SuccessMessage, RedirectUrl = dto.RedirectUrl,
         EmailTo = dto.EmailTo, EmailSubject = dto.EmailSubject,
-        StoreSubmissions = dto.StoreSubmissions, IsEnabled = dto.IsEnabled,
+        StoreEntries = dto.StoreEntries, IsEnabled = dto.IsEnabled,
+        VisibleColumns = string.IsNullOrEmpty(dto.VisibleColumnsJson)
+            ? null : JsonSerializer.Deserialize<List<string>>(dto.VisibleColumnsJson, JsonOpts),
+        EnableRenderApi = dto.EnableRenderApi,
+        EnableEntriesApi = dto.EnableEntriesApi,
         CreatedUtc = dto.CreatedUtc, UpdatedUtc = dto.UpdatedUtc
     };
 
-    private static SubmissionViewModel MapSubmission(SimpleFormSubmissionDto dto) => new()
+    private EntryViewModel MapEntry(SimpleFormEntryDto dto, bool canViewSensitive = false)
     {
-        Id = dto.Id, FormId = dto.FormId,
-        Data = string.IsNullOrEmpty(dto.DataJson)
-            ? [] : JsonSerializer.Deserialize<Dictionary<string, string>>(dto.DataJson, JsonOpts) ?? [],
-        IpAddress = dto.IpAddress, CreatedUtc = dto.CreatedUtc
-    };
+        var data = string.IsNullOrEmpty(dto.DataJson)
+            ? new Dictionary<string, string>()
+            : JsonSerializer.Deserialize<Dictionary<string, string>>(dto.DataJson, JsonOpts) ?? [];
+
+        foreach (var key in data.Keys.ToList())
+        {
+            var val = data[key];
+            if (val != null && val.StartsWith(EncryptedPrefix))
+            {
+                if (canViewSensitive)
+                {
+                    try { data[key] = Protector.Unprotect(val[EncryptedPrefix.Length..]); }
+                    catch { data[key] = "[decryption error]"; }
+                }
+                else { data[key] = MaskedValue; }
+            }
+        }
+
+        return new EntryViewModel
+        {
+            Id = dto.Id, FormId = dto.FormId,
+            Data = data,
+            IpAddress = dto.IpAddress, CreatedUtc = dto.CreatedUtc
+        };
+    }
 }
