@@ -270,6 +270,7 @@ function _renderTypeAttributes(host, field, idx) {
     return nothing;
 }
 
+
 function _renderFieldCard(host, field, idx, needsOptions) {
     const f = host._editForm;
     const currentTypeLabel = host._fieldTypes.find(ft => ft.type === field.type)?.label || field.type;

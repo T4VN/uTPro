@@ -1,0 +1,13 @@
+@* Color picker *@
+@model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
+@{
+    var formId = ViewData["FormId"] as string ?? "sf";
+    var fieldId = formId + "-" + Model.Name;
+}
+
+<label for="@fieldId">
+    @Model.Label
+</label>
+<input type="color" id="@fieldId" name="@Model.Name"
+       value="@(Model.DefaultValue ?? "#000000")" />
+<span class="sf-error" data-for="@Model.Name"></span>

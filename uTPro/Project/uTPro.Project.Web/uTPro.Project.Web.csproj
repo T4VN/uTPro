@@ -13,23 +13,10 @@
 		<None Remove="Controllers\Api\**" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Content Include="App_Plugins\assets\img\bkg-login.jpg" />
-	  <Content Include="App_Plugins\assets\img\logo.svg" />
 	  <Content Include="App_Plugins\cms-screen\index.js" />
 	  <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
 	  <Content Include="App_Plugins\cms-screen\style.css" />
 	  <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
-	  <Content Include="App_Plugins\simple-form\index.js" />
-	  <Content Include="App_Plugins\simple-form\umbraco-package.json" />
-	  <Content Include="App_Plugins\simple-form\lang\en-us.js" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="App_Plugins\simple-form\api.js" />
-	  <None Include="App_Plugins\simple-form\styles.js" />
-	  <None Include="App_Plugins\simple-form\views\detail-view.js" />
-	  <None Include="App_Plugins\simple-form\views\editor-view.js" />
-	  <None Include="App_Plugins\simple-form\views\entries-view.js" />
-	  <None Include="App_Plugins\simple-form\views\list-view.js" />
 	</ItemGroup>
 
 	<ItemGroup>

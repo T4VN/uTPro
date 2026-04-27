@@ -1,0 +1,31 @@
+@using uTPro.Extension.CurrentSite
+@model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
+@{
+    var formId = ViewData["FormId"] as string ?? "sf";
+    var fieldId = formId + "-" + Model.Name;
+    var rows = Model.Attributes?.GetValueOrDefault("rows") ?? "4";
+    var currentSite = ViewData["CurrentSite"] as ICurrentSiteExtension;
+    var validationMsg = Model.ValidationMessage;
+    if (currentSite != null
+        && !string.IsNullOrEmpty(validationMsg)
+        && validationMsg.StartsWith("{{") && validationMsg.EndsWith("}}"))
+    {
+        var dictKey = validationMsg[2..^2].Trim();
+        var translated = currentSite.GetDictionaryValue(dictKey);
+        if (!string.IsNullOrEmpty(translated))
+        {
+            validationMsg = translated;
+        }
+    }
+}
+
+<label for="@fieldId">
+    @Model.Label
+    @if (Model.Required) { <span class="sf-required">*</span> }
+</label>
+<textarea id="@fieldId" name="@Model.Name"
+          placeholder="@Model.Placeholder"
+          @(Model.Required ? "required" : "")
+          rows="@rows"
+          data-msg="@validationMsg">@Model.DefaultValue</textarea>
+<span class="sf-error" data-for="@Model.Name"></span>

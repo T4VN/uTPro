@@ -6,13 +6,6 @@ namespace uTPro.Feature.SimpleForm.ViewComponents;
 
 public class SimpleFormViewComponent(ISimpleFormService formService, IWebHostEnvironment env) : ViewComponent
 {
-    /// <summary>
-    /// Renders a SimpleForm by alias.
-    /// Template resolution order:
-    ///   1. Explicit template parameter: ~/Views/Partials/SimpleForm/{template}.cshtml
-    ///   2. Form-specific template:      ~/Views/Partials/SimpleForm/{alias}.cshtml
-    ///   3. Default template:            ~/Views/Partials/SimpleForm/Default.cshtml
-    /// </summary>
     public IViewComponentResult Invoke(
         string alias,
         string? template = null,
@@ -36,22 +29,19 @@ public class SimpleFormViewComponent(ISimpleFormService formService, IWebHostEnv
 
     private string ResolveTemplate(string? template, string alias)
     {
-        // 1. Explicit template
         if (!string.IsNullOrEmpty(template))
         {
-            var explicitPath = $"~/Views/Partials/SimpleForm/{template}.cshtml";
-            if (ViewExists(explicitPath)) return explicitPath;
+            var path = $"~/Views/Partials/SimpleForm/{template}.cshtml";
+            if (FileExists(path)) return path;
         }
 
-        // 2. Form-specific template (by alias)
         var aliasPath = $"~/Views/Partials/SimpleForm/{alias}.cshtml";
-        if (ViewExists(aliasPath)) return aliasPath;
+        if (FileExists(aliasPath)) return aliasPath;
 
-        // 3. Default
         return "~/Views/Partials/SimpleForm/Default.cshtml";
     }
 
-    private bool ViewExists(string viewPath)
+    private bool FileExists(string viewPath)
     {
         var physicalPath = Path.Combine(
             env.ContentRootPath,

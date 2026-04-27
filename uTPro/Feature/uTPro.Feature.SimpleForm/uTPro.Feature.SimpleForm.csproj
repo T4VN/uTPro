@@ -1,9 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <!-- Disable RCL static web assets — we copy files via MSBuild target instead -->
+    <DisableStaticWebAssets>true</DisableStaticWebAssets>
+    <WebProjectPath>..\..\Project\uTPro.Project.Web</WebProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +16,38 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\uTPro.Common\uTPro.Common.csproj" />
+    <ProjectReference Include="..\..\Extension\uTPro.Extension.CurrentSite\uTPro.Extension.CurrentSite.csproj" />
   </ItemGroup>
+
+  <!-- 
+    Auto-copy Views and wwwroot to web project on build.
+    This ensures Razor views and static assets are available at runtime.
+    Web project files take precedence (won't overwrite if newer).
+  -->
+  <Target Name="CopyViewsToWebProject" AfterTargets="Build" Condition="Exists('$(WebProjectPath)')">
+    <!-- Clean destination folders first to remove stale files -->
+    <RemoveDir Directories="$(WebProjectPath)\Views\Partials\SimpleForm" Condition="Exists('$(WebProjectPath)\Views\Partials\SimpleForm')" />
+    <RemoveDir Directories="$(WebProjectPath)\Views\Shared\Components\SimpleForm" Condition="Exists('$(WebProjectPath)\Views\Shared\Components\SimpleForm')" />
+    <RemoveDir Directories="$(WebProjectPath)\wwwroot\App_Plugins\simple-form" Condition="Exists('$(WebProjectPath)\wwwroot\App_Plugins\simple-form')" />
+    <RemoveDir Directories="$(WebProjectPath)\wwwroot\uTPro\simple-form" Condition="Exists('$(WebProjectPath)\wwwroot\uTPro\simple-form')" />
+
+    <!-- Copy Views -->
+    <ItemGroup>
+      <SimpleFormViews Include="Views\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SimpleFormViews)"
+          DestinationFiles="@(SimpleFormViews->'$(WebProjectPath)\Views\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+
+    <!-- Copy wwwroot (css, js, App_Plugins) -->
+    <ItemGroup>
+      <SimpleFormWwwroot Include="wwwroot\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SimpleFormWwwroot)"
+          DestinationFiles="@(SimpleFormWwwroot->'$(WebProjectPath)\wwwroot\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+
+    <Message Importance="high" Text="SimpleForm: Cleaned and copied Views + wwwroot to $(WebProjectPath)" />
+  </Target>
 
 </Project>

@@ -1,0 +1,22 @@
+@model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
+@{
+    var formId = ViewData["FormId"] as string ?? "sf";
+    var fieldId = formId + "-" + Model.Name;
+}
+
+<label for="@fieldId">
+    @Model.Label
+    @if (Model.Required) { <span class="sf-required">*</span> }
+</label>
+<select id="@fieldId" name="@Model.Name" @(Model.Required ? "required" : "")>
+    <option value="">@(Model.Placeholder ?? "-- Select --")</option>
+    @if (Model.Options != null)
+    {
+        @foreach (var opt in Model.Options)
+        {
+            var sel = opt.Value == Model.DefaultValue;
+            <option value="@opt.Value" selected="@sel">@opt.Text</option>
+        }
+    }
+</select>
+<span class="sf-error" data-for="@Model.Name"></span>

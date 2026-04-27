@@ -1,0 +1,59 @@
+@* ═══════════════════════════════════════════════════════════════
+    DEFAULT FIELD PARTIAL — handles: text, email, tel, number, date, url, password
+    To add a CUSTOM field type, create a new file in this folder:
+      Fields/{YourType}.cshtml  (e.g. Fields/turnstile.cshtml)
+    It receives: Model = FormFieldViewModel, ViewData["FormId"] = form element id
+    
+    MULTI-LANGUAGE SUPPORT:
+      The ValidationMessage field supports both plain text and dictionary keys.
+      If the value matches a dictionary key, it will be resolved to the
+      current culture's translation. Otherwise, the raw text is used as-is.
+═══════════════════════════════════════════════════════════════ *@
+@using uTPro.Extension.CurrentSite
+@model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
+@{
+    var formId = ViewData["FormId"] as string ?? "sf";
+    var fieldId = formId + "-" + Model.Name;
+    var currentSite = ViewData["CurrentSite"] as ICurrentSiteExtension;
+    // Resolve validation message:
+    //   - Plain text  → used as-is (e.g. "Please enter your name")
+    //   - {{key}}     → resolved via Umbraco Dictionary (e.g. "{{SimpleForm.NameRequired}}")
+    var validationMsg = Model.ValidationMessage;
+    if (currentSite != null
+        && !string.IsNullOrEmpty(validationMsg)
+        && validationMsg.StartsWith("{{") && validationMsg.EndsWith("}}"))
+    {
+        var dictKey = validationMsg[2..^2].Trim();
+        var translated = currentSite.GetDictionaryValue(dictKey);
+        if (!string.IsNullOrEmpty(translated))
+        {
+            validationMsg = translated;
+        }
+    }
+}
+
+@if (Model.Type != "hidden")
+{
+    <label for="@fieldId">
+        @Model.Label
+        @if (Model.Required) { <span class="sf-required">*</span> }
+    </label>
+}
+
+@{
+    var minAttr = Model.Attributes?.GetValueOrDefault("min") ?? "";
+    var maxAttr = Model.Attributes?.GetValueOrDefault("max") ?? "";
+    var stepAttr = Model.Attributes?.GetValueOrDefault("step") ?? "";
+    var acceptAttr = Model.Attributes?.GetValueOrDefault("accept") ?? "";
+}
+
+<input type="@Model.Type" id="@fieldId" name="@Model.Name"
+       placeholder="@Model.Placeholder" value="@Model.DefaultValue"
+       @(Model.Required ? "required" : "")
+       @(string.IsNullOrEmpty(Model.Validation) ? "" : $"pattern=\"{Model.Validation}\"")
+       @(!string.IsNullOrEmpty(minAttr) ? $"min=\"{minAttr}\"" : "")
+       @(!string.IsNullOrEmpty(maxAttr) ? $"max=\"{maxAttr}\"" : "")
+       @(!string.IsNullOrEmpty(stepAttr) ? $"step=\"{stepAttr}\"" : "")
+       @(!string.IsNullOrEmpty(acceptAttr) ? $"accept=\"{acceptAttr}\"" : "")
+       data-msg="@validationMsg" />
+<span class="sf-error" data-for="@Model.Name"></span>

@@ -49,7 +49,6 @@
                 }
             });
 
-            // Hook: allow custom field types to inject validation/data
             if (window.__sfBeforeSubmit) {
                 var hookResult = await window.__sfBeforeSubmit(alias, data, form);
                 if (hookResult === false) return;
