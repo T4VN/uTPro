@@ -165,6 +165,11 @@ namespace uTPro.Extension.CurrentSite
             // Start from provided item
             var current = item ?? throw new Exception("Not found item: " + alias);
 
+            if (string.Equals(current.ContentType?.Alias, GlobalPageError.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
+            {
+                return GetItemByAlias(this.PageErrors?.Parent(), alias, isFirst);
+            }
+
             // quick check
             if (string.Equals(current.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
                 return current;
