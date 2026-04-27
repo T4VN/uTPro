@@ -83,8 +83,10 @@ namespace uTPro.Project.Web.Configure
                 }
                 return View(view, model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error rendering template for {ContentType}", 
+                    UmbracoRouteValues?.PublishedRequest?.PublishedContent?.ContentType?.Alias);
                 return new ActionResultPageError(_currentSite);
             }
         }
