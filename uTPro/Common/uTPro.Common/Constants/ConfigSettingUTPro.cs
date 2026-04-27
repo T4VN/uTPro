@@ -2,11 +2,11 @@
 {
     public struct ConfigSettingUTPro
     {
-        public const string KeyPath = "uTPro";
-        public const string DefaultCulture = KeyPath + ":DefaultCulture";
+        public const string Key = "uTPro";
+        public const string DefaultCulture = Key + ":DefaultCulture";
         public struct Backoffice
         {
-            public const string Key = KeyPath + ":Backoffice";
+            public const string Key = ConfigSettingUTPro.Key + ":Backoffice";
             public const string Enabled = Key + ":Enabled";
             public const string Domain = Key + ":Url";
         }

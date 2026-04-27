@@ -47,7 +47,40 @@ uTPro comes with a curated set of utilities and best practices already integrate
 - **Performance optimizations** (lazy loading, async scripts, caching hints).
 - **Sample components** (navigation, footer, hero section) ready to customize.
 
-**With the support of extensions:** [Smidge](https://github.com/Shazwazza/Smidge), [UmbracoSeoVisualizer](https://marketplace.umbraco.com/package/umbracoseovisualizer), [Umbraco.Community.BlockPreview](https://marketplace.umbraco.com/package/umbraco.community.blockpreview), [uSync](https://marketplace.umbraco.com/package/usync), [WebMarkupMin.AspNetCoreLatest](https://www.nuget.org/packages/WebMarkupMin.AspNetCoreLatest/), [LigerShark.WebOptimizer.Core](https://www.nuget.org/packages/LigerShark.WebOptimizer.Core)...
+**With the support of extensions:** [UmbracoSeoVisualizer](https://marketplace.umbraco.com/package/umbracoseovisualizer), [Umbraco.Community.BlockPreview](https://marketplace.umbraco.com/package/umbraco.community.blockpreview), [uSync](https://marketplace.umbraco.com/package/usync), [WebMarkupMin.AspNetCoreLatest](https://www.nuget.org/packages/WebMarkupMin.AspNetCoreLatest/), [LigerShark.WebOptimizer.Core](https://www.nuget.org/packages/LigerShark.WebOptimizer.Core), [MimeKit](https://www.nuget.org/packages/MimeKit)...
+
+---
+
+## 🏗️ Modular Architecture
+
+uTPro follows a clean modular architecture with clear separation of concerns:
+
+- **Common** — Shared models, constants, CMS-generated content models
+- **Extension** — Reusable services (site context, culture management, URL helpers)
+- **Foundation** — Infrastructure modules (middleware, favicon, sitemap, robots.txt)
+- **Feature** — Optional pluggable features (form builder, file manager, audit log, etc.)
+- **Project** — Main web application and configuration
+
+---
+
+## 🔒 Security Built-in
+
+- Security headers (X-Content-Type-Options, X-Frame-Options, HSTS, Referrer-Policy)
+- Secure session cookies (HttpOnly, Secure, SameSite)
+- Request size limits to prevent DoS
+- Domain-based access control with wildcard support
+
+---
+
+## 📋 Tech Stack
+
+| Component | Version |
+|-----------|---------|
+| Umbraco CMS | 16.5.1 |
+| .NET | 9.0 |
+| uSync | 16.1.0 |
+| BlockPreview | 4.2.2 |
+| SeoVisualizer | 16.0.1 |
 
 ---
 
