@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uTPro URL Viewer</title>
+    <style>
+        :root {
+            --blue: #1a73e8;
+            --red: #d93025;
+            --green: #188038;
+            --orange: #e37400;
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --border: #dadce0;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 10px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar .brand {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--blue);
+            white-space: nowrap;
+            margin-right: 8px;
+        }
+
+        .toolbar select,
+        .toolbar input[type="text"] {
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0 10px;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--surface);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .toolbar select:focus,
+        .toolbar input[type="text"]:focus {
+            border-color: var(--blue);
+        }
+
+        .toolbar select {
+            min-width: 80px;
+        }
+
+        #schemeSelect {
+            width: 90px;
+        }
+
+        #urlInput {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        #uaSelect {
+            width: 180px;
+        }
+
+        #refSelect {
+            width: 110px;
+        }
+
+        .btn-view {
+            height: 36px;
+            padding: 0 20px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .btn-view:hover {
+            background: #1557b0;
+        }
+
+        .btn-view:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ── Main ── */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        /* ── Error Alert ── */
+        .error-alert {
+            display: none;
+            background: #fce8e6;
+            border: 1px solid var(--red);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            color: var(--red);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Loading ── */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ── Result Area ── */
+        #resultArea {
+            display: none;
+        }
+
+        /* ── Scan Bar ── */
+        .scan-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .scan-bar span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .scan-bar a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        .scan-bar a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Cloaking Warning ── */
+        .cloaking-box {
+            display: none;
+            background: #fce8e6;
+            border: 2px solid var(--red);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .cloaking-box .cloak-title {
+            display: inline-block;
+            background: var(--red);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .cloaking-box ul {
+            list-style: disc;
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .cloaking-box li {
+            font-size: 14px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .cloaking-box .cloak-titles {
+            font-size: 13px;
+            margin: 8px 0;
+            color: var(--text-secondary);
+        }
+
+        .cloaking-box .cloak-titles strong {
+            color: var(--text);
+        }
+
+        .cloaking-box a {
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        /* ── Headers Section ── */
+        .headers-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .headers-section .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 16px;
+            background: #f1f3f4;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hop {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+        }
+
+        .hop:last-child {
+            border-bottom: none;
+        }
+
+        .hop-url {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--red);
+            word-break: break-all;
+            margin-bottom: 6px;
+        }
+
+        .hop-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .hop-headers {
+            font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            color: var(--text-secondary);
+        }
+
+        /* ── Content Title ── */
+        .content-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .content-title span {
+            color: var(--blue);
+            word-break: break-all;
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color 0.2s, border-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            color: var(--blue);
+        }
+
+        .tab-btn.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+        }
+
+        .badge {
+            display: inline-block;
+            min-width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            padding: 0 6px;
+        }
+
+        .badge-ok { background: var(--green); }
+        .badge-warn { background: var(--orange); }
+        .badge-danger { background: var(--red); }
+
+        .tab-panel {
+            display: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ── Meta Tags Table ── */
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .meta-table th,
+        .meta-table td {
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .meta-table th {
+            background: #f1f3f4;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .meta-table td {
+            word-break: break-word;
+        }
+
+        /* ── Spam Words ── */
+        .spam-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .spam-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fef7e0;
+            border: 1px solid var(--orange);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 13px;
+        }
+
+        .spam-item .count {
+            background: var(--orange);
+            color: #fff;
+            border-radius: 3px;
+            padding: 0 5px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* ── CSS Rules ── */
+        .css-list {
+            list-style: none;
+        }
+
+        .css-list li {
+            font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+            font-size: 12px;
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            word-break: break-all;
+        }
+
+        /* ── JS Issues ── */
+        .js-issue {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            font-size: 13px;
+            border-left: 4px solid var(--border);
+            background: #f8f9fa;
+        }
+        .js-issue.error { border-left-color: var(--red); background: #fce8e6; }
+        .js-issue.warning { border-left-color: var(--orange); background: #fef7e0; }
+        .js-issue.info { border-left-color: var(--blue); background: #e8f0fe; }
+        .js-issue .sev {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 2px 8px; border-radius: 3px; white-space: nowrap;
+        }
+        .js-issue .sev.error { background: var(--red); color: #fff; }
+        .js-issue .sev.warning { background: var(--orange); color: #fff; }
+        .js-issue .sev.info { background: var(--blue); color: #fff; }
+        .js-issue .cat {
+            font-size: 11px; color: var(--text-secondary);
+            background: var(--border); padding: 2px 6px; border-radius: 3px;
+            white-space: nowrap;
+        }
+        .js-issue .msg { flex: 1; }
+        .js-issue .snip {
+            font-family: "Cascadia Code", "Consolas", monospace;
+            font-size: 11px; color: var(--text-secondary);
+            background: rgba(0,0,0,.05); padding: 2px 6px; border-radius: 3px;
+            margin-top: 4px; word-break: break-all;
+        }
+
+        /* ── Source Viewer ── */
+        .source-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .source-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f1f3f4;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .source-toolbar .spacer {
+            flex: 1;
+        }
+
+        .btn-small {
+            height: 28px;
+            padding: 0 12px;
+            font-size: 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-small:hover {
+            background: #e8eaed;
+        }
+
+        .source-container {
+            display: flex;
+            overflow: auto;
+            max-height: 600px;
+            font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .line-numbers {
+            flex-shrink: 0;
+            padding: 10px 8px;
+            text-align: right;
+            color: #aab0b8;
+            background: #f8f9fa;
+            border-right: 1px solid var(--border);
+            user-select: none;
+            white-space: pre;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+        }
+
+        .source-code {
+            flex: 1;
+            padding: 10px 12px;
+            white-space: pre;
+            color: var(--text);
+            min-width: 0;
+        }
+
+        .source-code.wrap {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .source-code .hl-spam {
+            background: #fff3a8;
+            border-radius: 2px;
+            padding: 0 1px;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding: 20px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .toolbar {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+
+            .toolbar .brand {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+
+            #schemeSelect {
+                width: 75px;
+            }
+
+            #urlInput {
+                min-width: 120px;
+            }
+
+            #uaSelect {
+                width: 100%;
+            }
+
+            #refSelect {
+                width: 100%;
+            }
+
+            .btn-view {
+                width: 100%;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .source-container {
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Toolbar ── -->
+<div class="toolbar">
+    <div class="brand">uTPro URL Viewer</div>
+    <select id="schemeSelect">
+        <option value="https">https://</option>
+        <option value="http">http://</option>
+    </select>
+    <input type="text" id="urlInput" placeholder="Enter URL (e.g. example.com/page)">
+    <select id="uaSelect">
+        <option value="googlebot-smartphone">Googlebot Smartphone</option>
+        <option value="googlebot-desktop">Googlebot Desktop</option>
+        <option value="bingbot">Bingbot</option>
+        <option value="chrome">Chrome</option>
+        <option value="firefox">Firefox</option>
+        <option value="edge">Edge</option>
+    </select>
+    <select id="refSelect">
+        <option value="google">Google</option>
+        <option value="bing">Bing</option>
+        <option value="yahoo">Yahoo</option>
+        <option value="none">None</option>
+    </select>
+    <button class="btn-view" id="viewBtn" onclick="doFetch()">View</button>
+</div>
+
+<!-- ── Main ── -->
+<div class="main">
+    <div class="error-alert" id="errorAlert"></div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching URL...</div>
+    </div>
+
+    <div id="resultArea">
+        <!-- Scan Bar -->
+        <div class="scan-bar" id="scanBar"></div>
+
+        <!-- Cloaking Warning -->
+        <div class="cloaking-box" id="cloakingBox"></div>
+
+        <!-- Response Headers -->
+        <div class="headers-section" id="headersSection">
+            <div class="section-title">Response Headers (Redirect Chain)</div>
+            <div id="headersContent"></div>
+        </div>
+
+        <!-- Content Title -->
+        <div class="content-title" id="contentTitle"></div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="tabsBar">
+            <button class="tab-btn active" data-tab="meta" onclick="switchTab('meta')">
+                Return meta tags <span class="badge badge-ok" id="badgeMeta">0</span>
+            </button>
+            <button class="tab-btn" data-tab="spam" onclick="switchTab('spam')">
+                Spam hack words <span class="badge badge-ok" id="badgeSpam">0</span>
+            </button>
+            <button class="tab-btn" data-tab="css" onclick="switchTab('css')">
+                CSS that hides elements <span class="badge badge-ok" id="badgeCss">0</span>
+            </button>
+            <button class="tab-btn" data-tab="js" onclick="switchTab('js')">
+                JS Issues <span class="badge badge-ok" id="badgeJs">0</span>
+            </button>
+        </div>
+
+        <!-- Tab Panels -->
+        <div class="tab-panel active" id="panelMeta"></div>
+        <div class="tab-panel" id="panelSpam"></div>
+        <div class="tab-panel" id="panelCss"></div>
+        <div class="tab-panel" id="panelJs"></div>
+
+        <!-- Source Viewer -->
+        <div class="source-section">
+            <div class="source-toolbar">
+                <span>HTML Source</span>
+                <span class="spacer"></span>
+                <button class="btn-small" id="wrapBtn" onclick="toggleWrap()">Wrap</button>
+                <button class="btn-small" id="copyBtn" onclick="copySource()">Copy</button>
+            </div>
+            <div class="source-container">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <div class="source-code" id="sourceCode"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ── Config ── */
+var API_BASE = "";
+var rawHtml = "";
+var spamWordsGlobal = [];
+
+/* ── Escape helpers ── */
+function escHtml(s) {
+    var d = document.createElement("div");
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+}
+
+function escRx(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, function(m) { return '\\' + m; });
+}
+
+/* ── URL Params ── */
+function getParam(name) {
+    var params = new URLSearchParams(window.location.search);
+    return params.get(name) || "";
+}
+
+function initFromParams() {
+    var api = getParam("api");
+    if (api) { API_BASE = api.replace(/\/+$/, ""); }
+
+    var scheme = getParam("scheme");
+    if (scheme) { document.getElementById("schemeSelect").value = scheme.toLowerCase(); }
+
+    var url = getParam("url");
+    if (url) { document.getElementById("urlInput").value = url; }
+
+    var ua = getParam("ua");
+    if (ua) {
+        /* Map display names from URL params to select values */
+        var uaMap = {
+            "Googlebot Smartphone": "googlebot-smartphone",
+            "Googlebot Desktop": "googlebot-desktop",
+            "Bingbot": "bingbot",
+            "Chrome": "chrome",
+            "Firefox": "firefox",
+            "Edge": "edge"
+        };
+        document.getElementById("uaSelect").value = uaMap[ua] || ua.toLowerCase().replace(/\s+/g, "-");
+    }
+
+    var ref = getParam("ref");
+    if (ref) {
+        var refMap = {
+            "Google": "google",
+            "Bing": "bing",
+            "Yahoo": "yahoo",
+            "None": "none"
+        };
+        document.getElementById("refSelect").value = refMap[ref] || ref.toLowerCase();
+    }
+
+    if (url) { doFetch(); }
+}
+
+/* ── Tabs ── */
+function switchTab(name) {
+    var btns = document.querySelectorAll(".tab-btn");
+    var panels = document.querySelectorAll(".tab-panel");
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.remove("active");
+        panels[i].classList.remove("active");
+    }
+    var btn = document.querySelector(".tab-btn[data-tab=\"" + name + "\"]");
+    if (btn) { btn.classList.add("active"); }
+    var panel = document.getElementById("panel" + name.charAt(0).toUpperCase() + name.slice(1));
+    if (panel) { panel.classList.add("active"); }
+}
+
+/* ── Wrap Toggle ── */
+function toggleWrap() {
+    var el = document.getElementById("sourceCode");
+    el.classList.toggle("wrap");
+}
+
+/* ── Copy Source ── */
+function copySource() {
+    if (!rawHtml) { return; }
+    navigator.clipboard.writeText(rawHtml).then(function() {
+        var btn = document.getElementById("copyBtn");
+        btn.textContent = "Copied!";
+        setTimeout(function() { btn.textContent = "Copy"; }, 2000);
+    });
+}
+
+/* ── Badge helper ── */
+function setBadge(id, count) {
+    var el = document.getElementById(id);
+    el.textContent = count;
+    if (count === 0) {
+        el.className = "badge badge-ok";
+    } else if (count <= 3) {
+        el.className = "badge badge-warn";
+    } else {
+        el.className = "badge badge-danger";
+    }
+}
+
+/* ── Format bytes ── */
+function formatBytes(bytes) {
+    if (bytes === 0) { return "0 B"; }
+    var sizes = ["B", "KB", "MB", "GB"];
+    var i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
+}
+
+/* ── Main Fetch ── */
+function doFetch() {
+    var urlVal = document.getElementById("urlInput").value.trim();
+    if (!urlVal) {
+        showError("Please enter a URL.");
+        return;
+    }
+
+    var scheme = document.getElementById("schemeSelect").value;
+    var ua = document.getElementById("uaSelect").value;
+    var ref = document.getElementById("refSelect").value;
+
+    hideError();
+    document.getElementById("resultArea").style.display = "none";
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("viewBtn").disabled = true;
+
+    var body = JSON.stringify({
+        "url": urlVal,
+        "scheme": scheme,
+        "userAgent": ua,
+        "referrer": ref
+    });
+
+    fetch(API_BASE + "/api/UrlViewerApi/fetch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: body
+    })
+    .then(function(resp) {
+        if (!resp.ok) {
+            return resp.text().then(function(t) { throw new Error("HTTP " + resp.status + ": " + t); });
+        }
+        return resp.json();
+    })
+    .then(function(d) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("viewBtn").disabled = false;
+
+        if (!d.success) {
+            showError(d.errorMessage || "Request failed.");
+            return;
+        }
+
+        renderResult(d);
+    })
+    .catch(function(err) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("viewBtn").disabled = false;
+        showError(err.message || "Network error.");
+    });
+}
+
+/* ── Error helpers ── */
+function showError(msg) {
+    var el = document.getElementById("errorAlert");
+    el.textContent = msg;
+    el.style.display = "block";
+}
+
+function hideError() {
+    document.getElementById("errorAlert").style.display = "none";
+}
+
+/* ── Render Result ── */
+function renderResult(d) {
+    document.getElementById("resultArea").style.display = "block";
+
+    /* Scan Bar */
+    var scanTime = d.scannedAtUtc ? new Date(d.scannedAtUtc).toLocaleString() : "N/A";
+    var scanHtml = "<span>Scanned: " + escHtml(scanTime) + "</span>";
+    scanHtml += "<span>Elapsed: " + d.elapsedMilliseconds + " ms</span>";
+    scanHtml += "<span>Size: " + formatBytes(d.contentLength) + "</span>";
+    if (d.virusTotalUrl) {
+        scanHtml += "<span><a href=\"" + escHtml(d.virusTotalUrl) + "\" target=\"_blank\" rel=\"noopener\">VirusTotal</a></span>";
+    }
+    document.getElementById("scanBar").innerHTML = scanHtml;
+
+    /* Cloaking */
+    var cloakBox = document.getElementById("cloakingBox");
+    if (d.analysis && d.analysis.cloaking && d.analysis.cloaking.isCloaked) {
+        var c = d.analysis.cloaking;
+        var cHtml = "<div class=\"cloak-title\">Cloaking Detected</div>";
+        if (c.messages && c.messages.length > 0) {
+            cHtml += "<ul>";
+            for (var ci = 0; ci < c.messages.length; ci++) {
+                cHtml += "<li>" + escHtml(c.messages[ci]) + "</li>";
+            }
+            cHtml += "</ul>";
+        }
+        cHtml += "<div class=\"cloak-titles\">";
+        cHtml += "<strong>Bot title:</strong> " + escHtml(c.botTitle || "(empty)") + "<br>";
+        cHtml += "<strong>Chrome title:</strong> " + escHtml(c.chromeTitle || "(empty)");
+        cHtml += "</div>";
+        cHtml += "<a href=\"https://developers.google.com/search/docs/monitor-debug/fixing-cloaked-keywords\" target=\"_blank\" rel=\"noopener\">";
+        cHtml += "Google: Fixing cloaked keywords</a>";
+        cloakBox.innerHTML = cHtml;
+        cloakBox.style.display = "block";
+    } else {
+        cloakBox.style.display = "none";
+        cloakBox.innerHTML = "";
+    }
+
+    /* Response Headers */
+    var headersEl = document.getElementById("headersContent");
+    if (d.redirectChain && d.redirectChain.length > 0) {
+        var hHtml = "";
+        for (var hi = 0; hi < d.redirectChain.length; hi++) {
+            var hop = d.redirectChain[hi];
+            hHtml += "<div class=\"hop\">";
+            hHtml += "<div class=\"hop-url\">" + escHtml(hop.url) + "</div>";
+            hHtml += "<div class=\"hop-status\">" + hop.statusCode + " " + escHtml(hop.statusDescription) + "</div>";
+            if (hop.rawHeaders) {
+                hHtml += "<div class=\"hop-headers\">" + escHtml(hop.rawHeaders) + "</div>";
+            }
+            hHtml += "</div>";
+        }
+        headersEl.innerHTML = hHtml;
+        document.getElementById("headersSection").style.display = "block";
+    } else {
+        headersEl.innerHTML = "<div class=\"empty-state\">No redirect chain data.</div>";
+        document.getElementById("headersSection").style.display = "block";
+    }
+
+    /* Content Title */
+    document.getElementById("contentTitle").innerHTML = "Content returned by: <span>" + escHtml(d.finalUrl || d.requestedUrl) + "</span>";
+
+    /* Analysis */
+    var analysis = d.analysis || {};
+
+    /* Meta Tags */
+    var metaTags = analysis.metaTags || [];
+    setBadge("badgeMeta", metaTags.length);
+    if (metaTags.length > 0) {
+        var mHtml = "<table class=\"meta-table\"><thead><tr><th>Name</th><th>Content</th></tr></thead><tbody>";
+        for (var mi = 0; mi < metaTags.length; mi++) {
+            mHtml += "<tr><td>" + escHtml(metaTags[mi].name) + "</td><td>" + escHtml(metaTags[mi].content) + "</td></tr>";
+        }
+        mHtml += "</tbody></table>";
+        document.getElementById("panelMeta").innerHTML = mHtml;
+    } else {
+        document.getElementById("panelMeta").innerHTML = "<div class=\"empty-state\">No meta tags found.</div>";
+    }
+
+    /* Spam Words */
+    var spamWords = analysis.spamWords || [];
+    spamWordsGlobal = spamWords;
+    setBadge("badgeSpam", spamWords.length);
+    if (spamWords.length > 0) {
+        var sHtml = "<ul class=\"spam-list\">";
+        for (var si = 0; si < spamWords.length; si++) {
+            sHtml += "<li class=\"spam-item\">" + escHtml(spamWords[si].word);
+            sHtml += " <span class=\"count\">" + spamWords[si].count + "</span></li>";
+        }
+        sHtml += "</ul>";
+        document.getElementById("panelSpam").innerHTML = sHtml;
+    } else {
+        document.getElementById("panelSpam").innerHTML = "<div class=\"empty-state\">No spam hack words found.</div>";
+    }
+
+    /* Hidden CSS */
+    var cssRules = analysis.hiddenCssRules || [];
+    setBadge("badgeCss", cssRules.length);
+    if (cssRules.length > 0) {
+        var cssHtml = "<ul class=\"css-list\">";
+        for (var ri = 0; ri < cssRules.length; ri++) {
+            cssHtml += "<li>" + escHtml(cssRules[ri]) + "</li>";
+        }
+        cssHtml += "</ul>";
+        document.getElementById("panelCss").innerHTML = cssHtml;
+    } else {
+        document.getElementById("panelCss").innerHTML = "<div class=\"empty-state\">No CSS rules that hide elements.</div>";
+    }
+
+    /* JS Issues */
+    var jsIssues = analysis.jsIssues || [];
+    setBadge("badgeJs", jsIssues.length);
+    if (jsIssues.length > 0) {
+        var jHtml = "";
+        for (var ji = 0; ji < jsIssues.length; ji++) {
+            var issue = jsIssues[ji];
+            var sev = issue.severity || "info";
+            jHtml += "<div class=\"js-issue " + sev + "\">";
+            jHtml += "<span class=\"sev " + sev + "\">" + escHtml(sev) + "</span>";
+            jHtml += "<span class=\"cat\">" + escHtml(issue.category || "") + "</span>";
+            jHtml += "<div class=\"msg\">" + escHtml(issue.message || "");
+            if (issue.snippet) {
+                jHtml += "<div class=\"snip\">" + escHtml(issue.snippet) + "</div>";
+            }
+            jHtml += "</div></div>";
+        }
+        document.getElementById("panelJs").innerHTML = jHtml;
+    } else {
+        document.getElementById("panelJs").innerHTML = "<div class=\"empty-state\">No JavaScript issues detected.</div>";
+    }
+
+    /* Reset to first tab */
+    switchTab("meta");
+
+    /* Source Viewer */
+    rawHtml = d.htmlContent || "";
+    renderSource(rawHtml, spamWords);
+
+    /* Scroll page to top so user sees cloaking warning first */
+    window.scrollTo(0, 0);
+}
+
+/* ── Source Viewer Render ── */
+function renderSource(html, spamWords) {
+    var lines = html.split("\n");
+    /* Remove trailing empty lines */
+    while (lines.length > 0 && lines[lines.length - 1].trim() === "") {
+        lines.pop();
+    }
+
+    var lineNumsArr = [];
+    var codeArr = [];
+
+    /* Build spam regex */
+    var spamRx = null;
+    if (spamWords && spamWords.length > 0) {
+        var parts = [];
+        for (var wi = 0; wi < spamWords.length; wi++) {
+            parts.push(escRx(spamWords[wi].word));
+        }
+        spamRx = new RegExp("(" + parts.join("|") + ")", "gi");
+    }
+
+    for (var li = 0; li < lines.length; li++) {
+        lineNumsArr.push(li + 1);
+        var escaped = escHtml(lines[li]);
+        if (spamRx) {
+            escaped = escaped.replace(spamRx, function(match) {
+                return "<span class=\"hl-spam\">" + match + "</span>";
+            });
+        }
+        codeArr.push(escaped);
+    }
+
+    document.getElementById("lineNumbers").textContent = lineNumsArr.join("\n");
+    document.getElementById("sourceCode").innerHTML = codeArr.join("\n");
+
+    /* Scroll source viewer to top */
+    var container = document.querySelector(".source-container");
+    if (container) { container.scrollTop = 0; container.scrollLeft = 0; }
+}
+
+/* ── Init ── */
+document.addEventListener("DOMContentLoaded", function() {
+    initFromParams();
+
+    /* Enter key on URL input */
+    document.getElementById("urlInput").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") { doFetch(); }
+    });
+});
+
+</script>
+</body>
+</html>
