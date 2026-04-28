@@ -89,14 +89,14 @@ function _renderColumnCard(host, col, gIdx, cIdx, totalCols) {
             @dragover=${(e) => { if (e.dataTransfer.types.includes('application/col-drag')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('col-drag-over'); } }}
             @dragleave=${(e) => { e.currentTarget.classList.remove('col-drag-over'); }}
             @drop=${(e) => {
-                e.preventDefault(); e.currentTarget.classList.remove('col-drag-over');
-                try {
-                    const from = JSON.parse(e.dataTransfer.getData('application/col-drag'));
-                    if (from.gIdx === gIdx && from.cIdx !== cIdx) {
-                        const cols = host._editForm.groups[gIdx].columns; const [moved] = cols.splice(from.cIdx, 1); cols.splice(cIdx, 0, moved); host.requestUpdate();
-                    } else if (from.gIdx !== gIdx) { host._moveColumnTo(from.gIdx, from.cIdx, gIdx); }
-                } catch {}
-            }}>
+            e.preventDefault(); e.currentTarget.classList.remove('col-drag-over');
+            try {
+                const from = JSON.parse(e.dataTransfer.getData('application/col-drag'));
+                if (from.gIdx === gIdx && from.cIdx !== cIdx) {
+                    const cols = host._editForm.groups[gIdx].columns; const [moved] = cols.splice(from.cIdx, 1); cols.splice(cIdx, 0, moved); host.requestUpdate();
+                } else if (from.gIdx !== gIdx) { host._moveColumnTo(from.gIdx, from.cIdx, gIdx); }
+            } catch { }
+        }}>
             <div class="col-header">
                 <span class="col-drag-handle" title="Drag to reorder">&#9776;</span>
                 <span class="col-num">Col ${cIdx + 1}</span>
@@ -106,7 +106,7 @@ function _renderColumnCard(host, col, gIdx, cIdx, totalCols) {
             </div>
             <div class="col-fields">
                 <div class="col-actions">
-                    <label class="col-width-label">W
+                    <label class="col-width-label">
                         <uui-input type="number" .value=${String(col.width || 12)} min="1" max="12"
                             @input=${(e) => host._updateColumnWidth(gIdx, cIdx, e.target.value)}></uui-input>
                         ${_renderColMoveToSelect(host, gIdx, cIdx)}
@@ -136,22 +136,22 @@ function _renderFieldCompact(host, field, fIdx, loc) {
             @dragover=${(e) => { if (e.dataTransfer.types.includes('application/field-drag')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('fc-drag-over'); } }}
             @dragleave=${(e) => { e.currentTarget.classList.remove('fc-drag-over'); }}
             @drop=${(e) => {
-                e.preventDefault(); e.currentTarget.classList.remove('fc-drag-over');
-                try {
-                    const from = JSON.parse(e.dataTransfer.getData('application/field-drag'));
-                    if (from.gIdx === loc.gIdx && from.cIdx === loc.cIdx && from.fIdx !== fIdx) {
-                        const arr = host._editForm.groups[loc.gIdx].columns[loc.cIdx].fields;
-                        const [moved] = arr.splice(from.fIdx, 1); arr.splice(fIdx, 0, moved);
-                        arr.forEach((f, i) => f.sortOrder = i); host.requestUpdate();
-                    } else if (from.gIdx !== loc.gIdx || from.cIdx !== loc.cIdx) {
-                        const srcArr = host._editForm.groups[from.gIdx].columns[from.cIdx].fields;
-                        const [moved] = srcArr.splice(from.fIdx, 1);
-                        const destArr = host._editForm.groups[loc.gIdx].columns[loc.cIdx].fields;
-                        moved.sortOrder = fIdx; destArr.splice(fIdx, 0, moved);
-                        destArr.forEach((f, i) => f.sortOrder = i); host.requestUpdate();
-                    }
-                } catch {}
-            }}>
+            e.preventDefault(); e.currentTarget.classList.remove('fc-drag-over');
+            try {
+                const from = JSON.parse(e.dataTransfer.getData('application/field-drag'));
+                if (from.gIdx === loc.gIdx && from.cIdx === loc.cIdx && from.fIdx !== fIdx) {
+                    const arr = host._editForm.groups[loc.gIdx].columns[loc.cIdx].fields;
+                    const [moved] = arr.splice(from.fIdx, 1); arr.splice(fIdx, 0, moved);
+                    arr.forEach((f, i) => f.sortOrder = i); host.requestUpdate();
+                } else if (from.gIdx !== loc.gIdx || from.cIdx !== loc.cIdx) {
+                    const srcArr = host._editForm.groups[from.gIdx].columns[from.cIdx].fields;
+                    const [moved] = srcArr.splice(from.fIdx, 1);
+                    const destArr = host._editForm.groups[loc.gIdx].columns[loc.cIdx].fields;
+                    moved.sortOrder = fIdx; destArr.splice(fIdx, 0, moved);
+                    destArr.forEach((f, i) => f.sortOrder = i); host.requestUpdate();
+                }
+            } catch { }
+        }}>
             <span class="fc-label">${label} ${field.required ? html`<span class="fc-req" title="Required">*</span>` : nothing}</span>
             
             <div class="fc-actions">
@@ -183,22 +183,14 @@ function _renderFieldSettingsDialog(host) {
                     <uui-button look="secondary" compact @click=${close}>&#10005;</uui-button>
                 </div>
                 <div class="field-dialog-body">
-                    <!-- Toggles -->
-                    <div class="fd-toggles">
-                        <uui-toggle ?checked=${!field.isHidden} @change=${(e) => updateFn('isHidden', !e.target.checked)} label="Visible"></uui-toggle>
-                        <uui-toggle ?checked=${field.required} @change=${(e) => updateFn('required', e.target.checked)} label="Required"></uui-toggle>
-                        <uui-toggle ?checked=${field.isSensitive || field.type === 'password'} @change=${(e) => updateFn('isSensitive', e.target.checked)} label="Sensitive Data"></uui-toggle>
-                    </div>
-
                     <div class="fd-grid">
                         <!-- Type -->
-                        <div class="fd-row">
-                            <label class="fd-label">Type</label>
-                            <button class="type-picker-btn" @click=${() => {
-                                host._typePickerIdx = loc.fIdx; host._typePickerGroupIdx = loc.gIdx;
-                                host._typePickerColIdx = loc.cIdx; host._typePickerSearch = ''; host.requestUpdate();
-                            }}>${currentTypeLabel} &#9662;</button>
-                        </div>
+                        <label>Type
+                        <uui-button look="outline" compact @click=${() => {
+            host._typePickerIdx = loc.fIdx; host._typePickerGroupIdx = loc.gIdx;
+            host._typePickerColIdx = loc.cIdx; host._typePickerSearch = ''; host.requestUpdate();
+        }}>${currentTypeLabel}</uui-button>
+                        </label>
 
                         <!-- Move to -->
                         ${_renderMoveToInDialog(host, loc)}
@@ -220,15 +212,9 @@ function _renderFieldSettingsDialog(host) {
                     <div class="fd-grid">
                         <label>CSS Class <uui-input .value=${field.cssClass || ''} @input=${(e) => updateFn('cssClass', e.target.value)}></uui-input></label>
                     </div>
-                    <label style="display:block;margin-top:8px;">Content
-                        <div class="richtext-toolbar">
-                            <button type="button" @click=${(e) => { e.preventDefault(); document.execCommand('bold'); }}>B</button>
-                            <button type="button" @click=${(e) => { e.preventDefault(); document.execCommand('italic'); }}>I</button>
-                            <button type="button" @click=${(e) => { e.preventDefault(); document.execCommand('underline'); }}>U</button>
-                        </div>
-                        <div class="richtext-editor" contenteditable="true"
-                            .innerHTML=${field.defaultValue || ''}
-                            @input=${(e) => updateFn('defaultValue', e.target.innerHTML)}></div>
+                    <label style="display:block;margin-top:8px;">Content (HTML)
+                        <textarea class="fd-html-textarea" .value=${field.defaultValue || ''}
+                            @input=${(e) => updateFn('defaultValue', e.target.value)}></textarea>
                     </label>
                     `}
 
@@ -252,7 +238,13 @@ function _renderFieldSettingsDialog(host) {
 
                 </div>
                 <div class="field-dialog-footer">
-                    <uui-button look="primary" @click=${close}>Done</uui-button>
+                    <!-- Toggles -->
+                    <div class="fd-toggles">
+                        <uui-toggle ?checked=${!field.isHidden} @change=${(e) => updateFn('isHidden', !e.target.checked)} label="Visible"></uui-toggle>
+                        <uui-toggle ?checked=${field.required} @change=${(e) => updateFn('required', e.target.checked)} label="Required"></uui-toggle>
+                        <uui-toggle ?checked=${field.isSensitive || field.type === 'password'} @change=${(e) => updateFn('isSensitive', e.target.checked)} label="Sensitive Data"></uui-toggle>
+                        <uui-button look="primary" @click=${close}>Done</uui-button>
+                    </div>
                 </div>
             </div>
         </div>`;
@@ -271,18 +263,17 @@ function _renderMoveToInDialog(host, loc) {
     });
     if (destinations.length === 0) return nothing;
     return html`
-        <div class="fd-row" style="margin-top:12px;">
-            <label class="fd-label">Move to</label>
+        <label>Move to
             <select class="move-to-select" @change=${(e) => {
-                const val = e.target.value; if (!val) return;
-                const [tg, tc] = val.split(',').map(Number);
-                host._moveFieldTo({ gIdx: loc.gIdx, cIdx: loc.cIdx, fIdx: loc.fIdx }, { gIdx: tg, cIdx: tc });
-                host._fieldSettingsLoc = null; host.requestUpdate();
-            }}>
+            const val = e.target.value; if (!val) return;
+            const [tg, tc] = val.split(',').map(Number);
+            host._moveFieldTo({ gIdx: loc.gIdx, cIdx: loc.cIdx, fIdx: loc.fIdx }, { gIdx: tg, cIdx: tc });
+            host._fieldSettingsLoc = null; host.requestUpdate();
+        }}>
                 <option value="">Select destination…</option>
                 ${destinations.map(d => html`<option value="${d.gIdx},${d.cIdx}">→ ${d.label}</option>`)}
             </select>
-        </div>`;
+        </label>`;
 }
 
 // ── Shared helpers ──
@@ -336,23 +327,27 @@ function _renderColumnSettings(host, f) {
             <div class="settings-body">
                 ${allFieldNames.length === 0 ? html`<div class="empty">No fields yet.</div>` : nothing}
                 ${orderedNames.map((name, idx) => {
-                    const isVisible = f.visibleColumns == null ? true : f.visibleColumns.includes(name);
-                    return html`<label class="check-label settings-col-item" draggable="true"
+        const isVisible = f.visibleColumns == null ? true : f.visibleColumns.includes(name);
+        return html`<label class="check-label settings-col-item" draggable="true"
                         @dragstart=${(e) => { e.dataTransfer.setData('text/plain', idx.toString()); e.currentTarget.classList.add('dragging'); }}
                         @dragend=${(e) => { e.currentTarget.classList.remove('dragging'); }}
                         @dragover=${(e) => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }}
                         @dragleave=${(e) => { e.currentTarget.classList.remove('drag-over'); }}
-                        @drop=${(e) => { e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-                            const from = parseInt(e.dataTransfer.getData('text/plain')); if (from === idx) return;
-                            if (!f.visibleColumns) f.visibleColumns = [...allFieldNames];
-                            const arr = [...orderedNames]; const [m] = arr.splice(from, 1); arr.splice(idx, 0, m);
-                            f.visibleColumns = arr.filter(n => f.visibleColumns.includes(n)); host.requestUpdate(); }}>
+                        @drop=${(e) => {
+                e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+                const from = parseInt(e.dataTransfer.getData('text/plain')); if (from === idx) return;
+                if (!f.visibleColumns) f.visibleColumns = [...allFieldNames];
+                const arr = [...orderedNames]; const [m] = arr.splice(from, 1); arr.splice(idx, 0, m);
+                f.visibleColumns = arr.filter(n => f.visibleColumns.includes(n)); host.requestUpdate();
+            }}>
                         <span class="drag-handle">&#9776;</span>
                         <input type="checkbox" ?checked=${isVisible} @change=${(e) => {
-                            if (!f.visibleColumns) f.visibleColumns = [...allFieldNames];
-                            if (e.target.checked) { if (!f.visibleColumns.includes(name)) f.visibleColumns.push(name); }
-                            else { f.visibleColumns = f.visibleColumns.filter(c => c !== name); } host.requestUpdate(); }} />
-                        ${name}</label>`; })}
+                if (!f.visibleColumns) f.visibleColumns = [...allFieldNames];
+                if (e.target.checked) { if (!f.visibleColumns.includes(name)) f.visibleColumns.push(name); }
+                else { f.visibleColumns = f.visibleColumns.filter(c => c !== name); } host.requestUpdate();
+            }} />
+                        ${name}</label>`;
+    })}
             </div>
         </div>`;
 }
@@ -382,14 +377,14 @@ function _renderTypePicker(host) {
 function _renderTypeAttributes(host, field, idx, loc) {
     const t = field.type; if (!field.attributes) field.attributes = {};
     const a = field.attributes, s = (k, v) => { field.attributes[k] = v; host.requestUpdate(); };
-    if (t === 'number') return html`<div class="field-attrs"><label>Min <uui-input .value=${a.min||''} @input=${(e)=>s('min',e.target.value)}></uui-input></label><label>Max <uui-input .value=${a.max||''} @input=${(e)=>s('max',e.target.value)}></uui-input></label><label>Step <uui-input .value=${a.step||''} @input=${(e)=>s('step',e.target.value)}></uui-input></label></div>`;
-    if (t === 'date') return html`<div class="field-attrs"><label>Min <uui-input type="date" .value=${a.min||''} @input=${(e)=>s('min',e.target.value)}></uui-input></label><label>Max <uui-input type="date" .value=${a.max||''} @input=${(e)=>s('max',e.target.value)}></uui-input></label></div>`;
-    if (t === 'time') return html`<div class="field-attrs"><label>Min <uui-input .value=${a.min||''} @input=${(e)=>s('min',e.target.value)} placeholder="09:00"></uui-input></label><label>Max <uui-input .value=${a.max||''} @input=${(e)=>s('max',e.target.value)} placeholder="17:00"></uui-input></label></div>`;
-    if (t === 'textarea') return html`<div class="field-attrs"><label>Rows <uui-input .value=${a.rows||'4'} @input=${(e)=>s('rows',e.target.value)}></uui-input></label></div>`;
-    if (t === 'file') return html`<div class="field-attrs"><label>Accept <uui-input .value=${a.accept||''} @input=${(e)=>s('accept',e.target.value)} placeholder=".pdf,.jpg"></uui-input></label><label>Max MB <uui-input .value=${a.maxSize||''} @input=${(e)=>s('maxSize',e.target.value)}></uui-input></label></div>`;
-    if (t === 'range') return html`<div class="field-attrs"><label>Min <uui-input .value=${a.min||'0'} @input=${(e)=>s('min',e.target.value)}></uui-input></label><label>Max <uui-input .value=${a.max||'100'} @input=${(e)=>s('max',e.target.value)}></uui-input></label><label>Step <uui-input .value=${a.step||'1'} @input=${(e)=>s('step',e.target.value)}></uui-input></label></div>`;
-    if (t === 'accept') return html`<div class="field-attrs"><label>Text <uui-input .value=${a.text||''} @input=${(e)=>s('text',e.target.value)}></uui-input></label><label>Link URL <uui-input .value=${a.linkUrl||''} @input=${(e)=>s('linkUrl',e.target.value)}></uui-input></label><label>Link Text <uui-input .value=${a.linkText||''} @input=${(e)=>s('linkText',e.target.value)}></uui-input></label></div>`;
-    if (t === 'step') return html`<div class="field-attrs"><label>Title <uui-input .value=${a.title||''} @input=${(e)=>s('title',e.target.value)}></uui-input></label></div>`;
+    if (t === 'number') return html`<div class="field-attrs"><label>Min <uui-input .value=${a.min || ''} @input=${(e) => s('min', e.target.value)}></uui-input></label><label>Max <uui-input .value=${a.max || ''} @input=${(e) => s('max', e.target.value)}></uui-input></label><label>Step <uui-input .value=${a.step || ''} @input=${(e) => s('step', e.target.value)}></uui-input></label></div>`;
+    if (t === 'date') return html`<div class="field-attrs"><label>Min <uui-input type="date" .value=${a.min || ''} @input=${(e) => s('min', e.target.value)}></uui-input></label><label>Max <uui-input type="date" .value=${a.max || ''} @input=${(e) => s('max', e.target.value)}></uui-input></label></div>`;
+    if (t === 'time') return html`<div class="field-attrs"><label>Min <uui-input .value=${a.min || ''} @input=${(e) => s('min', e.target.value)} placeholder="09:00"></uui-input></label><label>Max <uui-input .value=${a.max || ''} @input=${(e) => s('max', e.target.value)} placeholder="17:00"></uui-input></label></div>`;
+    if (t === 'textarea') return html`<div class="field-attrs"><label>Rows <uui-input .value=${a.rows || '4'} @input=${(e) => s('rows', e.target.value)}></uui-input></label></div>`;
+    if (t === 'file') return html`<div class="field-attrs"><label>Accept <uui-input .value=${a.accept || ''} @input=${(e) => s('accept', e.target.value)} placeholder=".pdf,.jpg"></uui-input></label><label>Max MB <uui-input .value=${a.maxSize || ''} @input=${(e) => s('maxSize', e.target.value)}></uui-input></label></div>`;
+    if (t === 'range') return html`<div class="field-attrs"><label>Min <uui-input .value=${a.min || '0'} @input=${(e) => s('min', e.target.value)}></uui-input></label><label>Max <uui-input .value=${a.max || '100'} @input=${(e) => s('max', e.target.value)}></uui-input></label><label>Step <uui-input .value=${a.step || '1'} @input=${(e) => s('step', e.target.value)}></uui-input></label></div>`;
+    if (t === 'accept') return html`<div class="field-attrs"><label>Text <uui-input .value=${a.text || ''} @input=${(e) => s('text', e.target.value)}></uui-input></label><label>Link URL <uui-input .value=${a.linkUrl || ''} @input=${(e) => s('linkUrl', e.target.value)}></uui-input></label><label>Link Text <uui-input .value=${a.linkText || ''} @input=${(e) => s('linkText', e.target.value)}></uui-input></label></div>`;
+    if (t === 'step') return html`<div class="field-attrs"><label>Title <uui-input .value=${a.title || ''} @input=${(e) => s('title', e.target.value)}></uui-input></label></div>`;
     return nothing;
 }
 

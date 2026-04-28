@@ -328,4 +328,9 @@ export const dashboardStyles = css`
     .fd-grid label { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; font-weight: 500; }
     .fd-toggles { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
     .fd-options { margin-top: 12px; }
+    .fd-html-textarea {
+        width: 100%; min-height: 120px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+        font-family: monospace; font-size: 0.85rem; resize: vertical; box-sizing: border-box;
+        background: #fff; margin-top: 4px;
+    }
 `;
