@@ -297,12 +297,15 @@ function _renderEmbedSettings(host, f) {
 function _renderGeneralSettings(host, f) {
     return html`
         <div class="settings-panel">
-            <div class="settings-header"><h3>General Settings</h3></div>
+            <div class="settings-header">
+                <h3>General Settings
+                    <label class="check-label">
+                        <uui-toggle ?checked=${f.storeEntries} @change=${(e) => { f.storeEntries = e.target.checked; }} label="Store Entries"></uui-toggle>
+                        <uui-toggle ?checked=${f.isEnabled} @change=${(e) => { f.isEnabled = e.target.checked; }} label="Enabled"></uui-toggle>
+                    </label>
+                </h3>
+            </div>
             <div class="form-grid">
-                <label class="check-label">
-                    <uui-toggle ?checked=${f.storeEntries} @change=${(e) => { f.storeEntries = e.target.checked; }} label="Store Entries"></uui-toggle>
-                    <uui-toggle ?checked=${f.isEnabled} @change=${(e) => { f.isEnabled = e.target.checked; }} label="Enabled"></uui-toggle>
-                </label>
                 <label>Name <uui-input .value=${f.name} @input=${(e) => { f.name = e.target.value; }}></uui-input></label>
                 <label>Alias <uui-input .value=${f.alias} @input=${(e) => { f.alias = e.target.value; }}></uui-input></label>
                 <label>Success Message <uui-input .value=${f.successMessage || ''} @input=${(e) => { f.successMessage = e.target.value; }}></uui-input></label>
