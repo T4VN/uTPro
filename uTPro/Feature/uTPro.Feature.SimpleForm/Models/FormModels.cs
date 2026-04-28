@@ -13,6 +13,7 @@ public class SimpleFormDto
     public string Name { get; set; } = string.Empty;
     public string Alias { get; set; } = string.Empty;
     public string? FieldsJson { get; set; }
+    public string? GroupsJson { get; set; }
     public string? SuccessMessage { get; set; }
     public string? RedirectUrl { get; set; }
     public string? EmailTo { get; set; }
@@ -46,6 +47,8 @@ public class FormViewModel
     public string Name { get; set; } = string.Empty;
     public string Alias { get; set; } = string.Empty;
     public List<FormFieldViewModel> Fields { get; set; } = [];
+    /// <summary>Groups organise fields into visual sections, each with its own grid layout (1-12 columns).</summary>
+    public List<FormGroupViewModel> Groups { get; set; } = [];
     public string? SuccessMessage { get; set; }
     public string? RedirectUrl { get; set; }
     public string? EmailTo { get; set; }
@@ -57,6 +60,33 @@ public class FormViewModel
     public bool EnableEntriesApi { get; set; }
     public DateTime CreatedUtc { get; set; }
     public DateTime UpdatedUtc { get; set; }
+}
+
+/// <summary>
+/// A visual group/fieldset that contains columns, each with its own width and fields.
+/// </summary>
+public class FormGroupViewModel
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    /// <summary>Optional group title (rendered as fieldset legend or heading).</summary>
+    public string? Name { get; set; }
+    /// <summary>Optional CSS class applied to the group wrapper.</summary>
+    public string? CssClass { get; set; }
+    /// <summary>Columns in this group. Each column has a width (1-12) and its own fields.</summary>
+    public List<FormColumnViewModel> Columns { get; set; } = [];
+    public int SortOrder { get; set; }
+}
+
+/// <summary>
+/// A single column within a group. Width is based on a 12-column grid.
+/// </summary>
+public class FormColumnViewModel
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    /// <summary>Column width in a 12-column grid (1-12).</summary>
+    public int Width { get; set; } = 12;
+    /// <summary>Fields in this column, ordered by SortOrder.</summary>
+    public List<FormFieldViewModel> Fields { get; set; } = [];
 }
 
 public class FormFieldViewModel
@@ -94,6 +124,7 @@ public class SaveFormRequest
     public string Name { get; set; } = string.Empty;
     public string Alias { get; set; } = string.Empty;
     public List<FormFieldViewModel> Fields { get; set; } = [];
+    public List<FormGroupViewModel> Groups { get; set; } = [];
     public string? SuccessMessage { get; set; }
     public string? RedirectUrl { get; set; }
     public string? EmailTo { get; set; }

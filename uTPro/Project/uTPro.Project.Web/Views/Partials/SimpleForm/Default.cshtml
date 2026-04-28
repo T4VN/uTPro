@@ -1,3 +1,4 @@
+@using Microsoft.Extensions.DependencyInjection
 @using uTPro.Extension.CurrentSite
 @model uTPro.Feature.SimpleForm.Models.FormViewModel
 @inject ICurrentSiteExtension CurrentSite
@@ -9,48 +10,61 @@
     var resetText = ViewBag.ResetBtnText as string ?? "RESET";
 }
 
-
 <form id="@formId" class="sf @cssClass" novalidate
       data-alias="@Model.Alias"
       data-redirect="@(Model.RedirectUrl ?? "")"
       data-btn-text="@btnText">
     <input type="hidden" name="__alias" value="@Model.Alias" />
 
-    <div class="row">
-        @foreach (var field in Model.Fields.OrderBy(f => f.SortOrder))
-        {
-            if (field.IsHidden) { continue; }
-
-            var fieldCss = field.CssClass ?? "";
-
-            <div class="@fieldCss">
-                @{
-                    var customPartial = $"~/Views/Partials/SimpleForm/Fields/{field.Type}.cshtml";
-                    var fallbackPartial = "~/Views/Partials/SimpleForm/Fields/_Default.cshtml";
-                    var viewEngine = ViewContext.HttpContext.RequestServices.GetRequiredService<Microsoft.AspNetCore.Mvc.ViewEngines.ICompositeViewEngine>();
-                    var viewExists = viewEngine.GetView(null, customPartial, false).Success
-                                 || viewEngine.FindView(ViewContext, customPartial, false).Success;
-                }
-                @if (viewExists)
+    @foreach (var group in (Model.Groups ?? []).OrderBy(g => g.SortOrder))
+    {
+        var groupCss = group.CssClass ?? "";
+        <fieldset class="sf-group @groupCss">
+            @if (!string.IsNullOrWhiteSpace(group.Name))
+            {
+                <legend class="sf-group-title">@group.Name</legend>
+            }
+            <div class="row">
+                @foreach (var col in group.Columns)
                 {
-                    @await Html.PartialAsync(customPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId }, { "CurrentSite", CurrentSite } })
-                }
-                else
-                {
-                    @await Html.PartialAsync(fallbackPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId }, { "CurrentSite", CurrentSite } })
+                    var colWidth = Math.Clamp(col.Width, 1, 12);
+                    <div class="col-@colWidth col-12-small">
+                        @foreach (var field in col.Fields.OrderBy(f => f.SortOrder))
+                        {
+                            if (field.IsHidden) { continue; }
+                            var fieldCss = field.CssClass ?? "";
+                            <div class="sf-group-field @fieldCss">
+                                @{
+                                    var customPartial = $"~/Views/Partials/SimpleForm/Fields/{field.Type}.cshtml";
+                                    var fallbackPartial = "~/Views/Partials/SimpleForm/Fields/_Default.cshtml";
+                                    var viewEngine = ViewContext.HttpContext.RequestServices.GetRequiredService<Microsoft.AspNetCore.Mvc.ViewEngines.ICompositeViewEngine>();
+                                    var viewExists = viewEngine.GetView(null, customPartial, false).Success
+                                                 || viewEngine.FindView(ViewContext, customPartial, false).Success;
+                                }
+                                @if (viewExists)
+                                {
+                                    @await Html.PartialAsync(customPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId }, { "CurrentSite", CurrentSite } })
+                                }
+                                else
+                                {
+                                    @await Html.PartialAsync(fallbackPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId }, { "CurrentSite", CurrentSite } })
+                                }
+                            </div>
+                        }
+                    </div>
                 }
             </div>
-        }
+        </fieldset>
+    }
 
-        <div class="col-12">
-            <ul class="actions">
-                <li><button type="submit" class="style1">@btnText</button></li>
-                @if (showReset)
-                {
-                    <li><button type="reset" class="style2">@resetText</button></li>
-                }
-            </ul>
-        </div>
+    <div class="col-12">
+        <ul class="actions">
+            <li><button type="submit" class="style1">@btnText</button></li>
+            @if (showReset)
+            {
+                <li><button type="reset" class="style2">@resetText</button></li>
+            }
+        </ul>
     </div>
     <div class="sf-message" style="display:none;"></div>
 </form>

@@ -13,6 +13,12 @@
 .sf-success { background: #e8fde8; color: #27ae60; }
 .sf-fail { background: #fde8e8; color: #c0392b; }
 
+/* ── Groups / Fieldsets ── */
+.sf-group { border: none; padding: 0; margin: 0 0 1.5em 0; }
+.sf-group-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75em; padding: 0; }
+.sf-group-grid { width: 100%; }
+.sf-group-field { min-width: 0; }
+
 /* ── Content Block ── */
 .sf-content-block { margin: 8px 0; }
 

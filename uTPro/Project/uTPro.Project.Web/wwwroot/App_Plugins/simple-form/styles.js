@@ -185,6 +185,7 @@ export const dashboardStyles = css`
         background: rgba(0,0,0,0.5); z-index: 9999;
         display: flex; justify-content: center; align-items: center;
     }
+    .overlay.overlay-top { z-index: 10001; }
     .detail-panel {
         background: var(--uui-color-surface, #fff); border-radius: 8px;
         width: 600px; max-width: 90vw; max-height: 80vh; display: flex; flex-direction: column;
@@ -202,4 +203,129 @@ export const dashboardStyles = css`
     .detail-label { font-weight: 600; min-width: 120px; color: #555; font-size: 0.9rem; }
     .detail-value { flex: 1; word-break: break-word; white-space: pre-wrap; }
     .detail-footer { padding: 12px 20px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; }
+
+    /* ── Group cards ── */
+    .group-card {
+        border: 2px solid var(--uui-color-border, #ccc); border-radius: 8px;
+        margin-bottom: 16px; overflow: hidden;
+        background: var(--uui-color-surface, #fff);
+    }
+    .group-header {
+        display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+        background: var(--uui-color-surface-alt, #f0f0f5); flex-wrap: wrap;
+    }
+    .group-num { font-weight: 700; font-size: 1rem; color: #555; min-width: 80px; }
+    .group-settings { display: flex; gap: 10px; flex: 1; flex-wrap: wrap; align-items: flex-end; }
+    .group-setting-label {
+        display: flex; flex-direction: column; gap: 3px;
+        font-size: 0.8rem; font-weight: 500; min-width: 100px;
+    }
+    .group-setting-label uui-input { width: 100%; min-width: 80px; }
+    .group-actions { display: flex; gap: 4px; margin-left: auto; }
+    .group-preview {
+        padding: 10px 16px; border-bottom: 1px solid #eee;
+        background: var(--uui-color-surface-alt, #fafafa);
+    }
+    .group-preview-label { font-size: 0.8rem; color: #666; margin-bottom: 6px; display: block; }
+    .group-col-preview { min-height: 32px; }
+    .group-col-cell {
+        background: #e0e0e0; border-radius: 4px; padding: 6px 10px;
+        text-align: center; font-size: 0.8rem; font-weight: 600; color: #555;
+    }
+    .group-grid-empty {
+        grid-column: 1 / -1; text-align: center; color: #aaa;
+        font-size: 0.8rem; font-style: italic; padding: 4px;
+    }
+    .group-columns-container {
+        display: flex; gap: 12px; padding: 12px 16px; flex-wrap: wrap;
+    }
+
+    /* ── Column cards within a group ── */
+    .col-card {
+        min-width: 200px; box-sizing: border-box;
+        border: 1px dashed var(--uui-color-border, #ccc); border-radius: 6px;
+        background: var(--uui-color-surface-alt, #fafafa);
+    }
+    .col-header {
+        display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+        background: var(--uui-color-surface-alt, #f0f0f0);
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .col-num { font-weight: 600; font-size: 0.85rem; color: #555; }
+    .col-width-label {
+        display: flex; align-items: center; gap: 4px;
+        font-size: 0.8rem; font-weight: 500;
+    }
+    .col-width-label uui-input { width: 55px; }
+    .col-actions { margin-left: auto; }
+    .col-fields { padding: 8px 10px; }
+    .col-add-field {
+        text-align: center; padding: 6px 0; margin-top: 4px;
+        border-top: 1px dashed #ddd;
+    }
+
+    /* ── Move to select ── */
+    .move-to-select {
+        padding: 3px 6px; border: 1px solid #ccc; border-radius: 4px;
+        font-size: 0.78rem; background: #fff; height: 33px; box-sizing: border-box;
+        cursor: pointer; color: #555;
+    }
+    .move-to-select:hover { border-color: #888; }
+
+    /* ── Column drag & drop ── */
+    .col-drag-handle {
+        cursor: grab; color: #aaa; font-size: 0.9rem; user-select: none;
+    }
+    .col-drag-handle:active { cursor: grabbing; }
+    .col-card.col-dragging { opacity: 0.4; }
+    .col-card.col-drag-over {
+        box-shadow: inset 0 0 0 2px var(--uui-color-interactive, #1b264f);
+        border-color: var(--uui-color-interactive, #1b264f);
+    }
+
+    /* ── Compact field card ── */
+    .fc {
+        display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+        border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 4px;
+        background: #fff; cursor: grab; user-select: none;
+        transition: box-shadow 0.15s, opacity 0.15s;
+    }
+    .fc:hover { border-color: #bbb; }
+    .fc-hidden { opacity: 0.45; border-style: dashed; }
+    .fc-dragging { opacity: 0.3; }
+    .fc-drag-over { box-shadow: inset 0 0 0 2px var(--uui-color-interactive, #1b264f); }
+    .fc-type {
+        font-size: 0.7rem; font-weight: 600; color: #888; text-transform: uppercase;
+        background: #f0f0f0; padding: 1px 5px; border-radius: 3px; white-space: nowrap;
+    }
+    .fc-label { flex: 1; font-size: 0.85rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fc-req { color: #e53935; font-weight: 700; font-size: 1rem; }
+    .fc-actions { display: flex; gap: 2px; margin-left: auto; flex-shrink: 0; }
+    .fc-btn {
+        border: none; background: none; cursor: pointer; padding: 2px 4px;
+        font-size: 0.75rem; color: #888; border-radius: 3px;
+    }
+    .fc-btn:hover { background: #f0f0f0; color: #333; }
+    .fc-btn:disabled { opacity: 0.3; cursor: default; }
+    .fc-btn-danger:hover { background: #fde8e8; color: #c0392b; }
+
+    /* ── Field settings dialog ── */
+    .field-dialog {
+        background: var(--uui-color-surface, #fff); border-radius: 8px;
+        width: 640px; max-width: 90vw; max-height: 85vh; display: flex; flex-direction: column;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .field-dialog-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 14px 20px; border-bottom: 1px solid #e0e0e0;
+    }
+    .field-dialog-header h3 { margin: 0; font-size: 1rem; }
+    .field-dialog-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+    .field-dialog-footer { padding: 12px 20px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; }
+    .fd-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .fd-label { font-weight: 600; font-size: 0.85rem; min-width: 80px; }
+    .fd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .fd-grid label { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; font-weight: 500; }
+    .fd-toggles { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .fd-options { margin-top: 12px; }
 `;

@@ -67,6 +67,7 @@ internal class SimpleFormService(
             var db = scope.Database;
             var now = DateTime.UtcNow;
             var fieldsJson = JsonSerializer.Serialize(request.Fields, JsonOpts);
+            var groupsJson = JsonSerializer.Serialize(request.Groups, JsonOpts);
 
             if (request.Id > 0)
             {
@@ -76,6 +77,7 @@ internal class SimpleFormService(
                 existing.Name = request.Name;
                 existing.Alias = request.Alias;
                 existing.FieldsJson = fieldsJson;
+                existing.GroupsJson = groupsJson;
                 existing.SuccessMessage = request.SuccessMessage;
                 existing.RedirectUrl = request.RedirectUrl;
                 existing.EmailTo = request.EmailTo;
@@ -100,6 +102,7 @@ internal class SimpleFormService(
                     Name = request.Name,
                     Alias = request.Alias,
                     FieldsJson = fieldsJson,
+                    GroupsJson = groupsJson,
                     SuccessMessage = request.SuccessMessage,
                     RedirectUrl = request.RedirectUrl,
                     EmailTo = request.EmailTo,
@@ -152,14 +155,21 @@ internal class SimpleFormService(
             var fields = string.IsNullOrEmpty(form.FieldsJson)
                 ? [] : JsonSerializer.Deserialize<List<FormFieldViewModel>>(form.FieldsJson, JsonOpts) ?? [];
 
-            foreach (var f in fields.Where(f => f.Required && !f.IsHidden))
+            // Collect fields from groups → columns → fields
+            var groups = string.IsNullOrEmpty(form.GroupsJson)
+                ? [] : JsonSerializer.Deserialize<List<FormGroupViewModel>>(form.GroupsJson, JsonOpts) ?? [];
+            var allFields = groups.SelectMany(g => g.Columns.SelectMany(c => c.Fields)).ToList();
+            // Include any legacy ungrouped fields for backward compatibility
+            allFields.AddRange(fields);
+
+            foreach (var f in allFields.Where(f => f.Required && !f.IsHidden))
             {
                 if (!data.TryGetValue(f.Name, out var val) || string.IsNullOrWhiteSpace(val))
                     return (false, $"Field '{f.Label}' is required");
             }
 
             // Encrypt sensitive fields
-            var sensitiveNames = fields
+            var sensitiveNames = allFields
                 .Where(f => f.IsSensitive || f.Type == "password")
                 .Select(f => f.Name)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -241,6 +251,8 @@ internal class SimpleFormService(
         Id = dto.Id, Name = dto.Name, Alias = dto.Alias,
         Fields = string.IsNullOrEmpty(dto.FieldsJson)
             ? [] : JsonSerializer.Deserialize<List<FormFieldViewModel>>(dto.FieldsJson, JsonOpts) ?? [],
+        Groups = string.IsNullOrEmpty(dto.GroupsJson)
+            ? [] : JsonSerializer.Deserialize<List<FormGroupViewModel>>(dto.GroupsJson, JsonOpts) ?? [],
         SuccessMessage = dto.SuccessMessage, RedirectUrl = dto.RedirectUrl,
         EmailTo = dto.EmailTo, EmailSubject = dto.EmailSubject,
         StoreEntries = dto.StoreEntries, IsEnabled = dto.IsEnabled,
