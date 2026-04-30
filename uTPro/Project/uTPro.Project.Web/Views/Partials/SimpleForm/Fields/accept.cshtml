@@ -1,17 +1,20 @@
 @* Accept / Terms checkbox with optional link *@
+@using uTPro.Feature.SimpleForm.Helpers
 @model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
 @{
-    var formId = ViewData["FormId"] as string ?? "sf";
-    var fieldId = formId + "-" + Model.Name;
-    var text = Model.Attributes?.GetValueOrDefault("text") ?? "I agree to the";
-    var linkUrl = Model.Attributes?.GetValueOrDefault("linkUrl") ?? "";
-    var linkText = Model.Attributes?.GetValueOrDefault("linkText") ?? "Terms & Conditions";
+    var h = new FieldHelper(Model, ViewData);
+    var text = h.Attr("text", "I agree to the");
+    var linkUrl = h.Attr("linkUrl");
+    var linkText = h.Attr("linkText", "Terms & Conditions");
 }
 
 <label class="sf-option">
-    <input type="checkbox" id="@fieldId" name="@Model.Name" value="accepted"
-           @(Model.Required ? "required" : "")
-           data-msg="@Model.ValidationMessage" />
+    <input type="checkbox"
+           id="@h.FieldId"
+           name="@h.Name"
+           value="accepted"
+           @h.RequiredAttr()
+           @h.DataMsgAttr() />
     @text
     @if (!string.IsNullOrEmpty(linkUrl))
     {
@@ -19,4 +22,4 @@
     }
     @if (Model.Required) { <span class="sf-required">*</span> }
 </label>
-<span class="sf-error" data-for="@Model.Name"></span>
+@h.Error()

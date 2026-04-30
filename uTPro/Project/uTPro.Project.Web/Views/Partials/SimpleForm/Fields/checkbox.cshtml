@@ -1,21 +1,18 @@
+@using uTPro.Feature.SimpleForm.Helpers
 @model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
 @{
-    var formId = ViewData["FormId"] as string ?? "sf";
-    var fieldId = formId + "-" + Model.Name;
+    var h = new FieldHelper(Model, ViewData);
 }
 
 @if (Model.Options != null && Model.Options.Any())
 {
-    <label>
-        @Model.Label
-        @if (Model.Required) { <span class="sf-required">*</span> }
-    </label>
+    @h.LabelNoFor()
     <div class="sf-options">
         @foreach (var opt in Model.Options)
         {
-            var cbId = fieldId + "-" + opt.Value;
+            var cbId = h.FieldId + "-" + opt.Value;
             <label class="sf-option">
-                <input type="checkbox" id="@cbId" name="@Model.Name" value="@opt.Value" />
+                <input type="checkbox" id="@cbId" name="@h.Name" value="@opt.Value" />
                 @opt.Text
             </label>
         }
@@ -24,8 +21,8 @@
 else
 {
     <label class="sf-option">
-        <input type="checkbox" id="@fieldId" name="@Model.Name" value="true" />
+        <input type="checkbox" id="@h.FieldId" name="@h.Name" value="true" />
         @Model.Label
     </label>
 }
-<span class="sf-error" data-for="@Model.Name"></span>
+@h.Error()

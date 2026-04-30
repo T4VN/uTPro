@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using uTPro.Feature.SimpleForm.Services;
 
 namespace uTPro.Feature.SimpleForm.ViewComponents;
 
-public class SimpleFormViewComponent(ISimpleFormService formService, IWebHostEnvironment env) : ViewComponent
+public class SimpleFormViewComponent(
+    ISimpleFormService formService,
+    ICompositeViewEngine viewEngine) : ViewComponent
 {
     public IViewComponentResult Invoke(
         string alias,
@@ -27,25 +29,24 @@ public class SimpleFormViewComponent(ISimpleFormService formService, IWebHostEnv
         return View(viewPath, form);
     }
 
+    /// <summary>
+    /// Resolves the template path. Checks both local files and RCL-compiled views
+    /// so it works whether SimpleForm is a project reference or a NuGet package.
+    /// </summary>
     private string ResolveTemplate(string? template, string alias)
     {
         if (!string.IsNullOrEmpty(template))
         {
             var path = $"~/Views/Partials/SimpleForm/{template}.cshtml";
-            if (FileExists(path)) return path;
+            if (ViewExists(path)) return path;
         }
 
         var aliasPath = $"~/Views/Partials/SimpleForm/{alias}.cshtml";
-        if (FileExists(aliasPath)) return aliasPath;
+        if (ViewExists(aliasPath)) return aliasPath;
 
         return "~/Views/Partials/SimpleForm/Default.cshtml";
     }
 
-    private bool FileExists(string viewPath)
-    {
-        var physicalPath = Path.Combine(
-            env.ContentRootPath,
-            viewPath.Replace("~/", "").Replace("/", Path.DirectorySeparatorChar.ToString()));
-        return System.IO.File.Exists(physicalPath);
-    }
+    private bool ViewExists(string viewPath)
+        => viewEngine.GetView(null, viewPath, false).Success;
 }

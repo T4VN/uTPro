@@ -1,7 +1,9 @@
 @* Form Step divider — renders a visual step separator *@
+@using uTPro.Feature.SimpleForm.Helpers
 @model uTPro.Feature.SimpleForm.Models.FormFieldViewModel
 @{
-    var title = Model.Attributes?.GetValueOrDefault("title") ?? Model.Label ?? "Next Step";
+    var h = new FieldHelper(Model, ViewData);
+    var title = h.Attr("title", Model.Label ?? "Next Step");
 }
 
 <div class="sf-step">

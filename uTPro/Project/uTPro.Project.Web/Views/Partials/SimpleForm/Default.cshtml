@@ -1,13 +1,21 @@
+@using uTPro.Feature.SimpleForm.Helpers
+@using Umbraco.Cms.Core.Dictionary
 @using Microsoft.Extensions.DependencyInjection
-@using uTPro.Extension.CurrentSite
 @model uTPro.Feature.SimpleForm.Models.FormViewModel
-@inject ICurrentSiteExtension CurrentSite
+@inject ICultureDictionary CultureDictionary
 @{
     var formId = "sf-" + Model.Alias;
     var cssClass = ViewBag.FormCssClass as string ?? "";
     var btnText = ViewBag.SubmitBtnText as string ?? "SEND";
     var showReset = ViewBag.ShowReset as bool? ?? true;
     var resetText = ViewBag.ResetBtnText as string ?? "RESET";
+
+    // Shared ViewData passed to every field partial
+    var fieldViewData = new ViewDataDictionary(ViewData)
+    {
+        { "FormId", formId },
+        { "CultureDictionary", CultureDictionary }
+    };
 }
 
 <form id="@formId" class="sf @cssClass" novalidate
@@ -18,8 +26,7 @@
 
     @foreach (var group in (Model.Groups ?? []).OrderBy(g => g.SortOrder))
     {
-        var groupCss = group.CssClass ?? "";
-        <fieldset class="sf-group @groupCss">
+        <fieldset class="sf-group @(group.CssClass ?? "")">
             @if (!string.IsNullOrWhiteSpace(group.Name))
             {
                 <legend class="sf-group-title">@group.Name</legend>
@@ -27,28 +34,15 @@
             <div class="row">
                 @foreach (var col in group.Columns)
                 {
-                    var colWidth = Math.Clamp(col.Width, 1, 12);
-                    <div class="col-@colWidth col-12-small">
+                    <div class="col-@(Math.Clamp(col.Width, 1, 12)) col-12-small">
                         @foreach (var field in col.Fields.OrderBy(f => f.SortOrder))
                         {
                             if (field.IsHidden) { continue; }
-                            var fieldCss = field.CssClass ?? "";
-                            <div class="sf-group-field @fieldCss">
-                                @{
-                                    var customPartial = $"~/Views/Partials/SimpleForm/Fields/{field.Type}.cshtml";
-                                    var fallbackPartial = "~/Views/Partials/SimpleForm/Fields/_Default.cshtml";
-                                    var viewEngine = ViewContext.HttpContext.RequestServices.GetRequiredService<Microsoft.AspNetCore.Mvc.ViewEngines.ICompositeViewEngine>();
-                                    var viewExists = viewEngine.GetView(null, customPartial, false).Success
-                                                 || viewEngine.FindView(ViewContext, customPartial, false).Success;
-                                }
-                                @if (viewExists)
-                                {
-                                    @await Html.PartialAsync(customPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId }, { "CurrentSite", CurrentSite } })
-                                }
-                                else
-                                {
-                                    @await Html.PartialAsync(fallbackPartial, field, new ViewDataDictionary(ViewData) { { "FormId", formId }, { "CurrentSite", CurrentSite } })
-                                }
+                            <div class="sf-group-field @(field.CssClass ?? "")">
+                                @await Html.PartialAsync(
+                                    FieldPartialResolver.Resolve(field.Type, ViewContext),
+                                    field,
+                                    fieldViewData)
                             </div>
                         }
                     </div>
@@ -69,5 +63,11 @@
     <div class="sf-message" style="display:none;"></div>
 </form>
 
-<link rel="stylesheet" href="~/uTPro/simple-form/css/simple-form.css" />
-<script src="~/uTPro/simple-form/js/simple-form.js"></script>
+@if (Context.Items["sf-assets-loaded"] is not true)
+{
+    Context.Items["sf-assets-loaded"] = true;
+    uTPro.Feature.SimpleForm.Helpers.SimpleFormAssets.Resolve(
+        Context.RequestServices.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>());
+    <link rel="stylesheet" href="@Url.Content("~" + uTPro.Feature.SimpleForm.Helpers.SimpleFormAssets.Css)" />
+    <script src="@Url.Content("~" + uTPro.Feature.SimpleForm.Helpers.SimpleFormAssets.Js)"></script>
+}
