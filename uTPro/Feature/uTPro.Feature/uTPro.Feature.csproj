@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\uTPro.Feature.SimpleForm\uTPro.Feature.SimpleForm.csproj" />
+  </ItemGroup>
+
 </Project>

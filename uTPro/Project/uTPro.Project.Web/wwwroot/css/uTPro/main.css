@@ -102,11 +102,6 @@ form textarea {
         background: #f8f8f8;
     }
 
-    form input[type="text"],
-    form input[type="email"] input[type="password"] {
-        line-height: 1em;
-    }
-
 form select {
     line-height: 1em;
 }

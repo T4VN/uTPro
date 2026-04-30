@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+
+    <!-- NuGet package metadata -->
+    <PackageId>uTPro.Feature.SimpleForm</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>T4VN</Authors>
+    <Description>Lightweight form builder for Umbraco — create, manage, and render dynamic forms from the backoffice. Supports 19+ field types, groups/columns layout, client-side validation, sensitive data encryption, multi-language, and custom field extensibility.</Description>
+    <PackageTags>umbraco;form;form-builder;umbraco-plugin;cms</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/nickatgit/uTPro</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nickatgit/uTPro</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- Include README and icon in the NuGet package -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms" Version="16.*" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="9.*" />
+  </ItemGroup>
+
+  <!--
+    DEV-ONLY: Copy Views and wwwroot to the local web project on build.
+    This target is skipped during NuGet pack (RCL handles static assets automatically).
+    Set WebProjectPath to your web project's relative path, or remove this target entirely
+    if you only consume SimpleForm via NuGet.
+  -->
+  <PropertyGroup>
+    <WebProjectPath>..\..\Project\uTPro.Project.Web</WebProjectPath>
+  </PropertyGroup>
+
+  <Target Name="CopyViewsToWebProject" AfterTargets="Build" Condition="Exists('$(WebProjectPath)') AND '$(NoBuild)' != 'true' AND '$(GeneratePackageOnBuild)' != 'true'">
+    <RemoveDir Directories="$(WebProjectPath)\Views\Partials\SimpleForm" Condition="Exists('$(WebProjectPath)\Views\Partials\SimpleForm')" />
+    <RemoveDir Directories="$(WebProjectPath)\Views\Shared\Components\SimpleForm" Condition="Exists('$(WebProjectPath)\Views\Shared\Components\SimpleForm')" />
+    <RemoveDir Directories="$(WebProjectPath)\wwwroot\App_Plugins\simple-form" Condition="Exists('$(WebProjectPath)\wwwroot\App_Plugins\simple-form')" />
+    <RemoveDir Directories="$(WebProjectPath)\wwwroot\uTPro\simple-form" Condition="Exists('$(WebProjectPath)\wwwroot\uTPro\simple-form')" />
+
+    <ItemGroup>
+      <SimpleFormViews Include="Views\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SimpleFormViews)"
+          DestinationFiles="@(SimpleFormViews->'$(WebProjectPath)\Views\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+
+    <ItemGroup>
+      <SimpleFormWwwroot Include="wwwroot\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SimpleFormWwwroot)"
+          DestinationFiles="@(SimpleFormWwwroot->'$(WebProjectPath)\wwwroot\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+
+    <Message Importance="high" Text="SimpleForm: Cleaned and copied Views + wwwroot to $(WebProjectPath)" />
+  </Target>
+
+</Project>
