@@ -121,18 +121,55 @@ builder.Services.Configure<FormOptions>(options =>
     options.Limits.MaxRequestBodySize = 128L * 1024L * 1024L; // 128MB
 });
 
+// Data Protection keys path.
+// Resolution order:
+//   1. Explicit config "uTPro:DataProtection:KeysPath"
+//        - Absolute path  -> used as-is (e.g. C:\UmbracoKeys\uTPro-Shared)
+//        - Relative path  -> resolved against ContentRoot
+//      When load balancing (backoffice + multiple public subscribers sharing
+//      the same SQL), point every site to the SAME folder and use the SAME
+//      "uTPro:DataProtection:ApplicationName" so auth/antiforgery cookies
+//      can be decrypted by every instance.
+//   2. Else, if Umbraco:CMS:Hosting:LocalTempStorageLocation = "EnvironmentTemp"
+//      -> %TEMP%/UmbracoData/<hash-of-ContentRoot>/PersistKeys
+//         (keeps keys out of the project folder, per-site isolated).
+//   3. Else -> <ContentRoot>/umbraco/Data/TEMP/PersistKeys (Umbraco default).
+var dpKeysPath = builder.Configuration["uTPro:DataProtection:KeysPath"];
+if (!string.IsNullOrWhiteSpace(dpKeysPath))
+{
+    if (!Path.IsPathRooted(dpKeysPath))
+    {
+        // Resolve relative paths against ContentRoot (on IIS, the process CWD
+        // is usually C:\Windows\System32\inetsrv, which is not what we want).
+        dpKeysPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, dpKeysPath));
+    }
+}
+else
+{
+    var localTempStorage = builder.Configuration["Umbraco:CMS:Hosting:LocalTempStorageLocation"];
+    if (string.Equals(localTempStorage, "EnvironmentTemp", StringComparison.OrdinalIgnoreCase))
+    {
+        var hashBytes = System.Security.Cryptography.SHA1.HashData(
+            System.Text.Encoding.UTF8.GetBytes(builder.Environment.ContentRootPath));
+        var hash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+        dpKeysPath = Path.Combine(Path.GetTempPath(), "UmbracoData", hash, "PersistKeys");
+    }
+    else
+    {
+        dpKeysPath = Path.Combine(
+            builder.Environment.ContentRootPath,
+            "umbraco", "Data", "TEMP", "PersistKeys");
+    }
+}
+var dpKeysDir = new DirectoryInfo(dpKeysPath);
+if (!dpKeysDir.Exists)
+{
+    dpKeysDir.Create();
+}
+
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(
-        new DirectoryInfo(
-            Path.Combine(
-                builder.Environment.ContentRootPath,
-                "umbraco",
-                "Data",
-                "TEMP",
-                "PersistKeys")
-            )
-    )
-    .SetApplicationName("uTPro")
+    .PersistKeysToFileSystem(dpKeysDir)
+    .SetApplicationName(builder.Configuration["uTPro:DataProtection:ApplicationName"] ?? "uTPro")
     .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 var app = builder.Build();
