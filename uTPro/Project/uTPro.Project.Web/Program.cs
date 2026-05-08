@@ -15,6 +15,23 @@ using WebMarkupMin.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Override TMP/TEMP per site from appsettings (uTPro:Hosting:TempPath).
+// Must run before anything that calls Path.GetTempPath() (e.g. Umbraco with
+// LocalTempStorageLocation=EnvironmentTemp, Examine TempFileSystemDirectoryFactory).
+// Relative paths are resolved against ContentRoot; absolute paths used as-is.
+var customTempPath = builder.Configuration["uTPro:Hosting:TempPath"];
+if (!string.IsNullOrWhiteSpace(customTempPath))
+{
+    if (!Path.IsPathRooted(customTempPath))
+    {
+        customTempPath = Path.GetFullPath(
+            Path.Combine(builder.Environment.ContentRootPath, customTempPath));
+    }
+    Directory.CreateDirectory(customTempPath);
+    Environment.SetEnvironmentVariable("TMP", customTempPath);
+    Environment.SetEnvironmentVariable("TEMP", customTempPath);
+}
+
 // Umbraco setup
 var umbracoBuilder = builder.CreateUmbracoBuilder()
     .AddBackOffice()
