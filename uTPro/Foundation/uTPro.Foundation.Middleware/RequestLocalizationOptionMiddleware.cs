@@ -16,8 +16,7 @@ namespace uTPro.Foundation.Middleware
         public static IApplicationBuilder UseWebRequestLocalization(this IApplicationBuilder app)
         {
             var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
-            bool isEnabled = true;
-            bool.TryParse(config.GetSection(ConfigSettingUTPro.ListRememberLanguage.Enabled)?.Value, out isEnabled);
+            bool.TryParse(config.GetSection(ConfigSettingUTPro.ListRememberLanguage.Enabled)?.Value, out bool isEnabled);
             if (isEnabled)
             {
                 var requestLocalizationOptions = app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
@@ -30,7 +29,7 @@ namespace uTPro.Foundation.Middleware
 
     internal class RequestLocalizationOptionMiddleware
     {
-        private const string CookieCulture = ".UTPro.Culture";
+        private const string CookieCulture = ".uTPro.Culture";
         private static readonly DateTimeOffset CookieExpiry = DateTimeOffset.UtcNow.AddDays(3);
 
         private static readonly Lazy<HashSet<string>> _wwwRootEntries = new(() =>
@@ -81,11 +80,10 @@ namespace uTPro.Foundation.Middleware
 
             try
             {
-                bool isEnableCheckBackoffice = false;
-                bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
+                bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out bool isEnableCheckBackoffice);
 
                 string fullUrl = DetermineProviderCultureResult(context, currentSite, isEnableCheckBackoffice);
-                if (!string.IsNullOrEmpty(fullUrl))
+                if (!string.IsNullOrEmpty(fullUrl) && IsLocalUrl(fullUrl))
                 {
                     context.Response.Redirect(fullUrl, true);
                     return;
@@ -261,6 +259,37 @@ namespace uTPro.Foundation.Middleware
                 }
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Validates that the redirect URL is a local URL (same-origin) to prevent
+        /// open-redirect / phishing attacks (CWE-601). Rejects absolute URLs,
+        /// protocol-relative URLs (e.g. "//evil.com"), backslash tricks, and any
+        /// URL containing a scheme delimiter.
+        /// </summary>
+        private static bool IsLocalUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return false;
+
+            // Reject protocol-relative URLs: "//host" or "/\host"
+            if (url.Length > 1 && (url[0] == '/' || url[0] == '\\')
+                && (url[1] == '/' || url[1] == '\\'))
+                return false;
+
+            // Reject absolute URLs with a scheme (e.g. "http://", "javascript:")
+            if (url.Contains("://", StringComparison.Ordinal))
+                return false;
+
+            // Must be rooted-relative (start with '/')
+            if (url[0] != '/')
+                return false;
+
+            // Parse as relative URI to ensure no host component sneaks in
+            if (!Uri.TryCreate(url, UriKind.Relative, out _))
+                return false;
+
+            return true;
         }
 
         private static (string culture, string prefixUrl, bool isRedirect) GetUrlCulture(
