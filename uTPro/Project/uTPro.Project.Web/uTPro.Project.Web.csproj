@@ -13,6 +13,9 @@
 		<None Remove="Controllers\Api\**" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Remove="Program - Copy.cs" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Content Include="App_Plugins\assets\img\bkg-login.jpg" />
 	  <Content Include="App_Plugins\assets\img\logo.svg" />
 	  <Content Include="App_Plugins\cms-screen\index.js" />

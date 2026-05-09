@@ -46,9 +46,9 @@
 		// Panel.
 			$(
 				'<div id="navPanel">' +
-					'<nav>' +
+					'<nav><ul>' +
 							$('.navHeader').navList()  +
-					'</nav>' +
+					'</ul></nav>' +
 				'</div>'
 			)
 				.appendTo($body)

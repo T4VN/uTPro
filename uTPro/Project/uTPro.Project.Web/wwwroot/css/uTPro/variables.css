@@ -1,0 +1,57 @@
+/* ==========================================================================
+   uTPro Design Tokens (CSS Custom Properties)
+   ==========================================================================
+   Central place to manage all brand colors. Change here → updates everywhere.
+   
+   Naming convention:
+     --utp-{category}-{variant}
+     Categories: primary, dark, light, gray, accent, text, bg
+   ========================================================================== */
+
+:root {
+    /* ── Brand Primary (Orange) ── */
+    --utp-primary:          #f6821f;   /* Main brand orange */
+    --utp-primary-light:    #ff9e40;   /* Lighter orange (headings, active nav, highlights) */
+    --utp-primary-hover:    #FFCE40;   /* Hover state (buttons, links) */
+    --utp-primary-active:   #d96760;   /* Active/pressed state */
+
+    /* ── Dark Palette ── */
+    --utp-dark:             #282b34;   /* Primary dark (footer bg, nav panel bg, dark sections) */
+    --utp-dark-alt:         #242730;   /* Slightly darker variant (nav panel) */
+    --utp-dark-medium:      #2f333b;   /* Medium dark (button style3, icon bg) */
+    --utp-dark-soft:        #3f434b;   /* Soft dark (hover states) */
+    --utp-dark-deep:        #1f232b;   /* Deepest dark (active states) */
+    --utp-dark-overlay:     #222835;   /* Dark with slight blue (dropotron bg) */
+    --utp-dark-btn:         #444;      /* Default button background */
+    --utp-dark-contact:     #3d4249;   /* Contact form icon bg */
+
+    /* ── Text Colors ── */
+    --utp-text:             #484d55;   /* Body text (default) */
+    --utp-text-light:       #606167;   /* Secondary/muted text */
+    --utp-text-muted:       #717479;   /* Links, subtle text */
+    --utp-text-dark:        #1a1a1a;   /* High-contrast dark text */
+    --utp-text-white:       #fff;      /* White text on dark backgrounds */
+    --utp-text-white-90:    rgba(255, 255, 255, 0.90);  /* Slightly transparent white */
+    --utp-text-white-80:    rgba(255, 255, 255, 0.80);  /* Footer text */
+    --utp-text-placeholder: #555;      /* Form placeholder */
+
+    /* ── Background Colors ── */
+    --utp-bg-white:         #fff;      /* White background */
+    --utp-bg-light:         #f3f3f3;   /* Light gray background */
+    --utp-bg-input:         #eee;      /* Form input background */
+    --utp-bg-input-focus:   #f8f8f8;   /* Form input focus */
+    --utp-bg-input-active:  #ccc;      /* Form input active/focus alt */
+    --utp-bg-table-alt:     #f4f4f4;   /* Table alternating rows */
+
+    /* ── Border & Shadow ── */
+    --utp-border-light:     #eee;      /* Light borders (lists, sections) */
+    --utp-border-medium:    #ddd;      /* Medium borders (hr, blockquote) */
+    --utp-border-dark:      #333;      /* Dark borders (footer hr) */
+    --utp-border-input:     #a0a1a7;   /* Input box-shadow color */
+    --utp-border-white-25:  rgba(255, 255, 255, 0.25);  /* White border on dark bg */
+    --utp-border-white-05:  rgba(255, 255, 255, 0.05);  /* Subtle white border */
+    --utp-border-white-15:  rgba(255, 255, 255, 0.15);  /* Dropotron separator */
+
+    /* ── Radius ── */
+    --utp-radius:           0.35em;    /* Standard border-radius */
+}

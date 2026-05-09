@@ -1,5 +1,4 @@
 @import url("../../assets/css/fontawesome-all.min.css");
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400italic,700,900");
 
 /*
 	Escape Velocity by HTML5 UP
@@ -195,7 +194,7 @@ textarea,
 select {
 	font-family: 'Source Sans Pro', sans-serif;
 	font-weight: 400;
-	color: #484d55;
+	color: var(--utp-text);
 	font-size: 14pt;
 	line-height: 1.75em;
 	letter-spacing: 0.025em;
@@ -208,7 +207,7 @@ h4,
 h5,
 h6 {
 	font-weight: 700;
-	color: #484d55;
+	color: var(--utp-text);
 }
 
 h1 a,
@@ -227,7 +226,7 @@ a {
 	-ms-transition: color .25s ease-in-out;
 	transition: color .25s ease-in-out;
 	text-decoration: underline;
-	color: #717479;
+	color: var(--utp-text-muted);
 }
 
 a:hover {
@@ -241,7 +240,7 @@ b {
 }
 
 blockquote {
-	border-left: solid 0.5em #ddd;
+	border-left: solid 0.5em var(--utp-border-medium);
 	padding: 1em 0 1em 2em;
 	font-style: italic;
 }
@@ -253,7 +252,7 @@ i {
 
 hr {
 	border: 0;
-	border-top: solid 1px #ddd;
+	border-top: solid 1px var(--utp-border-medium);
 	margin: 2em 0 2em 0;
 }
 
