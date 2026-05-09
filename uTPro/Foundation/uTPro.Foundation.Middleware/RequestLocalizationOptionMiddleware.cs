@@ -247,7 +247,15 @@ namespace uTPro.Foundation.Middleware
                     {
                         if (string.Equals(domainHost.Host, redirectUri.Host, StringComparison.OrdinalIgnoreCase))
                         {
-                            return _prefixUrl + httpContext.Request.Path + httpContext.Request.QueryString;
+                            var prefixPath = redirectUri.AbsolutePath ?? string.Empty;
+                            if (prefixPath.Contains("://", StringComparison.Ordinal))
+                                return string.Empty;
+
+                            prefixPath = "/" + prefixPath.Trim('/');
+                            if (prefixPath == "/")
+                                prefixPath = string.Empty;
+
+                            return prefixPath + httpContext.Request.Path + httpContext.Request.QueryString;
                         }
                     }
                 }
