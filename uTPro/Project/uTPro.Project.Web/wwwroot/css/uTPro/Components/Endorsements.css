@@ -4,10 +4,15 @@
 }
 
     .highlights .highlight h3 a {
-        color: #f6821f;
+        color: var(--section-text-color, var(--utp-text));
         margin: 0 0 0.75em 0;
         font-size: 1.15em;
         letter-spacing: 0.05em;
+        font-weight: 700;
+    }
+
+    .highlights .highlight p {
+        color: var(--section-text-color, var(--utp-text));
     }
 
 @media screen and (max-width: 980px) {

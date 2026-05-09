@@ -19,7 +19,7 @@ else
     @if (Model.Content.Image != null)
     {
         <div class="image featured">
-            <img src="@Model.Content.Image.MediaUrl()" alt="@Model.Content.Title" />
+            <img src="@Model.Content.Image.MediaUrl()" alt="@Model.Content.Title" loading="lazy" decoding="async" />
         </div>
     }
     <section class="features">

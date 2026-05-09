@@ -5,7 +5,7 @@
 .contactform form select,
 .contactform form textarea {
     /*background: #ccc;*/
-    color: #484d55;
+    color: var(--utp-text);
     box-shadow: none;
 }
 
@@ -14,7 +14,7 @@
     .contactform form input[type="password"]:focus,
     .contactform form select:focus,
     .contactform form textarea:focus {
-        background: #ccc;
+        background: var(--utp-bg-input-active);
     }
 
 .contactform input[type="button"],
@@ -22,7 +22,7 @@
 .contactform input[type="reset"],
 .contactform button,
 .contactform .button {
-    color: #fff;
+    color: var(--utp-text-white);
     box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.5);
 }
 
@@ -31,7 +31,7 @@
     .contactform input[type="reset"]:hover,
     .contactform button:hover,
     .contactform .button:hover {
-        color: #fff;
+        color: var(--utp-text-white);
         box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.65);
     }
 
@@ -60,7 +60,7 @@
 }
 
     .contactform .feature-list section {
-        border-top: solid 1px #eee;
+        border-top: solid 1px var(--utp-border-light);
         padding-top: 3em;
         padding-left: 5em;
         position: relative;
@@ -69,11 +69,11 @@
 
     .contactform .feature-list.small section {
         padding-left: 3.5em;
-        border-top-color: rgba(255, 255, 255, 0.05);
+        border-top-color: var(--utp-border-white-05);
     }
 
     .contactform .feature-list h3:before {
-        background: #3d4249 url("/assets/img/overlay.png");
+        background: var(--utp-dark-contact) url("/assets/img/overlay.png");
     }
 
 @media screen and (max-width: 980px) {

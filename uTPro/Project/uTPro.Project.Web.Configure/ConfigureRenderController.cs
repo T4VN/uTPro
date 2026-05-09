@@ -92,7 +92,6 @@ namespace uTPro.Project.Web.Configure
         }
     }
 
-    [Route("[controller]")]
     public class ErrorController : ControllerBase
     {
         private readonly ICurrentSiteExtension _currentSite;
@@ -102,9 +101,19 @@ namespace uTPro.Project.Web.Configure
             _currentSite = currentSite;
         }
 
-        public IActionResult Index()
+        [Route("/error")]
+        [Route("/error/{code:int}")]
+        public IActionResult Index(int? code = null)
         {
-            return new ActionResultPageError(_currentSite, titlePage: "PAGE ERROR", message: "Please contact admin for more details", statusCode: StatusCodes.Status400BadRequest);
+            var statusCode = code ?? StatusCodes.Status404NotFound;
+            var (titlePage, message) = statusCode switch
+            {
+                StatusCodes.Status404NotFound => ("PAGE NOT FOUND", "The page you requested could not be found."),
+                StatusCodes.Status500InternalServerError => ("SERVER ERROR", "An unexpected error occurred."),
+                StatusCodes.Status403Forbidden => ("ACCESS DENIED", "You do not have permission to view this page."),
+                _ => ("PAGE ERROR", "Please contact admin for more details")
+            };
+            return new ActionResultPageError(_currentSite, titlePage: titlePage, message: message, statusCode: statusCode);
         }
     }
 
