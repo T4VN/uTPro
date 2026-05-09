@@ -38,15 +38,15 @@ public static class PipelineSetup
     {
         app.Use(async (context, next) =>
         {
-            var h = context.Response.Headers;
-            h["X-Content-Type-Options"] = "nosniff";
-            h["X-Frame-Options"] = "SAMEORIGIN";
-            h["Referrer-Policy"] = "strict-origin-when-cross-origin";
-            h["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+            var header = context.Response.Headers;
+            header.XContentTypeOptions = "nosniff";
+            header.XFrameOptions = "SAMEORIGIN";
+            header["Referrer-Policy"] = "strict-origin-when-cross-origin";
+            header["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
 
             if (!env.IsDevelopment())
             {
-                h["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+                header.StrictTransportSecurity = "max-age=31536000; includeSubDomains";
             }
 
             // Browser cache for HTML pages (not backoffice, not static files)

@@ -16,8 +16,7 @@ namespace uTPro.Foundation.Middleware
         public static IApplicationBuilder UseWebRequestLocalization(this IApplicationBuilder app)
         {
             var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
-            bool isEnabled = true;
-            bool.TryParse(config.GetSection(ConfigSettingUTPro.ListRememberLanguage.Enabled)?.Value, out isEnabled);
+            bool.TryParse(config.GetSection(ConfigSettingUTPro.ListRememberLanguage.Enabled)?.Value, out bool isEnabled);
             if (isEnabled)
             {
                 var requestLocalizationOptions = app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
@@ -30,7 +29,7 @@ namespace uTPro.Foundation.Middleware
 
     internal class RequestLocalizationOptionMiddleware
     {
-        private const string CookieCulture = ".UTPro.Culture";
+        private const string CookieCulture = ".uTPro.Culture";
         private static readonly DateTimeOffset CookieExpiry = DateTimeOffset.UtcNow.AddDays(3);
 
         private static readonly Lazy<HashSet<string>> _wwwRootEntries = new(() =>
@@ -81,8 +80,7 @@ namespace uTPro.Foundation.Middleware
 
             try
             {
-                bool isEnableCheckBackoffice = false;
-                bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out isEnableCheckBackoffice);
+                bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out bool isEnableCheckBackoffice);
 
                 string fullUrl = DetermineProviderCultureResult(context, currentSite, isEnableCheckBackoffice);
                 if (!string.IsNullOrEmpty(fullUrl))
