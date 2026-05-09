@@ -25,6 +25,7 @@ namespace uTPro.Project.Web.Controllers.Pages
         [Route("/robots")]
         [Route("/robots.txt")]
         [HttpGet]
+        [ResponseCache(Duration = 900, Location = ResponseCacheLocation.Any)]
         public IActionResult Index()
         {
             return Content(_foundation.Generate(), MediaTypeNames.Text.Plain, Encoding.UTF8);

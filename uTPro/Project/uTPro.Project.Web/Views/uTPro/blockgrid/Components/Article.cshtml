@@ -29,7 +29,7 @@ else
             @if (Model.Content.Thumbnail != null)
             {
                 <div class="image featured">
-                    <img src="@Model.Content.Thumbnail.Url()" alt="@Model.Content.Title" />
+                    <img src="@Model.Content.Thumbnail.Url()" alt="@Model.Content.Title" loading="lazy" decoding="async" />
                 </div>
             }
             @if (Model.Content.Content != null)

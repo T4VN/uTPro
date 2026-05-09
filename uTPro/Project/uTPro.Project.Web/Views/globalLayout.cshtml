@@ -4,7 +4,7 @@
     var dir = CurrentSite.CurrentCulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
 }
 <!DOCTYPE html>
-<html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir" language="@CurrentSite.CurrentCulture.DisplayName">
+<html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir">
 <head>
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_MetaData);

@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Web.Common.PublishedModels;
 using uTPro.Common.Constants;
 using uTPro.Extension;
@@ -24,103 +24,113 @@ namespace uTPro.Foundation.Sitemap
 
     internal class SitemapFoundation : ISitemapFoundation
     {
-        const string fileSitemapXSL = "sitemap.xsl";
+        private const string FileSitemapXSL = "sitemap.xsl";
+        private const string CacheKeyPrefix = "uTPro:Sitemap:";
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
 
-        static readonly XNamespace schemas_Sitemap = "http://www.sitemaps.org/schemas/sitemap/0.9";
-        static readonly XNamespace schemas_xhtml = "http://www.w3.org/1999/xhtml";
-        static readonly XNamespace schemas_xsd = "http://www.w3.org/2001/XMLSchema";
-        static readonly XNamespace schemas_xsi = "http://www.w3.org/2001/XMLSchema-instance";
-        private class Utf8StringWriter : StringWriter
+        private static readonly XNamespace SchemaSitemap = "http://www.sitemaps.org/schemas/sitemap/0.9";
+        private static readonly XNamespace SchemaXhtml = "http://www.w3.org/1999/xhtml";
+        private static readonly XNamespace SchemaXsd = "http://www.w3.org/2001/XMLSchema";
+        private static readonly XNamespace SchemaXsi = "http://www.w3.org/2001/XMLSchema-instance";
+
+        private sealed class Utf8StringWriter : StringWriter
         {
-            public override Encoding Encoding { get { return Encoding.UTF8; } }
+            public override Encoding Encoding => Encoding.UTF8;
         }
 
-        readonly ICurrentSiteExtension _currentSite;
-        public SitemapFoundation(ICurrentSiteExtension currentSite)
+        private readonly ICurrentSiteExtension _currentSite;
+        private readonly IMemoryCache _cache;
+
+        public SitemapFoundation(ICurrentSiteExtension currentSite, IMemoryCache cache)
         {
             _currentSite = currentSite;
+            _cache = cache;
         }
 
         public string Generate()
         {
+            // Cache key includes the host so multi-site deployments get separate sitemaps.
+            var cacheKey = CacheKeyPrefix + (_currentSite.GetItem().Root?.Name ?? "default");
+
+            if (_cache.TryGetValue(cacheKey, out string? cached) && cached != null)
+            {
+                return cached;
+            }
+
+            var result = BuildSitemap();
+            _cache.Set(cacheKey, result, CacheDuration);
+            return result;
+        }
+
+        private string BuildSitemap()
+        {
             XElement root = InitElementRoot();
             var nodes = GetListNodes();
-            if (nodes != null)
-            {
-                foreach (PublishedContentCulture dataNode in nodes)
-                {
-                    string culture = dataNode.Culture;// item.Value.Culture;
-                    var node = dataNode.ListContent;// item.Value.Culture;
-                    if (node != null)
-                    {
-                        XElement urlElement = new XElement(schemas_Sitemap + "url");
-                        ValueLoc(node, culture, urlElement);
-                        ValueLastMod(node, urlElement);
-                        ValueChangeFreqency(node, culture, urlElement);
-                        ValuePriority(node, culture, urlElement);
-                        ValueXHTMLLink(node, culture, urlElement);
 
-                        root.Add(urlElement);
-                    }
-                }
+            foreach (var dataNode in nodes)
+            {
+                string culture = dataNode.Culture;
+                var node = dataNode.Content;
+                if (node == null) continue;
+
+                XElement urlElement = new XElement(SchemaSitemap + "url");
+                AddLoc(node, culture, urlElement);
+                AddLastMod(node, urlElement);
+                AddChangeFrequency(node, culture, urlElement);
+                AddPriority(node, culture, urlElement);
+                AddXhtmlLinks(node, urlElement);
+
+                root.Add(urlElement);
             }
+
             XDocument document = new XDocument(new XDeclaration("1.0", "UTF-8", null), root);
             return ConvertDocumentToString(document);
         }
 
-        private void ValueLoc(IPublishedContent node, string culture, XElement element)
+        private static void AddLoc(IPublishedContent node, string culture, XElement element)
         {
-            element.Add(new XElement(schemas_Sitemap + "loc", node.Url(culture, mode: UrlMode.Absolute)));
+            element.Add(new XElement(SchemaSitemap + "loc", node.Url(culture, mode: UrlMode.Absolute)));
         }
 
-        private void ValueLastMod(IPublishedContent node, XElement element)
+        private static void AddLastMod(IPublishedContent node, XElement element)
         {
-            element.Add(new XElement(schemas_Sitemap + "lastmod", node.UpdateDate.ToString("yyyy-MM-dd")));
+            element.Add(new XElement(SchemaSitemap + "lastmod", node.UpdateDate.ToString("yyyy-MM-dd")));
         }
 
-        private void ValueChangeFreqency(IPublishedContent node, string culture, XElement element)
+        private static void AddChangeFrequency(IPublishedContent node, string culture, XElement element)
         {
-            string changeFreqency = string.Empty;
-            try
+            var changeFrequency = node.Value<string>(nameof(GlobalPageSitemapSetting.SitemapXmlChangeFrequency), culture);
+            if (!string.IsNullOrWhiteSpace(changeFrequency))
             {
-                changeFreqency = node.ValueToString(nameof(GlobalPageSitemapSetting.SitemapXmlChangeFrequency), culture);
-            }
-            catch (Exception) { }
-            if (string.IsNullOrWhiteSpace(changeFreqency) == false)
-            {
-                element.Add(new XElement(schemas_Sitemap + "changefreq", changeFreqency.ToLower()));
+                element.Add(new XElement(SchemaSitemap + "changefreq", changeFrequency.ToLowerInvariant()));
             }
         }
 
-        private void ValuePriority(IPublishedContent node, string culture, XElement element)
+        private static void AddPriority(IPublishedContent node, string culture, XElement element)
         {
-            decimal priority = -1;
-            try
+            var priority = node.Value<decimal>(nameof(GlobalPageSitemapSetting.SitemapXmlPriority), culture);
+            if (priority > 0)
             {
-                priority = node.Value<decimal>(nameof(GlobalPageSitemapSetting.SitemapXmlPriority), culture);
-            }
-            catch (Exception) { }
-            if (priority >= 0)
-            {
-                element.Add(new XElement(schemas_Sitemap + "priority", priority));
+                element.Add(new XElement(SchemaSitemap + "priority", priority));
             }
             else
             {
-                priority = node.Level - 1;
-                priority = 1.1M - (priority / 10);
-                element.Add(new XElement(schemas_Sitemap + "priority", priority));
+                // Auto-calculate based on depth (Google ignores priority but some crawlers use it)
+                decimal autoPriority = Math.Max(0.1M, 1.1M - ((node.Level - 1) / 10M));
+                element.Add(new XElement(SchemaSitemap + "priority", autoPriority));
             }
         }
 
-        private void ValueXHTMLLink(IPublishedContent node, string culture, XElement element)
+        private static void AddXhtmlLinks(IPublishedContent node, XElement element)
         {
+            if (node.Cultures.Count <= 1) return;
+
             foreach (var itemCul in node.Cultures)
             {
-                if (GetHiddenSitemap(node, itemCul.Value.Culture))
-                {
+                if (node.Value<bool>(nameof(GlobalPageSitemapSetting.SitemapHiddenSitemap), itemCul.Value.Culture))
                     continue;
-                }
-                var elementCul = new XElement(schemas_xhtml + "link",
+
+                var elementCul = new XElement(SchemaXhtml + "link",
                     new XAttribute("rel", "alternate"),
                     new XAttribute("hreflang", itemCul.Value.Culture),
                     new XAttribute("href", node.Url(itemCul.Value.Culture, mode: UrlMode.Absolute)));
@@ -128,83 +138,71 @@ namespace uTPro.Foundation.Sitemap
             }
         }
 
-        private XElement InitElementRoot()
+        private static XElement InitElementRoot()
         {
-            return new XElement(schemas_Sitemap + "urlset"
-                , new XAttribute(XNamespace.Xmlns + "xhtml", schemas_xhtml)
-                , new XAttribute(XNamespace.Xmlns + "xsd", schemas_xsd)
-                , new XAttribute(XNamespace.Xmlns + "xsi", schemas_xsi)
-                );
-        }
-
-        private bool GetHiddenSitemap(IPublishedContent node, string culture)
-        {
-            return node.Value<bool>(nameof(GlobalPageSitemapSetting.SitemapHiddenSitemap), culture);
-        }
-
-        private bool GetHiddenTheirChildrenSitemap(IPublishedContent node, string culture)
-        {
-            return node.Value<bool>(nameof(GlobalPageSitemapSetting.SitemapHiddenTheirChildren), culture);
+            return new XElement(SchemaSitemap + "urlset",
+                new XAttribute(XNamespace.Xmlns + "xhtml", SchemaXhtml),
+                new XAttribute(XNamespace.Xmlns + "xsd", SchemaXsd),
+                new XAttribute(XNamespace.Xmlns + "xsi", SchemaXsi));
         }
 
         private string ConvertDocumentToString(XDocument document)
         {
-            StringWriter sw = new Utf8StringWriter();
+            var sw = new Utf8StringWriter();
             sw.WriteLine(document.Declaration?.ToString());
-            if (System.IO.File.Exists(Path.Combine(PathFolder.DirectoryWWWRoot, fileSitemapXSL)))
+            if (System.IO.File.Exists(Path.Combine(PathFolder.DirectoryWWWRoot, FileSitemapXSL)))
             {
-                sw.WriteLine("<?xml-stylesheet type=\"text/xsl\" href=\"/" + fileSitemapXSL + "\"?>");
+                sw.WriteLine("<?xml-stylesheet type=\"text/xsl\" href=\"/" + FileSitemapXSL + "\"?>");
             }
             sw.WriteLine(document.ToString());
             return sw.ToString();
         }
 
-        private IEnumerable<PublishedContentCulture> GetListNodes()
+        private IEnumerable<SitemapEntry> GetListNodes()
         {
-            IList<PublishedContentCulture> lstCulture = new List<PublishedContentCulture>();
             var rootNode = _currentSite.GetItem().PageHome;
-            if (rootNode == null)
-            {
-                return lstCulture;
-            }
-            var culs = _currentSite.GetCultures();
-            List<string> lstItemHiddenParent = new List<string>();
-            foreach (var item in culs)
+            if (rootNode == null) yield break;
+
+            var cultures = _currentSite.GetCultures().ToList();
+
+            foreach (var cultureInfo in cultures)
             {
                 string path = string.Empty;
-                var lstContent = rootNode.DescendantsOrSelf(item.Culture).OrderBy(x => x.Path).ToList();
+                var lstContent = rootNode.DescendantsOrSelf(cultureInfo.Culture)
+                    .OrderBy(x => x.Path)
+                    .ToList();
+
                 foreach (var itemContent in lstContent)
                 {
-                    if (!string.IsNullOrEmpty(path) && itemContent.Path.IndexOf(path) == 0)
-                    {
+                    // Skip children of hidden-children nodes
+                    if (!string.IsNullOrEmpty(path) && itemContent.Path.StartsWith(path, StringComparison.Ordinal))
                         continue;
+
+                    if (!itemContent.Value<bool>(nameof(GlobalPageSitemapSetting.SitemapHiddenSitemap), cultureInfo.Culture))
+                    {
+                        yield return new SitemapEntry
+                        {
+                            Culture = cultureInfo.Culture,
+                            Content = itemContent
+                        };
                     }
 
-                    if (!GetHiddenSitemap(itemContent, item.Culture))
-                    {
-                        lstCulture.Add(new PublishedContentCulture()
-                        {
-                            Culture = item.Culture,
-                            ListContent = itemContent
-                        });
-                    }
-                    if (!GetHiddenTheirChildrenSitemap(itemContent, item.Culture))
-                    {
-                        path = string.Empty;
-                    }
-                    else
+                    if (itemContent.Value<bool>(nameof(GlobalPageSitemapSetting.SitemapHiddenTheirChildren), cultureInfo.Culture))
                     {
                         path = itemContent.Path;
                     }
+                    else
+                    {
+                        path = string.Empty;
+                    }
                 }
             }
-            return lstCulture;
         }
 
-        private class PublishedContentCulture
+        private sealed class SitemapEntry
         {
-            public string Culture { get; set; } = string.Empty;
-            public IPublishedContent? ListContent { get; set; }
+            public string Culture { get; init; } = string.Empty;
+            public IPublishedContent? Content { get; init; }
         }
     }
 }

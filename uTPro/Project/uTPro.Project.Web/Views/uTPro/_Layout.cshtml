@@ -5,16 +5,43 @@
     var homePage = CurrentSite.GetItem().PageHome;
 }
 <!DOCTYPE html>
-<html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir" language="@CurrentSite.CurrentCulture.DisplayName">
+<html lang="@CurrentSite.CurrentCulture.TwoLetterISOLanguageName" dir="@dir">
 <head>
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_MetaData);
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.HeaderOpeningScripts));
     }
+    @* Critical CSS inlined to eliminate render-blocking for above-the-fold content *@
+    <style>
+        html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}body{margin:0;font-family:'Source Sans Pro',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14pt;line-height:1.75em;color:#484d55}body.is-preload *,body.is-preload *:before,body.is-preload *:after{animation:none!important;transition:none!important}.container{margin:0 auto;max-width:100%;width:68em}.navHeader{position:absolute;display:block;top:2.5em;left:0;width:100%;text-align:center;z-index:9999}.navHeader>ul{display:inline-block;border-radius:.35em;box-shadow:inset 0 0 1px 1px rgba(255,255,255,.25);padding:0 1em 0 0;list-style:none}.navHeader>ul>li{display:inline-block;text-align:center;padding:0 1.25em;white-space:nowrap}.navHeader>ul>li>a{display:block;color:rgba(255,255,255,.75);text-transform:uppercase;text-decoration:none;font-size:.7em;letter-spacing:.25em;height:4em;line-height:4em}.page-wrapper{min-height:100vh}main{display:block}img{max-width:100%;height:auto}.umb-block-grid__layout-container{display:grid;grid-template-columns:repeat(var(--umb-block-grid--grid-columns,1),minmax(0,1fr))}.umb-block-grid__layout-item{grid-column-end:span min(var(--umb-block-grid--item-column-span,1),var(--umb-block-grid--grid-columns))}@@media(max-width:980px){.navHeader{display:none!important}}
+    </style>
+    @* Preconnect to font origins before any stylesheet requests them *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    @* Preload LCP image (hero banner) — browser discovers it immediately instead of
+       waiting for CSS to parse. This is the single biggest LCP improvement. *@
+    @{
+        var lcpImage = homePage?.Value<Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent>("backgroundImage");
+        if (lcpImage != null)
+        {
+            var lcpUrl = lcpImage.GetCropUrl(width: 1920, quality: 75, furtherOptions: "&format=WebP");
+            <link rel="preload" href="@lcpUrl" as="image" type="image/webp" fetchpriority="high">
+        }
+    }
+    @* Preload critical font files to avoid FOIT *@
+    <link rel="preload" href="/assets/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+    @* Google Fonts loaded async: media="print" trick defers download until after paint *@
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;0,900;1,400&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;0,900;1,400&display=swap"></noscript>
+    @* Non-critical CSS — still render-blocking but minified by WebOptimizer + compressed by Brotli *@
+    <link rel="stylesheet" href="/css/uTPro/variables.css" />
     <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
     <link rel="stylesheet" href="/css/uTPro/layout.css" />
     <link rel="stylesheet" href="/css/uTPro/main.css" />
-    <link rel="stylesheet" href="/css/uTPro/icon.css" />
+    @* Icon CSS loaded async — FontAwesome icons are below the fold *@
+    <link rel="stylesheet" href="/css/uTPro/icon.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/css/uTPro/icon.css"></noscript>
     @RenderSection("Styles", false)
     @Html.RenderSections(HtmlSectionBlockExtensions.Position.Head)
     @{
@@ -22,6 +49,12 @@
     }
 </head>
 <body class="bodypage is-preload">
+    <script>
+        // Remove is-preload immediately after paint (don't wait for jQuery)
+        window.addEventListener('load',function(){
+            setTimeout(function(){document.body.classList.remove('is-preload')},100);
+        });
+    </script>
     @Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop)
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
@@ -38,20 +71,51 @@
             <div class="container">
                 <div id="copyright">
                     <ul>
-                        <li>© T4VN</li>
-                        <li>Design: <a target="_blank" href="http://html5up.net">HTML5 UP</a></li>
+                        <li>&copy; T4VN</li>
+                        <li>Design: <a target="_blank" rel="noopener" href="https://html5up.net">HTML5 UP</a></li>
                     </ul>
                 </div>
             </div>
         </div>
     </main>
-    <script src="/assets/scripts/jquery.min.js"></script>
-    <script src="/assets/scripts/jquery.dropotron.min.js"></script>
-    <script src="/assets/scripts/browser.min.js"></script>
-    <script src="/assets/scripts/breakpoints.min.js"></script>
-    <script src="/scripts/uTPro/util.js"></script>
-    <script src="/scripts/uTPro/main.js"></script>
-    <script src="/scripts/uTPro/select-language.js"></script>
+    @* Scripts loaded after user interaction or idle — reduces TBT significantly.
+       jQuery + plugins are only needed for nav dropdown (dropotron) which users
+       don't interact with in the first 3 seconds anyway. *@
+    <script>
+        // Load non-critical scripts after first user interaction or after 3s idle
+        (function(){
+            var loaded=false;
+            function loadScripts(){
+                if(loaded)return;loaded=true;
+                var scripts=[
+                    '/assets/scripts/jquery.min.js',
+                    '/assets/scripts/jquery.dropotron.min.js',
+                    '/assets/scripts/browser.min.js',
+                    '/assets/scripts/breakpoints.min.js',
+                    '/scripts/uTPro/util.js',
+                    '/scripts/uTPro/main.js',
+                    '/scripts/uTPro/select-language.js'
+                ];
+                function loadNext(i){
+                    if(i>=scripts.length)return;
+                    var s=document.createElement('script');
+                    s.src=scripts[i];s.defer=true;
+                    s.onload=function(){loadNext(i+1)};
+                    document.body.appendChild(s);
+                }
+                loadNext(0);
+            }
+            // Trigger on first interaction OR after 3s (whichever comes first)
+            ['mousedown','touchstart','keydown','scroll'].forEach(function(e){
+                document.addEventListener(e,loadScripts,{once:true,passive:true});
+            });
+            if('requestIdleCallback' in window){
+                requestIdleCallback(loadScripts,{timeout:3000});
+            }else{
+                setTimeout(loadScripts,3000);
+            }
+        })();
+    </script>
     @RenderSection("Scripts", false)
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));

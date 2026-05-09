@@ -19,44 +19,54 @@ namespace uTPro.Extension.CurrentSite
         GlobalRoot Root { get; }
         GlobalFolderSites FolderSite { get; }
         GlobalFolderSettings FolderSettings { get; }
-        //GlobalFolderArchives? FolderArchives { get; }
         IPublishedContent? Current { get; }
         IPublishedContent? PageHome { get; }
         IPublishedContent? PageErrors { get; }
     }
-    internal class CurrentItemExtension(
+
+    /// <summary>
+    /// Scoped service that resolves the current site's content tree nodes.
+    /// All properties are memoized per-request to avoid repeated tree traversals
+    /// and domain lookups (previously each property getter re-computed from scratch
+    /// on every access — 20+ times per page render).
+    /// </summary>
+    internal sealed class CurrentItemExtension(
         ILogger<CurrentItemExtension> logger,
         ICurrentSiteExtension currentSite
-        ) : ICurrentItemExtension, IDisposable
+        ) : ICurrentItemExtension
     {
-        ~CurrentItemExtension()
-        {
-            Dispose(false);
-        }
+        private readonly ICurrentSiteExtension _currentSite = currentSite;
+        private readonly ILogger<CurrentItemExtension> _logger = logger;
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        // Memoization fields
+        private GlobalRoot? _root;
+        private bool _rootResolved;
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // free managed resources
-            }
-            // free native resources if there are any.
-        }
+        private GlobalFolderSites? _folderSite;
+        private bool _folderSiteResolved;
 
-        readonly ICurrentSiteExtension _currentSite = currentSite;
-        readonly ILogger<CurrentItemExtension> _logger = logger;
+        private GlobalFolderSettings? _folderSettings;
+        private bool _folderSettingsResolved;
+
+        private IPublishedContent? _current;
+        private bool _currentResolved;
+
+        private IPublishedContent? _pageHome;
+        private bool _pageHomeResolved;
+
+        private IPublishedContent? _pageErrors;
+        private bool _pageErrorsResolved;
 
         public GlobalRoot Root
         {
             get
             {
-                return (GlobalRoot)this.GetItemByAlias(this.Current, GlobalRoot.ModelTypeAlias, true);
+                if (!_rootResolved)
+                {
+                    _root = (GlobalRoot)GetItemByAlias(Current, GlobalRoot.ModelTypeAlias, true);
+                    _rootResolved = true;
+                }
+                return _root!;
             }
         }
 
@@ -64,9 +74,14 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                var folderSite = this.PageHome?.Parent<GlobalFolderSites>() ?? null;
-                folderSite ??= (GlobalFolderSites)GetItemByAlias(this.PageHome, GlobalFolderSites.ModelTypeAlias, true);
-                return folderSite ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
+                if (!_folderSiteResolved)
+                {
+                    var folderSite = PageHome?.Parent<GlobalFolderSites>() ?? null;
+                    folderSite ??= (GlobalFolderSites)GetItemByAlias(PageHome, GlobalFolderSites.ModelTypeAlias, true);
+                    _folderSite = folderSite ?? throw new Exception(nameof(GlobalFolderSites) + " is null");
+                    _folderSiteResolved = true;
+                }
+                return _folderSite!;
             }
         }
 
@@ -74,66 +89,83 @@ namespace uTPro.Extension.CurrentSite
         {
             get
             {
-                if (this.FolderSite.GlobalSettings != null)
+                if (!_folderSettingsResolved)
                 {
-                    return (GlobalFolderSettings)this.FolderSite.GlobalSettings;
+                    if (FolderSite.GlobalSettings != null)
+                    {
+                        _folderSettings = (GlobalFolderSettings)FolderSite.GlobalSettings;
+                    }
+                    else
+                    {
+                        _folderSettings = Root.FirstChild<GlobalFolderSettings>()
+                            ?? throw new Exception(nameof(GlobalFolderSettings) + " is null");
+                    }
+                    _folderSettingsResolved = true;
                 }
-                return this.Root.FirstChild<GlobalFolderSettings>() ?? throw new Exception(nameof(GlobalFolderSettings) + " is null");
+                return _folderSettings!;
             }
         }
-
-        //public GlobalFolderArchives? FolderArchives
-        //{
-        //    get
-        //    {
-        //        return this.Root.FirstChild<GlobalFolderArchives>();
-        //    }
-        //}
 
         public IPublishedContent? Current
         {
             get
             {
-                var published = _currentSite.UContext.PublishedRequest?.PublishedContent;
-                return published ?? this.PageHome;
+                if (!_currentResolved)
+                {
+                    var published = _currentSite.UContext.PublishedRequest?.PublishedContent;
+                    _current = published ?? PageHome;
+                    _currentResolved = true;
+                }
+                return _current;
             }
         }
-
 
         public IPublishedContent? PageHome
         {
             get
             {
-                try
+                if (!_pageHomeResolved)
                 {
-                    return this.GetItemWithDomain() ?? null;
+                    try
+                    {
+                        _pageHome = GetItemWithDomain();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Get PageHome error");
+                        _pageHome = null;
+                    }
+                    _pageHomeResolved = true;
                 }
-                catch (Exception ex)
-                {
-                    _logger?.LogError(ex, "Get PageHome error");
-                    return null;
-                }
+                return _pageHome;
             }
         }
+
         public IPublishedContent? PageErrors
         {
             get
             {
-                try
+                if (!_pageErrorsResolved)
                 {
-                    var pageHome = this.PageHome;
-                    if (pageHome != null)
+                    try
                     {
-                        var pageNotFound = pageHome.Value<IPublishedContent>(nameof(GlobalPageNavigationConfigSettingForHomePage.PageNotFound));
-                        return pageNotFound;
+                        var pageHome = PageHome;
+                        if (pageHome != null)
+                        {
+                            var pageNotFound = pageHome.Value<IPublishedContent>(
+                                nameof(GlobalPageNavigationConfigSettingForHomePage.PageNotFound));
+                            _pageErrors = pageNotFound;
+                        }
+                        _pageErrors ??= FolderSite.FirstChild<GlobalPageError>();
                     }
-                    return this.FolderSite.FirstChild<GlobalPageError>() ?? null;
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Get PageErrors error");
+                        _pageErrors = null;
+                    }
+                    _pageErrorsResolved = true;
                 }
-                catch (Exception ex)
-                {
-                    _logger?.LogError(ex, "Get PageErrors error");
-                    return null;
-                }
+                return _pageErrors;
             }
         }
 
@@ -142,39 +174,36 @@ namespace uTPro.Extension.CurrentSite
             int contentid = _currentSite.UContext.PublishedRequest?.Domain?.ContentId ?? 0;
             if (contentid != 0)
             {
-                var item = _currentSite.UContext.Content?.GetById(contentid);
-                return item;
+                return _currentSite.UContext.Content?.GetById(contentid);
             }
-            else//find domain
+
+            // Fallback: find domain
+            var domains = _currentSite.GetDomains(true);
+            if (domains == null) return null;
+            foreach (var domain in domains)
             {
-                var domains = _currentSite.GetDomains(true).GetAwaiter().GetResult();
-                if (domains == null) return null;
-                foreach (var domain in domains)
-                {
-                    if (domain == null) continue;
-                    var currentItem = _currentSite.UContext.Content?.GetById(domain.ContentId);
-                    if (currentItem != null)
-                        return currentItem;
-                }
+                if (domain == null) continue;
+                var currentItem = _currentSite.UContext.Content?.GetById(domain.ContentId);
+                if (currentItem != null)
+                    return currentItem;
             }
             return null;
         }
 
         private IPublishedContent GetItemByAlias(IPublishedContent? item, string alias, bool isFirst)
         {
-            // Start from provided item
             var current = item ?? throw new Exception("Not found item: " + alias);
 
             if (string.Equals(current.ContentType?.Alias, GlobalPageError.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
             {
-                return GetItemByAlias(this.PageErrors?.Parent(), alias, isFirst);
+                return GetItemByAlias(PageErrors?.Parent(), alias, isFirst);
             }
 
-            // quick check
+            // Quick check
             if (string.Equals(current.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
                 return current;
 
-            // try traversing parents first (cheaper, no parsing)
+            // Traverse parents (cheapest path)
             var parent = current.Parent();
             while (parent != null)
             {
@@ -183,24 +212,21 @@ namespace uTPro.Extension.CurrentSite
                 parent = parent.Parent();
             }
 
-            // fallback to path-based traversal (optimized parsing)
+            // Fallback to path-based traversal
             var (idToken, pathIds) = GetIdParent(current.Path ?? string.Empty, isFirst);
             while (!string.IsNullOrEmpty(idToken))
             {
                 if (int.TryParse(idToken, out var idRoot))
                 {
                     var p = _currentSite.UContext.Content?.GetById(idRoot);
-                    if (p != null)
-                    {
-                        if (string.Equals(p.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
-                            return p;
-                    }
+                    if (p != null && string.Equals(p.ContentType?.Alias, alias, StringComparison.OrdinalIgnoreCase))
+                        return p;
                 }
 
                 if (string.IsNullOrEmpty(pathIds))
                     break;
 
-                (idToken, pathIds) = GetIdParent(pathIds ?? string.Empty, false);
+                (idToken, pathIds) = GetIdParent(pathIds, false);
             }
 
             throw new Exception("Not found item: " + alias);
@@ -235,17 +261,16 @@ namespace uTPro.Extension.CurrentSite
                 return (pathIds, null);
             }
             int prevComma = pathIds.LastIndexOf(',', lastComma - 1);
-            string parent;
+            string parentStr;
             if (prevComma >= 0)
             {
-                parent = pathIds.Substring(prevComma + 1, lastComma - prevComma - 1);
+                parentStr = pathIds.Substring(prevComma + 1, lastComma - prevComma - 1);
             }
             else
             {
-                parent = pathIds[..lastComma];
+                parentStr = pathIds[..lastComma];
             }
-            return (parent, pathIds);
+            return (parentStr, pathIds);
         }
-
     }
 }

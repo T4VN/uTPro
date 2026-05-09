@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.OutputCaching;
 using System.Net.Mime;
 using System.Text;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -25,7 +26,8 @@ namespace uTPro.Project.Web.Controllers.Pages
         [Route("/sitemap.xml")]
         [Route("/sitemap")]
         [HttpGet]
-        //[ResponseCache(Duration = 900)]
+        [OutputCache(PolicyName = "Sitemap")]
+        [ResponseCache(Duration = 900, Location = ResponseCacheLocation.Any)]
         public IActionResult Index()
         {
             return Content(_foundation.Generate(), MediaTypeNames.Text.Xml, Encoding.UTF8);
