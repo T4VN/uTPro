@@ -7,7 +7,7 @@
 }
 
     .features .feature-list section {
-        border-top: solid 1px #eee;
+        border-top: solid 1px var(--utp-border-light);
         padding-top: 3em;
         padding-left: 5em;
         position: relative;

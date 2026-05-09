@@ -5,16 +5,39 @@
     position: relative;
     padding: 6em 0 9em 0;
     background-color: var(--section-bg-color);
-    color: var(--section-text-color)
+    /* Fallback #484d55 (body text color) works on both light and dark backgrounds
+       when CMS editor forgets to set --section-text-color */
+    color: var(--section-text-color, var(--utp-text));
 }
 
-    .wrapper * {
-        color: var(--section-text-color)
+    .wrapper,
+    .wrapper *,
+    .wrapper p,
+    .wrapper a,
+    .wrapper strong,
+    .wrapper b,
+    .wrapper h1,
+    .wrapper h2,
+    .wrapper h3,
+    .wrapper h4,
+    .wrapper h5,
+    .wrapper h6 {
+        color: var(--section-text-color, var(--utp-text));
+    }
+
+    .wrapper a {
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+    }
+
+    .wrapper a:hover {
+        opacity: 0.85;
     }
 
 
     .wrapper .image {
-        border: solid 10px #fff;
+        border: solid 10px var(--utp-bg-white);
     }
 
     .wrapper .title {
@@ -35,6 +58,7 @@
         margin-left: -12.5em;
         padding-top: 0.5em;
         background: var(--section-bg-color);
+        color: var(--section-text-color, var(--utp-text));
     }
 
         .wrapper .title:before {
