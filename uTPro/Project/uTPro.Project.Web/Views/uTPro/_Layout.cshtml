@@ -28,9 +28,6 @@
             <link rel="preload" href="@lcpUrl" as="image" type="image/webp" fetchpriority="high">
         }
     }
-    @* Preload critical font files to avoid FOIT *@
-    <link rel="preload" href="/assets/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/assets/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
     @* Google Fonts loaded async: media="print" trick defers download until after paint *@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;0,900;1,400&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;0,900;1,400&display=swap"></noscript>
