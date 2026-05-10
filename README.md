@@ -99,3 +99,7 @@ uTPro is **completely free and open source**, giving developers the freedom to *
 ## Include CSS/JS only when the component is rendered
 
 <img width="1031" height="417" alt="image" src="https://github.com/user-attachments/assets/37206453-3593-4c07-ac50-66334d0544de" />
+
+## Development, but don't forget SEO
+
+<img width="2559" height="1385" alt="image" src="https://github.com/user-attachments/assets/b50f208f-64ad-4f45-ae8e-8213248dda87" />
