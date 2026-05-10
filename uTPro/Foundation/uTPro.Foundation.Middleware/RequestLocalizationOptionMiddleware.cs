@@ -94,8 +94,6 @@ namespace uTPro.Foundation.Middleware
                 logger.LogError(ex, "Error in RequestLocalizationOptionMiddleware: {Message}", ex.Message);
             }
 
-                }
-            }
             await _next.Invoke(context).ConfigureAwait(false);
         }
 
@@ -125,10 +123,12 @@ namespace uTPro.Foundation.Middleware
 
         private static bool IsExcludeHost(HttpContext context, ICurrentSiteExtension currentSite, bool isEnableCheckBackoffice)
         {
+            if (!context.Request.Host.HasValue)
                 return false;
+
             if (!isEnableCheckBackoffice)
                 return false;
-                    return false;
+
             var lstUrl = currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Domain)?.Value?
                 .Split([",", ";"], StringSplitOptions.RemoveEmptyEntries);
 
@@ -138,7 +138,7 @@ namespace uTPro.Foundation.Middleware
             var host = context.Request.Host.Host;
             return lstUrl.Any(x => x.Trim().Equals(host, StringComparison.OrdinalIgnoreCase));
         }
-            }
+
         private static HashSet<string> GetExcludePaths(ICurrentSiteExtension currentSite, bool isEnableCheckBackoffice)
         {
             if (_cachedExcludePaths != null)
@@ -157,10 +157,6 @@ namespace uTPro.Foundation.Middleware
                     result.Add("app_plugins");
                 }
 
-        {
-            get
-            {
-                // Exclude request config setting
                 bool isEnabled = false;
                 var configSection = currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Enabled);
                 if (configSection != null && bool.TryParse(configSection.Value, out isEnabled) && isEnabled)
@@ -168,6 +164,10 @@ namespace uTPro.Foundation.Middleware
                     var pathsSection = currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Paths);
                     var lstPaths = pathsSection?.Get<string[]>();
                     if (lstPaths != null)
+                    {
+                        foreach (var item in lstPaths)
+                        {
+                            if (!string.IsNullOrWhiteSpace(item))
                                 result.Add(item.Trim().ToLowerInvariant());
                         }
                     }
@@ -175,21 +175,6 @@ namespace uTPro.Foundation.Middleware
 
                 _cachedExcludePaths = result;
                 return _cachedExcludePaths;
-                        }
-                    }
-                }
-
-                if (!isEnableCheckBackoffice)
-                {
-                    yield return "umbraco";
-                    yield return "app_plugins";
-                }
-
-                // Folders and files in wwwroot (cached to avoid IO on every request)
-                foreach (var item in _wwwRootEntries.Value)
-                {
-                    yield return item;
-                }
             }
         }
 
@@ -261,6 +246,21 @@ namespace uTPro.Foundation.Middleware
                         if (string.Equals(domainHost.Host, redirectUri.Host, StringComparison.OrdinalIgnoreCase))
                         {
                             var prefixPath = redirectUri.AbsolutePath ?? string.Empty;
+                            if (prefixPath.Contains("://", StringComparison.Ordinal))
+                                return string.Empty;
+
+                            prefixPath = "/" + prefixPath.Trim('/');
+                            if (prefixPath == "/")
+                                prefixPath = string.Empty;
+
+                            return prefixPath + httpContext.Request.Path + httpContext.Request.QueryString;
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
         /// <summary>
         /// Validates that the redirect URL is a local URL (same-origin) to prevent
         /// open-redirect / phishing attacks (CWE-601). Rejects absolute URLs,
@@ -296,21 +296,6 @@ namespace uTPro.Foundation.Middleware
             HttpContext context, string[] parts,
             IReadOnlyList<Umbraco.Cms.Core.Routing.Domain> domains,
             ICurrentSiteExtension currentSite)
-
-                            prefixPath = "/" + prefixPath.Trim('/');
-                            if (prefixPath == "/")
-                                prefixPath = string.Empty;
-
-                            return prefixPath + httpContext.Request.Path + httpContext.Request.QueryString;
-                        }
-                    }
-                }
-            }
-            return string.Empty;
-        }
-
-
-        private async Task<Tuple<string, string, bool>> GetUrlCulture(HttpContext? context, string[] parts)
         {
             Umbraco.Cms.Core.Routing.Domain? cul = null;
             bool isRedirect = true;
