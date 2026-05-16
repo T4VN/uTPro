@@ -1,0 +1,82 @@
+{
+  "alias": "uTPro.AutoTranslation",
+  "name": "uTPro Auto Translation",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "workspaceAction",
+      "kind": "default",
+      "alias": "uTPro.AutoTranslation.Action.Document",
+      "name": "Auto Translate Document",
+      "api": "/App_Plugins/auto-translation/auto-translate-action.js",
+      "weight": 900,
+      "meta": {
+        "label": "Auto Translate",
+        "look": "secondary",
+        "color": "default"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.WorkspaceAlias",
+          "match": "Umb.Workspace.Document"
+        }
+      ]
+    },
+    {
+      "type": "workspaceAction",
+      "kind": "default",
+      "alias": "uTPro.AutoTranslation.Action.Media",
+      "name": "Auto Translate Media",
+      "api": "/App_Plugins/auto-translation/auto-translate-action.js",
+      "weight": 900,
+      "meta": {
+        "label": "Auto Translate",
+        "look": "secondary",
+        "color": "default"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.WorkspaceAlias",
+          "match": "Umb.Workspace.Media"
+        }
+      ]
+    },
+    {
+      "type": "workspaceAction",
+      "kind": "default",
+      "alias": "uTPro.AutoTranslation.Action.Dictionary",
+      "name": "Auto Translate Dictionary",
+      "api": "/App_Plugins/auto-translation/auto-translate-dictionary-action.js",
+      "weight": 900,
+      "meta": {
+        "label": "Auto Translate",
+        "look": "secondary",
+        "color": "default"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.WorkspaceAlias",
+          "match": "Umb.Workspace.Dictionary"
+        }
+      ]
+    },
+    {
+      "type": "localization",
+      "alias": "uTPro.AutoTranslation.Localize.EnUS",
+      "name": "Auto Translation English",
+      "js": "/App_Plugins/auto-translation/lang/en-us.js",
+      "meta": {
+        "culture": "en-US"
+      }
+    },
+    {
+      "type": "localization",
+      "alias": "uTPro.AutoTranslation.Localize.ViVN",
+      "name": "Auto Translation Vietnamese",
+      "js": "/App_Plugins/auto-translation/lang/vi-vn.js",
+      "meta": {
+        "culture": "vi-VN"
+      }
+    }
+  ]
+}

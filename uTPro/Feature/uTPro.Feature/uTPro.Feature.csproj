@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\uTPro.Feature.AutoTranslation\uTPro.Feature.AutoTranslation.csproj" />
+  </ItemGroup>
+
 </Project>
