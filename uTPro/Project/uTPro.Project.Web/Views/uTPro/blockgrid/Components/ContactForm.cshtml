@@ -19,7 +19,9 @@ else
 
             <!-- Contact Form -->
             <section>
-                <form method="post" action="#">
+                @await Component.InvokeAsync("SimpleForm", new { alias = "contact-us" })
+
+                @* <form method="post" action="#">
                     <div class="row gtr-50">
                         <div class="col-6 col-12-small">
                             <input type="text" name="name" id="contact-name" placeholder="Name">
@@ -37,7 +39,7 @@ else
                             </ul>
                         </div>
                     </div>
-                </form>
+                </form> *@
             </section>
 
         </div>
