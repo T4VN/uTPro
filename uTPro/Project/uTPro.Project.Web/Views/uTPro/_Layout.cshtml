@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
     <link rel="stylesheet" href="/css/uTPro/layout.css" />
     <link rel="stylesheet" href="/css/uTPro/main.css" />
+    <link rel="stylesheet" href="/css/uTPro/Components/CookieConsent.css" />
     @* Icon CSS loaded async — FontAwesome icons are below the fold *@
     <link rel="stylesheet" href="/css/uTPro/icon.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/css/uTPro/icon.css"></noscript>
@@ -113,6 +114,20 @@
             }
         })();
     </script>
+    @* ── Cookie Consent Banner ── *@
+    <div id="cookieConsent" class="cookie-consent" role="dialog" aria-label="Cookie consent" aria-live="polite">
+        <div class="cookie-consent__message">
+            Trang web này sử dụng cookie để cải thiện trải nghiệm của bạn.
+            <br />
+            Bạn có thể chấp nhận hoặc từ chối cookie không cần thiết.
+        </div>
+        <div class="cookie-consent__actions">
+            <button id="cookieAccept" class="cookie-consent__btn cookie-consent__btn--accept" type="button">Chấp nhận</button>
+            <button id="cookieReject" class="cookie-consent__btn cookie-consent__btn--reject" type="button">Từ chối</button>
+        </div>
+    </div>
+    <script src="/scripts/uTPro/cookie-consent.js"></script>
+
     @RenderSection("Scripts", false)
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
