@@ -1,21 +1,21 @@
 /**
- * Cookie Consent Banner
+ * Consent Banner
  * ---------------------
- * Lightweight, no-dependency cookie consent implementation.
- * Stores user preference in a first-party cookie for 365 days.
+ * Lightweight, no-dependency consent implementation.
+ * Stores user preference in localStorage.
  *
- * Cookie name: "cookie_consent"
+ * Storage key: "consent_preference"
  * Values: "accepted" | "rejected"
  *
  * Usage:
- *   if (window.CookieConsent.allowed()) {
+ *   if (window.ConsentBanner.allowed()) {
  *       // load Google Analytics, Facebook Pixel, etc.
  *   }
  *
  * Auto-blocking third-party scripts:
- *   Add data-cookie-consent to any script tag you want to block until accepted:
- *   <script type="text/plain" data-cookie-consent src="https://www.googletagmanager.com/gtag/js?id=G-XXX"></script>
- *   <script type="text/plain" data-cookie-consent>
+ *   Add data-consent to any script tag you want to block until accepted:
+ *   <script type="text/plain" data-consent src="https://www.googletagmanager.com/gtag/js?id=G-XXX"></script>
+ *   <script type="text/plain" data-consent>
  *       fbq('init', '123456');
  *   </script>
  *
@@ -27,45 +27,45 @@
 (function () {
     'use strict';
 
-    var COOKIE_NAME = 'cookie_consent';
-    var COOKIE_DAYS = 365;
+    var STORAGE_KEY = 'consent_preference';
 
-    function getCookie(name) {
-        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? match[2] : null;
+    function getConsent() {
+        try {
+            return localStorage.getItem(STORAGE_KEY);
+        } catch (e) {
+            return null;
+        }
     }
 
-    function setCookie(name, value, days) {
-        var expires = '';
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-            expires = '; expires=' + date.toUTCString();
+    function setConsent(value) {
+        try {
+            localStorage.setItem(STORAGE_KEY, value);
+        } catch (e) {
+            // localStorage unavailable (private browsing, etc.)
         }
-        document.cookie = name + '=' + value + expires + '; path=/; SameSite=Lax';
     }
 
     function hideBanner() {
-        var banner = document.getElementById('cookieConsent');
+        var banner = document.getElementById('consentBanner');
         if (banner) {
             banner.classList.remove('is-visible');
         }
     }
 
     /**
-     * Activate all blocked scripts (type="text/plain" with data-cookie-consent).
+     * Activate all blocked scripts (type="text/plain" with data-consent).
      * Clones each script tag with correct type so the browser executes it.
      */
     function activateBlockedScripts() {
-        var blocked = document.querySelectorAll('script[data-cookie-consent]');
+        var blocked = document.querySelectorAll('script[data-consent]');
         for (var i = 0; i < blocked.length; i++) {
             var original = blocked[i];
             var newScript = document.createElement('script');
 
-            // Copy all attributes except type
+            // Copy all attributes except type and data-consent
             for (var j = 0; j < original.attributes.length; j++) {
                 var attr = original.attributes[j];
-                if (attr.name !== 'type' && attr.name !== 'data-cookie-consent') {
+                if (attr.name !== 'type' && attr.name !== 'data-consent') {
                     newScript.setAttribute(attr.name, attr.value);
                 }
             }
@@ -81,36 +81,38 @@
     }
 
     function onAccept() {
-        setCookie(COOKIE_NAME, 'accepted', COOKIE_DAYS);
+        setConsent('accepted');
         hideBanner();
         activateBlockedScripts();
     }
 
     function onReject() {
-        setCookie(COOKIE_NAME, 'rejected', COOKIE_DAYS);
+        setConsent('rejected');
         hideBanner();
     }
 
     function init() {
+        var consent = getConsent();
+
         // If user already accepted, activate blocked scripts
-        if (getCookie(COOKIE_NAME) === 'accepted') {
+        if (consent === 'accepted') {
             activateBlockedScripts();
             return;
         }
 
         // If user already rejected, do nothing
-        if (getCookie(COOKIE_NAME) === 'rejected') {
+        if (consent === 'rejected') {
             return;
         }
 
         // No choice yet — show banner
-        var banner = document.getElementById('cookieConsent');
+        var banner = document.getElementById('consentBanner');
         if (!banner) return;
 
         banner.classList.add('is-visible');
 
-        var acceptBtn = document.getElementById('cookieAccept');
-        var rejectBtn = document.getElementById('cookieReject');
+        var acceptBtn = document.getElementById('consentAccept');
+        var rejectBtn = document.getElementById('consentReject');
 
         if (acceptBtn) {
             acceptBtn.addEventListener('click', onAccept);
@@ -121,22 +123,22 @@
     }
 
     // ── Public API ──
-    window.CookieConsent = {
-        /** Returns true if user accepted cookies */
+    window.ConsentBanner = {
+        /** Returns true if user accepted */
         allowed: function () {
-            return getCookie(COOKIE_NAME) === 'accepted';
+            return getConsent() === 'accepted';
         },
-        /** Returns true if user rejected cookies */
+        /** Returns true if user rejected */
         rejected: function () {
-            return getCookie(COOKIE_NAME) === 'rejected';
+            return getConsent() === 'rejected';
         },
         /** Returns true if user hasn't made a choice yet */
         pending: function () {
-            return getCookie(COOKIE_NAME) === null;
+            return getConsent() === null;
         },
         /** Reset preference (shows banner again on next page load) */
         reset: function () {
-            setCookie(COOKIE_NAME, '', -1);
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
         }
     };
 

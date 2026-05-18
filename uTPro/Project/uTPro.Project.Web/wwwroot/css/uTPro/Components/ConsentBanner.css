@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Cookie Consent Banner
+   Consent Banner
    ========================================================================== */
 
-.cookie-consent {
+.consent-banner {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -19,14 +19,14 @@
     flex-wrap: wrap;
     font-size: 0.8em;
     line-height: 1.4;
-    animation: cookieSlideUp 0.4s ease-out;
+    animation: consentSlideUp 0.4s ease-out;
 }
 
-.cookie-consent.is-visible {
+.consent-banner.is-visible {
     display: flex;
 }
 
-@keyframes cookieSlideUp {
+@keyframes consentSlideUp {
     from {
         transform: translateY(100%);
         opacity: 0;
@@ -37,27 +37,27 @@
     }
 }
 
-.cookie-consent__message {
+.consent-banner__message {
     flex: 1 1 400px;
     max-width: 700px;
 }
 
-.cookie-consent__message a {
+.consent-banner__message a {
     color: var(--utp-primary-light);
     text-decoration: underline;
 }
 
-.cookie-consent__message a:hover {
+.consent-banner__message a:hover {
     color: var(--utp-primary-hover);
 }
 
-.cookie-consent__actions {
+.consent-banner__actions {
     display: flex;
     gap: 0.75em;
     flex-shrink: 0;
 }
 
-.cookie-consent__btn {
+.consent-banner__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -76,23 +76,23 @@
     min-width: auto;
 }
 
-.cookie-consent__btn--accept {
+.consent-banner__btn--accept {
     background: var(--utp-primary);
     color: var(--utp-text-white);
 }
 
-.cookie-consent__btn--accept:hover {
+.consent-banner__btn--accept:hover {
     background: var(--utp-primary-hover);
     color: var(--utp-text-dark);
 }
 
-.cookie-consent__btn--reject {
+.consent-banner__btn--reject {
     background: transparent;
     color: var(--utp-text-white-80);
     border: 1px solid var(--utp-border-white-25);
 }
 
-.cookie-consent__btn--reject:hover {
+.consent-banner__btn--reject:hover {
     background: var(--utp-dark-soft);
     color: var(--utp-text-white);
 }
@@ -100,24 +100,24 @@
 /* ── Responsive ── */
 
 @media screen and (max-width: 736px) {
-    .cookie-consent {
+    .consent-banner {
         flex-direction: column;
         text-align: center;
         padding: 0.8em 1em;
         gap: 0.6em;
     }
 
-    .cookie-consent__message {
+    .consent-banner__message {
         flex: none;
         font-size: 0.85em;
     }
 
-    .cookie-consent__actions {
+    .consent-banner__actions {
         width: 100%;
         justify-content: center;
     }
 
-    .cookie-consent__btn {
+    .consent-banner__btn {
         flex: 1;
         max-width: 50%;
         padding: 0.6em 1em;
