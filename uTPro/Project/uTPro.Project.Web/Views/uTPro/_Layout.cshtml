@@ -36,7 +36,7 @@
     <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
     <link rel="stylesheet" href="/css/uTPro/layout.css" />
     <link rel="stylesheet" href="/css/uTPro/main.css" />
-    <link rel="stylesheet" href="/css/uTPro/Components/CookieConsent.css" />
+    <link rel="stylesheet" href="/css/uTPro/Components/ConsentBanner.css" />
     @* Icon CSS loaded async — FontAwesome icons are below the fold *@
     <link rel="stylesheet" href="/css/uTPro/icon.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/css/uTPro/icon.css"></noscript>
@@ -114,19 +114,19 @@
             }
         })();
     </script>
-    @* ── Cookie Consent Banner ── *@
-    <div id="cookieConsent" class="cookie-consent" role="dialog" aria-label="Cookie consent" aria-live="polite">
-        <div class="cookie-consent__message">
+    @* ── Consent Banner ── *@
+    <div id="consentBanner" class="consent-banner" role="dialog" aria-label="Consent banner" aria-live="polite">
+        <div class="consent-banner__message">
             Trang web này sử dụng cookie để cải thiện trải nghiệm của bạn.
             <br />
             Bạn có thể chấp nhận hoặc từ chối cookie không cần thiết.
         </div>
-        <div class="cookie-consent__actions">
-            <button id="cookieAccept" class="cookie-consent__btn cookie-consent__btn--accept" type="button">Chấp nhận</button>
-            <button id="cookieReject" class="cookie-consent__btn cookie-consent__btn--reject" type="button">Từ chối</button>
+        <div class="consent-banner__actions">
+            <button id="consentAccept" class="consent-banner__btn consent-banner__btn--accept" type="button">Chấp nhận</button>
+            <button id="consentReject" class="consent-banner__btn consent-banner__btn--reject" type="button">Từ chối</button>
         </div>
     </div>
-    <script src="/scripts/uTPro/cookie-consent.js"></script>
+    <script src="/scripts/uTPro/consent-banner.js"></script>
 
     @RenderSection("Scripts", false)
     @{
