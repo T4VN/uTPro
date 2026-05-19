@@ -4,8 +4,6 @@
 **uTPro** is a powerful **Starter Kit Template** built to **accelerate website development on the Umbraco platform**.  
 It enables developers to create **enterprise‑grade websites** faster, more reliably, and with a professional structure from day one.  
 
-<img width="1200" height="297" alt="image" src="https://github.com/user-attachments/assets/41cd2a67-8bc1-40ca-a689-3db1bcee1b24" />
-
 ---
 
 ## 🔑 Core Principles
@@ -49,8 +47,63 @@ uTPro comes with a curated set of utilities and best practices already integrate
 - **Performance optimizations** (lazy loading, async scripts, caching hints).
 - **Sample components** (navigation, footer, hero section) ready to customize.
 
-**With the support of extensions:** [Smidge](https://github.com/Shazwazza/Smidge), [UmbracoSeoVisualizer](https://marketplace.umbraco.com/package/umbracoseovisualizer), [Umbraco.Community.BlockPreview](https://marketplace.umbraco.com/package/umbraco.community.blockpreview), [uSync](https://marketplace.umbraco.com/package/usync), [WebMarkupMin.AspNetCoreLatest](https://www.nuget.org/packages/WebMarkupMin.AspNetCoreLatest/), [LigerShark.WebOptimizer.Core](https://www.nuget.org/packages/LigerShark.WebOptimizer.Core)...
+**With the support of extensions:** [UmbracoSeoVisualizer](https://marketplace.umbraco.com/package/umbracoseovisualizer), [Umbraco.Community.BlockPreview](https://marketplace.umbraco.com/package/umbraco.community.blockpreview), [uSync](https://marketplace.umbraco.com/package/usync), [WebMarkupMin.AspNetCoreLatest](https://www.nuget.org/packages/WebMarkupMin.AspNetCoreLatest/), [LigerShark.WebOptimizer.Core](https://www.nuget.org/packages/LigerShark.WebOptimizer.Core), [MimeKit](https://www.nuget.org/packages/MimeKit)...
+
+---
+
+## 🏗️ Modular Architecture
+
+uTPro follows a clean modular architecture with clear separation of concerns:
+
+- **Common** — Shared models, constants, CMS-generated content models
+- **Extension** — Reusable services (site context, culture management, URL helpers)
+- **Foundation** — Infrastructure modules (middleware, favicon, sitemap, robots.txt)
+- **Feature** — Optional pluggable features (form builder, file manager, audit log, etc.)
+- **Project** — Main web application and configuration
+
+---
+
+## 🔒 Security Built-in
+
+- Security headers (X-Content-Type-Options, X-Frame-Options, HSTS, Referrer-Policy)
+- Secure session cookies (HttpOnly, Secure, SameSite)
+- Request size limits to prevent DoS
+- Domain-based access control with wildcard support
+
+---
+
+## 📋 Tech Stack
+
+| Component | Version |
+|-----------|---------|
+| Umbraco CMS | 16.5.1 |
+| .NET | 9.0 |
+| uSync | 16.1.0 |
+| BlockPreview | 4.2.2 |
+| SeoVisualizer | 16.0.1 |
 
 ---
 
 uTPro is **completely free and open source**, giving developers the freedom to **customize, extend, and innovate without limits**.  
+
+# Here are some screenshots:
+
+## Preview live in Backoffice:
+
+<img width="1200" height="297" alt="image" src="https://github.com/user-attachments/assets/41cd2a67-8bc1-40ca-a689-3db1bcee1b24" />
+
+## Share Component (Top/Bottom Component for layout):
+
+<img width="1404" height="566" alt="image" src="https://github.com/user-attachments/assets/2127053b-3081-4c1e-b86f-53c1333ea051" />
+
+## Include CSS/JS only when the component is rendered
+
+<img width="1031" height="417" alt="image" src="https://github.com/user-attachments/assets/37206453-3593-4c07-ac50-66334d0544de" />
+
+<img width="1584" height="401" alt="image" src="https://github.com/user-attachments/assets/4b9d4bc0-34e2-45b1-a199-ec6af7e44a44" />
+
+> 📖 See [Script Queue documentation](docs/5.-Script-Queue.md) for how components register JS files with dependency-aware loading (jQuery-dependent vs standalone).
+
+## Development, but don't forget SEO
+
+<img width="2559" height="1378" alt="image" src="https://github.com/user-attachments/assets/251e4e1e-ceac-4782-8d4a-ca06c5315cd5" />

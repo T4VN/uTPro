@@ -50,9 +50,11 @@ Sitemap: {{Url}}sitemap.xml
         private Uri GetAbsoluteUri()
         {
             var request = _httpContextAccessor?.HttpContext?.Request;
-            UriBuilder uriBuilder = new UriBuilder();
-            uriBuilder.Scheme = request?.Scheme;
-            uriBuilder.Host = request?.Host.Host;
+            UriBuilder uriBuilder = new()
+            {
+                Scheme = request?.Scheme,
+                Host = request?.Host.Host
+            };
             return uriBuilder.Uri;
         }
 

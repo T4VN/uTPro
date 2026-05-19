@@ -1,0 +1,27 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__CookieConsentBanner>>
+@{
+}
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/CookieConsentBanner.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString(), HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/CookieConsentBanner.css" />
+    }
+    Html.QueueStandaloneScript($"/scripts/{CurrentSite.GetItem().Root.Name}/cookie-consent-banner.js"); // Standalone: no jQuery dependency — loads independently via <script defer>
+    //Html.QueueScript($"/scripts/{CurrentSite.GetItem().Root.Name}/cookie-consent-banner.js"); // Deferred: needs jQuery — appended to sequential loader chain (loads AFTER jQuery)
+}
+
+<div id="consentBanner" class="consent-banner" role="dialog" aria-label="Consent banner" aria-live="polite" style="@(Context.Request.IsBlockPreviewRequest() ? "" : "position: fixed;display: none;")">
+    <div class="consent-banner__message">
+        @Model.Content.Content
+    </div>
+    <div class="consent-banner__actions">
+        <button id="consentAccept" class="consent-banner__btn consent-banner__btn--accept" type="button">Chấp nhận</button>
+        <button id="consentReject" class="consent-banner__btn consent-banner__btn--reject" type="button">Từ chối</button>
+    </div>
+</div>

@@ -1,6 +1,7 @@
 .richtext p {
     margin: 0;
 }
+
 .umb-block-grid__layout-container {
     position: relative;
     display: grid;

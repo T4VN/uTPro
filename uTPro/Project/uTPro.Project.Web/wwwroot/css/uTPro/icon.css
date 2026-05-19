@@ -1,0 +1,63 @@
+.icon {
+    text-decoration: none;
+    text-decoration: none;
+}
+
+    .icon:before {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        line-height: 1;
+        text-transform: none !important;
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 400;
+    }
+
+    .icon:before {
+        line-height: inherit;
+        font-size: 1.25em;
+    }
+
+    .icon.brands:before {
+        font-family: 'Font Awesome 5 Brands';
+    }
+
+.feature-list .icon > .label {
+    display: none;
+}
+
+.feature-list .icon.solid:before {
+    font-weight: 900;
+}
+
+.feature-list h3.icon {
+    color: var(--utp-primary) !important;
+    margin: -0.35em 0 0.75em 0;
+    font-size: 1.15em;
+    letter-spacing: 0.05em;
+    background: var(--utp-dark);
+    border-radius: var(--utp-radius);
+    padding: .25em;
+}
+
+    .feature-list h3.icon:before {
+        display: block;
+        color: var(--utp-text-white);
+        background: var(--utp-dark-medium) url("/assets/img/overlay.png");
+        border-radius: 2.5em;
+        text-align: center;
+        width: 2.5em;
+        height: 2.5em;
+        line-height: 2.5em;
+        margin-right: 0.75em;
+        position: absolute;
+        left: 0;
+        margin-top: -0.5em;
+    }
+
+.feature-list.small h3.icon:before {
+    font-size: 0.8em;
+}

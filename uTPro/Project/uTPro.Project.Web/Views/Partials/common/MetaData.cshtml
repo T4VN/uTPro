@@ -1,3 +1,4 @@
+@using System.Net
 @inject Umbraco.Cms.Core.Services.IDomainService _domainService
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
@@ -10,12 +11,12 @@
 
     var seo = Model.Value<SeoVisualizer.SeoValues>(nameof(GlobalPageHeadMetaSetting.HeadTitleAndDescription));
     string url = $"{Context.Request.Scheme}://{Context.Request.Host}";
-    string canonical = Model.Url(mode: UrlMode.Absolute); //$"{url}{Context.Request.Path}";
+    string canonical = Model.Url(mode: UrlMode.Absolute);
     string sitemap = $"{url}/sitemap.xml";
     var title = GetTitle();
     var description = GetDescription();
-    var keywords = GetKeywords();
     var thumbnail = GetThumbnail();
+    var ogImage = GetOgImage();
 
     IHtmlContent GetTitle()
     {
@@ -53,43 +54,56 @@
         return Html.Raw(value);
     }
 
-    IHtmlContent GetKeywords()
+    /// <summary>
+    /// OG/Twitter image should be 1200x630 for optimal social sharing.
+    /// Uses desktop crop (wider) instead of mobile crop.
+    /// </summary>
+    string GetOgImage()
     {
-        List<string> value = new List<string>(folderSite.ValueToStringArray(nameof(GlobalPageHeadMetaSetting.HeadKeywords)));
-        value.AddRange(Model.ValueToStringArray(nameof(GlobalPageHeadMetaSetting.HeadKeywords)));
-        if (value != null && value.Any())
+        string value = !string.IsNullOrEmpty(Model.ValueToMediaDesktop(nameof(GlobalPageHeadSocialMetaSetting.OgImage)))
+            ? Model.ValueToMediaDesktop(nameof(GlobalPageHeadSocialMetaSetting.OgImage))
+            : Model.ValueToMediaDesktop(nameof(GlobalPageHeadMetaSetting.HeadSocialShareImage));
+        if (string.IsNullOrEmpty(value))
         {
-            return Html.Raw(string.Join(",", value.GroupBy(x => x).Select(x => x.First())));
+            value = folderSite.ValueToMediaDesktop(nameof(GlobalSiteSettings.SiteSettingsLogo));
         }
-        return Html.Raw(string.Empty);
+        // Ensure absolute URL
+        if (!string.IsNullOrEmpty(value) && !value.StartsWith("http"))
+        {
+            value = url + value;
+        }
+        return value;
     }
 
     IHtmlContent GetSocialFB()
     {
         List<string> value = new List<string>();
         string ogType = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgType)))
-        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgType))
-        : "website";
-        value.Add($"<meta property=\"og:type\" content=\"{ogType}\"/>");
+            ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgType))
+            : "website";
+        value.Add($"<meta property=\"og:type\" content=\"{WebUtility.HtmlEncode(ogType)}\"/>");
 
-        value.Add($@"<meta property=""og:title"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)))
+        var ogTitle = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)))
                         ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle))
-                        : title)}""/>");
+                        : title.ToHtmlString();
+        value.Add($"<meta property=\"og:title\" content=\"{WebUtility.HtmlEncode(ogTitle)}\"/>");
 
-        value.Add($@"<meta property=""og:description"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)))
+        var ogDesc = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)))
                         ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription))
-                        : description)}""/>");
+                        : description.ToHtmlString();
+        value.Add($"<meta property=\"og:description\" content=\"{WebUtility.HtmlEncode(ogDesc)}\"/>");
 
-        value.Add($@"<meta property=""og:image"" content=""{(!string.IsNullOrEmpty(Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage)))
-                        ? Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage))
-                        : thumbnail)}""/>");
+        value.Add($"<meta property=\"og:image\" content=\"{WebUtility.HtmlEncode(ogImage)}\"/>");
+        value.Add($"<meta property=\"og:image:width\" content=\"1200\"/>");
+        value.Add($"<meta property=\"og:image:height\" content=\"630\"/>");
 
         if (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.FacebookAppId))))
         {
-            value.Add($"<meta property=\"fb:app_id\" content=\"{Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.FacebookAppId))}\"/>");
+            value.Add($"<meta property=\"fb:app_id\" content=\"{WebUtility.HtmlEncode(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.FacebookAppId)))}\"/>");
         }
-        value.Add($"<meta property=\"og:url\" content=\"{canonical}\"/>");
+        value.Add($"<meta property=\"og:url\" content=\"{WebUtility.HtmlEncode(canonical)}\"/>");
         value.Add($"<meta property=\"og:locale\" content=\"{CurrentSite.CurrentCulture.Name}\"/>");
+        value.Add($"<meta property=\"og:site_name\" content=\"{WebUtility.HtmlEncode(folderSite.SiteName?.Title ?? "")}\"/>");
         return Html.Raw(string.Join(Environment.NewLine, value));
     }
 
@@ -97,65 +111,80 @@
     {
         List<string> value = new List<string>();
         string cardType = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterCardType)))
-        ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterCardType))
-        : "summary";
-        value.Add($"<meta property=\"twitter:card\" content=\"{cardType}\"/>");
+            ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterCardType))
+            : "summary_large_image";
+        value.Add($"<meta name=\"twitter:card\" content=\"{WebUtility.HtmlEncode(cardType)}\"/>");
 
-        value.Add($@"<meta property=""twitter:title"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)))
+        var twTitle = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle)))
                         ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgTitle))
-                        : title)}""/>");
+                        : title.ToHtmlString();
+        value.Add($"<meta name=\"twitter:title\" content=\"{WebUtility.HtmlEncode(twTitle)}\"/>");
 
-        value.Add($@"<meta property=""twitter:description"" content=""{(!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)))
+        var twDesc = !string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription)))
                         ? Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.OgDescription))
-                        : description)}""/>");
+                        : description.ToHtmlString();
+        value.Add($"<meta name=\"twitter:description\" content=\"{WebUtility.HtmlEncode(twDesc)}\"/>");
 
-        value.Add($@"<meta property=""twitter:image"" content=""{(!string.IsNullOrEmpty(Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage)))
-                        ? Model.ValueToMediaMobile(nameof(GlobalPageHeadSocialMetaSetting.OgImage))
-                        : thumbnail)}""/>");
+        value.Add($"<meta name=\"twitter:image\" content=\"{WebUtility.HtmlEncode(ogImage)}\"/>");
 
         if (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterSite))))
         {
-            value.Add($"<meta property=\"twitter:site\" content=\"{Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterSite))}\"/>");
+            value.Add($"<meta name=\"twitter:site\" content=\"{WebUtility.HtmlEncode(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterSite)))}\"/>");
         }
 
         if (!string.IsNullOrEmpty(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterImageAlt))))
         {
-            value.Add($"<meta property=\"twitter:image:alt\" content=\"{Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterImageAlt))}\"/>");
+            value.Add($"<meta name=\"twitter:image:alt\" content=\"{WebUtility.HtmlEncode(Model.ValueToString(nameof(GlobalPageHeadSocialMetaSetting.TwitterImageAlt)))}\"/>");
         }
         return Html.Raw(string.Join(Environment.NewLine, value));
     }
 
-    async Task<IHtmlContent> GetAlternateHreflang()
+    IHtmlContent GetAlternateHreflang()
     {
         List<string> value = new List<string>();
         string formatTag = "<link rel=\"alternate\" hreflang=\"{0}\" href=\"{1}\" />";
-        var lstDomain = await CurrentSite.GetDomains(true);
-        if (lstDomain.Count() > 1)
+        var lstDomain = CurrentSite.GetDomains(true);
+        if (lstDomain.Count > 1)
         {
             var domainDefault = lstDomain.FirstOrDefault(x => x.Name.EndsWith("/"));
-            string url = Model.Url(mode: UrlMode.Absolute, culture: domainDefault?.Culture);
-            if (domainDefault != null)
-            {
-                value.Add(string.Format(formatTag, "x-default", url));
-            }
+            // x-default: use default culture URL or first domain
+            string xDefaultUrl = Model.Url(mode: UrlMode.Absolute, culture: domainDefault?.Culture ?? lstDomain[0].Culture);
+            value.Add(string.Format(formatTag, "x-default", xDefaultUrl));
+
             foreach (var item in lstDomain)
             {
-                url = Model.Url(mode: UrlMode.Absolute, culture: item.Culture);
-                if (item.Culture != domainDefault?.Culture)
-                {
-                    value.Add(string.Format(formatTag, item.Culture?.ToLower(), url));
-                }
+                var itemUrl = Model.Url(mode: UrlMode.Absolute, culture: item.Culture);
+                value.Add(string.Format(formatTag, item.Culture?.ToLower(), itemUrl));
             }
         }
 
         return Html.Raw(string.Join(Environment.NewLine, value));
+    }
+
+    /// <summary>
+    /// Build breadcrumb JSON-LD from ancestors
+    /// </summary>
+    IHtmlContent GetBreadcrumbJsonLd()
+    {
+        var ancestors = Model.AncestorsOrSelf().Reverse().ToList();
+        if (ancestors.Count <= 1) return Html.Raw(string.Empty);
+
+        var items = new List<string>();
+        int position = 1;
+        foreach (var item in ancestors)
+        {
+            var itemUrl = item.Url(mode: UrlMode.Absolute);
+            var itemName = WebUtility.HtmlEncode(item.Name());
+            items.Add($@"{{""@type"":""ListItem"",""position"":{position},""name"":""{itemName}"",""item"":""{itemUrl}""}}");
+            position++;
+        }
+        var json = $@"{{""@context"":""https://schema.org"",""@type"":""BreadcrumbList"",""itemListElement"":[{string.Join(",", items)}]}}";
+        return Html.Raw($"<script type=\"application/ld+json\">{json}</script>");
     }
 }
 
 <meta charset="utf-8">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
 @if (Model.Value<bool>(nameof(GlobalPageSitemapSetting.SitemapStopInternalLinksBeingFollowed)))
 {
@@ -163,15 +192,8 @@
 }
 else
 {
-    <meta name="robots" content="index, archive, follow, noodp" />
-    <meta name="googlebot" content="index,archive,follow,noodp" />
-    <meta name="msnbot" content="all,index,follow" />
-    <meta name="revisit-after" content="1 days" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 }
-
-<meta http-equiv="content-language" content="@CurrentSite.CurrentCulture.Name.ToLower()" />
-
-@*<meta name="google" content="nositelinkssearchbox" />*@
 
 <title>@title</title>
 <meta name="title" content="@title" />
@@ -179,14 +201,38 @@ else
 {
     <meta name="description" content="@description" />
 }
-
-@if (!string.IsNullOrEmpty(keywords.ToHtmlString()))
-{
-    <meta name="keywords" content="@keywords" />
-}
 <link rel="canonical" href="@canonical" />
 <link rel="sitemap" href="@sitemap" />
 <link rel="shortcut icon" href="@(folderSite.SiteFavicon != null ? folderSite.SiteFavicon.Url() : "/favicon.ico")" />
 @GetSocialFB()
 @GetSocialTwitter()
-@(await GetAlternateHreflang())
+@(GetAlternateHreflang())
+
+@* JSON-LD: WebSite + SearchAction *@
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "@WebUtility.HtmlEncode(folderSite.SiteName?.Title ?? "")",
+    "url": "@url",
+    @if (!string.IsNullOrEmpty(description.ToHtmlString()))
+    {
+        @:"description": "@WebUtility.HtmlEncode(description.ToHtmlString())",
+    }
+    "inLanguage": "@CurrentSite.CurrentCulture.Name"
+}
+</script>
+
+@* JSON-LD: Organization *@
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
+    "name": "@WebUtility.HtmlEncode(folderSite.SiteName?.Title ?? "")",
+    "url": "@url",
+    "logo": "@(folderSite.SiteLogo != null ? url + folderSite.SiteLogo.Url() : url + "/assets/img/logo.svg")"
+}
+</script>
+
+@* JSON-LD: BreadcrumbList *@
+@GetBreadcrumbJsonLd()

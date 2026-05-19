@@ -50,6 +50,24 @@ background-color:var(--section-bg-color);";
 
     var textColor = $@"--section-text-color:{(!string.IsNullOrEmpty(Model.Content.TextColor) ? Model.Content.TextColor : "#000")};";
 }
-<section class="@Model.Content.ContentType.Alias" style="@(bkg + textColor)">
-    @await Html.GetPreviewBlockGridItemAreasHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}areas")
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/wrapper.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/wrapper.css" />
+    }
+}
+<section class="@Model.Content.ContentType.Alias"
+         style="@(bkg + textColor)">
+    <div class="wrapper">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <div class="title">@Model.Content.Title</div>
+        }
+        @await Html.GetPreviewBlockGridItemAreasHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}areas")
+    </div>
 </section>

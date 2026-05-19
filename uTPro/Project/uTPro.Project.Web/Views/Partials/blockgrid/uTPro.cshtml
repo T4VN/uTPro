@@ -3,10 +3,13 @@
 @{
     if (Model?.Any() != true) { return; }
 }
+@if (Model != null)
+{
+    <div class="umb-block-grid"
+         data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
+         style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
+        @* @await Html.GetBlockGridItemsHtmlAsync(Model) *@
+        @await Html.GetPreviewBlockGridItemsHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
+    </div>
 
-<div class="umb-block-grid"
-     data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
-     style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
-    @* @await Html.GetBlockGridItemsHtmlAsync(Model) *@
-    @await Html.GetPreviewBlockGridItemsHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
-</div>
+}

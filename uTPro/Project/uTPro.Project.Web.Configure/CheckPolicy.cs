@@ -30,6 +30,10 @@ namespace uTPro.Project.Web.Configure
             internal static readonly DateTime exp_Date = DateTime.MaxValue;
         }
 
+        // Cache compiled regex patterns to avoid recompilation on every request
+        private static readonly Lazy<IReadOnlyList<Regex>> _compiledPatterns = new(() =>
+            Policy.allow_domain.Select(x => LikeExpressionToRegex(x)).ToList());
+
         public string Check(HttpContext httpContext)
         {
             if (Policy.isCheck)
@@ -43,29 +47,30 @@ namespace uTPro.Project.Web.Configure
 
         string? checkExp()
         {
-            bool check = Policy.exp_Date <= DateTime.Now;
+            bool check = Policy.exp_Date <= DateTime.UtcNow;
             return check ? $"Your web page has been expired ({Policy.exp_Date})!" : null;
         }
 
         string? checkDomain(HttpContext httpContext)
         {
-            bool check = Policy.allow_domain.Count != 0
-                && Policy.allow_domain.Any(x => LikeExpressionToRegexPattern(x).IsMatch(httpContext.Request.Host.Host));
-            return !check ? $"Your domain name has been blocked ({httpContext.Request.Host.Host})" : null;
+            var host = httpContext.Request.Host.Host;
+            bool check = _compiledPatterns.Value.Count != 0
+                && _compiledPatterns.Value.Any(x => x.IsMatch(host));
+            return !check ? $"Your domain name has been blocked ({host})" : null;
         }
 
-        private Regex LikeExpressionToRegexPattern(String likePattern)
+        private static Regex LikeExpressionToRegex(string likePattern)
         {
             var replacementToken = "~~~";
 
-            String result = likePattern.Replace("_", replacementToken)
+            string result = likePattern.Replace("_", replacementToken)
                 .Replace("%", ".*");
 
             result = Regex.Replace(result, @"\[.*" + replacementToken + @".*\]", "_");
 
             result = result.Replace(replacementToken, ".");
 
-            return new Regex("^" + result + "$", RegexOptions.IgnoreCase);
+            return new Regex("^" + result + "$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
     }
 
