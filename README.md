@@ -100,6 +100,10 @@ uTPro is **completely free and open source**, giving developers the freedom to *
 
 <img width="1031" height="417" alt="image" src="https://github.com/user-attachments/assets/37206453-3593-4c07-ac50-66334d0544de" />
 
+<img width="1584" height="401" alt="image" src="https://github.com/user-attachments/assets/4b9d4bc0-34e2-45b1-a199-ec6af7e44a44" />
+
+> 📖 See [Script Queue documentation](docs/5.-Script-Queue.md) for how components register JS files with dependency-aware loading (jQuery-dependent vs standalone).
+
 ## Development, but don't forget SEO
 
 <img width="2559" height="1378" alt="image" src="https://github.com/user-attachments/assets/251e4e1e-ceac-4782-8d4a-ca06c5315cd5" />
