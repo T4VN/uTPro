@@ -1,0 +1,14 @@
+﻿@using (Html.SetSection(CurrentSite.GetItem().Root.Name + "copyright", HtmlSectionBlockExtensions.Position.BodyBottom))
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/copyright.css" />
+}
+<div style="background-color: #282b34">
+    <div class="container">
+        <div id="copyright">
+            <ul>
+                <li>&copy; T4VN</li>
+                <li>Design: <a target="_blank" rel="noopener" href="https://html5up.net">HTML5 UP</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

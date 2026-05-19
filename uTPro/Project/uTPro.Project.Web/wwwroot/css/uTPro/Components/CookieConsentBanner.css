@@ -1,9 +1,8 @@
-/* ==========================================================================
-   Consent Banner
-   ========================================================================== */
+.umb-block-grid__layout-item:has(.consent-banner) {
+    display: contents;
+}
 
 .consent-banner {
-    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
@@ -12,7 +11,7 @@
     color: var(--utp-text-white-90);
     padding: 0.7em 1.5em;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 1.2em;
@@ -22,15 +21,18 @@
     animation: consentSlideUp 0.4s ease-out;
 }
 
-.consent-banner.is-visible {
-    display: flex;
-}
+    /* is-visible is no longer needed — JS controls visibility via inline style.
+       Kept for backward compatibility if referenced elsewhere. */
+    .consent-banner.is-visible {
+        display: flex;
+    }
 
 @keyframes consentSlideUp {
     from {
         transform: translateY(100%);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -42,14 +44,18 @@
     max-width: 700px;
 }
 
-.consent-banner__message a {
-    color: var(--utp-primary-light);
-    text-decoration: underline;
-}
+    .consent-banner__message a {
+        color: var(--utp-primary-light);
+        text-decoration: underline;
+    }
 
-.consent-banner__message a:hover {
-    color: var(--utp-primary-hover);
-}
+        .consent-banner__message a:hover {
+            color: var(--utp-primary-hover);
+        }
+
+    .consent-banner__message p {
+        margin: 0
+    }
 
 .consent-banner__actions {
     display: flex;
@@ -81,10 +87,10 @@
     color: var(--utp-text-white);
 }
 
-.consent-banner__btn--accept:hover {
-    background: var(--utp-primary-hover);
-    color: var(--utp-text-dark);
-}
+    .consent-banner__btn--accept:hover {
+        background: var(--utp-primary-hover);
+        color: var(--utp-text-dark);
+    }
 
 .consent-banner__btn--reject {
     background: transparent;
@@ -92,10 +98,10 @@
     border: 1px solid var(--utp-border-white-25);
 }
 
-.consent-banner__btn--reject:hover {
-    background: var(--utp-dark-soft);
-    color: var(--utp-text-white);
-}
+    .consent-banner__btn--reject:hover {
+        background: var(--utp-dark-soft);
+        color: var(--utp-text-white);
+    }
 
 /* ── Responsive ── */
 
