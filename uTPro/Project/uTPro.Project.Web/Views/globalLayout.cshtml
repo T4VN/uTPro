@@ -25,6 +25,7 @@
     </main>
     @{
         RenderSection("Scripts", false);
+        @Html.RenderStandaloneScripts()
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
         Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyBottom);
     }

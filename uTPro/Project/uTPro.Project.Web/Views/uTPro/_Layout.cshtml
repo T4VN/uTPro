@@ -32,8 +32,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;0,900;1,400&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;0,900;1,400&display=swap"></noscript>
     @* Non-critical CSS — still render-blocking but minified by WebOptimizer + compressed by Brotli *@
-    <link rel="stylesheet" href="/css/uTPro/variables.css" />
     <link rel="stylesheet" href="/assets/css/blockgridlayout.css" />
+    <link rel="stylesheet" href="/css/uTPro/variables.css" />
     <link rel="stylesheet" href="/css/uTPro/layout.css" />
     <link rel="stylesheet" href="/css/uTPro/main.css" />
     @* Icon CSS loaded async — FontAwesome icons are below the fold *@
@@ -59,21 +59,6 @@
     }
     <main class="page-wrapper">
         @RenderBody()
-
-        @using (Html.SetSection(CurrentSite.GetItem().Root.Name + "copyright", HtmlSectionBlockExtensions.Position.BodyBottom))
-        {
-            <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/copyright.css" />
-        }
-        <div style="background-color: #282b34">
-            <div class="container">
-                <div id="copyright">
-                    <ul>
-                        <li>&copy; T4VN</li>
-                        <li>Design: <a target="_blank" rel="noopener" href="https://html5up.net">HTML5 UP</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
     </main>
     @* Scripts loaded after user interaction or idle — reduces TBT significantly.
        jQuery + plugins are only needed for nav dropdown (dropotron) which users
@@ -92,6 +77,7 @@
                     '/scripts/uTPro/util.js',
                     '/scripts/uTPro/main.js',
                     '/scripts/uTPro/select-language.js'
+                    @Html.RenderScriptQueue()
                 ];
                 function loadNext(i){
                     if(i>=scripts.length)return;
@@ -113,7 +99,9 @@
             }
         })();
     </script>
+
     @RenderSection("Scripts", false)
+    @Html.RenderStandaloneScripts()
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyClosingScripts));
     }
