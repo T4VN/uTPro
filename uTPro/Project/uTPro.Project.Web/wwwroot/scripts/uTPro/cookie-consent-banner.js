@@ -48,7 +48,7 @@
     function hideBanner() {
         var banner = document.getElementById('consentBanner');
         if (banner) {
-            banner.classList.remove('is-visible');
+            banner.style.display = 'none';
         }
     }
 
@@ -109,7 +109,7 @@
         var banner = document.getElementById('consentBanner');
         if (!banner) return;
 
-        banner.classList.add('is-visible');
+        banner.style.display = '';  // Remove inline display:none → CSS display:flex takes effect
 
         var acceptBtn = document.getElementById('consentAccept');
         var rejectBtn = document.getElementById('consentReject');

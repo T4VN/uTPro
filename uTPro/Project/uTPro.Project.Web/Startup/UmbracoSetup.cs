@@ -19,8 +19,10 @@ public static class UmbracoSetup
                 options.BlockGrid.Stylesheets =
                 [
                     "/assets/css/blockgridlayout-backoffice.css",
+                    "/css/uTPro/variables.css",
                     "/css/uTPro/layout.css",
-                    "/css/uTPro/main.css"
+                    "/css/uTPro/main.css",
+                    "/css/uTPro/icon.css"
                 ];
             })
             .Build();
