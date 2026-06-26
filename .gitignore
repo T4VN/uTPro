@@ -489,3 +489,9 @@ umbraco-package-schema.json
 
 **/usync/Snapshots
 /Deploy
+
+## Dot-prefixed folders (except .github which holds repo actions)
+.*/
+**/.*/
+!.github/
+!**/.github/
