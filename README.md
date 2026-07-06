@@ -47,7 +47,7 @@ uTPro comes with a curated set of utilities and best practices already integrate
 - **Performance optimizations** (lazy loading, async scripts, caching hints).
 - **Sample components** (navigation, footer, hero section) ready to customize.
 
-**With the support of extensions:** [UmbracoSeoVisualizer](https://marketplace.umbraco.com/package/umbracoseovisualizer), [Umbraco.Community.BlockPreview](https://marketplace.umbraco.com/package/umbraco.community.blockpreview), [uSync](https://marketplace.umbraco.com/package/usync), [WebMarkupMin.AspNetCoreLatest](https://www.nuget.org/packages/WebMarkupMin.AspNetCoreLatest/), [LigerShark.WebOptimizer.Core](https://www.nuget.org/packages/LigerShark.WebOptimizer.Core), [MimeKit](https://www.nuget.org/packages/MimeKit)...
+**With the support of extensions:** [UmbracoSeoVisualizer](https://marketplace.umbraco.com/package/umbracoseovisualizer), [Umbraco.Community.BlockPreview](https://marketplace.umbraco.com/package/umbraco.community.blockpreview), [uSync](https://marketplace.umbraco.com/package/usync), [WebMarkupMin.AspNetCoreLatest](https://www.nuget.org/packages/WebMarkupMin.AspNetCoreLatest/), [LigerShark.WebOptimizer.Core](https://www.nuget.org/packages/LigerShark.WebOptimizer.Core)...
 
 ---
 
