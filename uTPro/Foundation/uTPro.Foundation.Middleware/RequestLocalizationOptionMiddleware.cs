@@ -253,7 +253,25 @@ namespace uTPro.Foundation.Middleware
                             if (prefixPath == "/")
                                 prefixPath = string.Empty;
 
-                            return prefixPath + httpContext.Request.Path + httpContext.Request.QueryString;
+                            var currentPath = httpContext.Request.Path.Value ?? "/";
+                            var query = httpContext.Request.QueryString.ToString();
+
+                            // Build the target path, avoiding a double slash when the request
+                            // is at the site root ("/") but a language prefix is being added.
+                            string target;
+                            if (string.IsNullOrEmpty(prefixPath))
+                                target = currentPath + query;
+                            else if (currentPath == "/")
+                                target = prefixPath + query;
+                            else
+                                target = prefixPath + currentPath + query;
+
+                            // Never redirect to the URL we are already on (prevents redirect loops,
+                            // e.g. the default culture served at the site root).
+                            if (string.Equals(target, currentPath + query, StringComparison.Ordinal))
+                                return string.Empty;
+
+                            return target;
                         }
                     }
                 }
@@ -321,11 +339,57 @@ namespace uTPro.Foundation.Middleware
                 if (string.IsNullOrWhiteSpace(culture))
                     culture = GetLanguageDefault(domains, currentSite);
 
-                cul = domains.FirstOrDefault(x =>
-                    x.Culture != null && x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase));
+                cul = SelectDomainForCulture(domains, culture);
             }
 
             return (cul?.Culture ?? string.Empty, cul?.Name ?? string.Empty, isRedirect);
+        }
+
+        private static Umbraco.Cms.Core.Routing.Domain? SelectDomainForCulture(
+            IReadOnlyList<Umbraco.Cms.Core.Routing.Domain> domains, string culture)
+        {
+            if (string.IsNullOrEmpty(culture))
+                return null;
+
+            var candidates = domains
+                .Where(x => x.Culture != null
+                    && x.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (candidates.Count == 0)
+                return null;
+            if (candidates.Count == 1)
+                return candidates[0];
+
+            var distinctHosts = candidates
+                .Select(GetDomainHost)
+                .Where(h => !string.IsNullOrEmpty(h))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count();
+
+            // Same host across candidates → prefer the entry with a path segment (/vi).
+            if (distinctHosts <= 1)
+                return candidates.FirstOrDefault(HasPathSegment) ?? candidates[0];
+
+            // Different hosts → keep the configured domain list order.
+            return candidates[0];
+        }
+
+        private static string GetDomainHost(Umbraco.Cms.Core.Routing.Domain domain)
+        {
+            if (Uri.TryCreate(SchemeUrlExtensions.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)
+                && uri.IsAbsoluteUri)
+                return uri.Host;
+            return string.Empty;
+        }
+
+        private static bool HasPathSegment(Umbraco.Cms.Core.Routing.Domain domain)
+        {
+            if (Uri.TryCreate(SchemeUrlExtensions.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)
+                && uri.IsAbsoluteUri)
+                return !string.IsNullOrEmpty(uri.AbsolutePath.Trim('/'));
+
+            return !string.IsNullOrEmpty(domain.Name.Trim('/'));
         }
     }
 }
