@@ -41,6 +41,7 @@ It enables developers to create **enterprise‑grade websites** faster, more rel
 
 uTPro comes with a curated set of utilities and best practices already integrated, so you can start building immediately:
 
+- **Database flexibility** — Runs on **PostgreSQL** (default), **SQL Server**, or **SQLite**. Switch engines by changing just two `ConnectionStrings` keys in `appsettings.json` — no code changes. See [4.8 Database Provider](docs/4.-Configurations.md#48-database-provider-postgresql--sql-server--sqlite).  
 - **Pre‑configured build scripts** (minification, bundling, cache‑busting).  
 - **SEO‑friendly meta setup** and Open Graph defaults.  
 - **Accessibility helpers** to ensure inclusive design.
@@ -78,6 +79,7 @@ uTPro follows a clean modular architecture with clear separation of concerns:
 |-----------|---------|
 | Umbraco CMS | 16.5.1 |
 | .NET | 9.0 |
+| Database | PostgreSQL (default) · SQL Server · SQLite |
 | uSync | 16.1.0 |
 | BlockPreview | 4.2.2 |
 | SeoVisualizer | 16.0.1 |

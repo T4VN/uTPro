@@ -1,3 +1,4 @@
+using Our.Umbraco.PostgreSql;
 using Umbraco.Community.BlockPreview.Extensions;
 
 namespace uTPro.Project.Web.Startup;
@@ -9,10 +10,23 @@ public static class UmbracoSetup
 {
     public static WebApplicationBuilder ConfigureUmbraco(this WebApplicationBuilder builder)
     {
-        builder.CreateUmbracoBuilder()
+        // Only wire up the PostgreSQL provider when the configured provider is PostgreSQL.
+        // Our.Umbraco.PostgreSql registers its factory as "Npgsql2", so a case-insensitive
+        // "Npgsql" contains-check matches both "Npgsql" and "Npgsql2". SQL Server / SQLite skip it.
+        var providerName = builder.Configuration.GetConnectionString("umbracoDbDSN_ProviderName");
+        var usePostgreSql = providerName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true;
+
+        var umbracoBuilder = builder.CreateUmbracoBuilder()
             .AddBackOffice()
             .AddWebsite()
-            .AddComposers()
+            .AddComposers();
+
+        if (usePostgreSql)
+        {
+            umbracoBuilder.AddUmbracoPostgreSqlSupport();
+        }
+
+        umbracoBuilder
             .AddBlockPreview(options =>
             {
                 options.BlockGrid.Enabled = true;
