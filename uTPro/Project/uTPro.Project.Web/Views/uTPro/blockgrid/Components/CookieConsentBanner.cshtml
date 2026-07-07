@@ -21,7 +21,7 @@ else
         @Model.Content.Content
     </div>
     <div class="consent-banner__actions">
-        <button id="consentAccept" class="consent-banner__btn consent-banner__btn--accept" type="button">Chấp nhận</button>
-        <button id="consentReject" class="consent-banner__btn consent-banner__btn--reject" type="button">Từ chối</button>
+        <button id="consentAccept" class="consent-banner__btn consent-banner__btn--accept" type="button">@Umbraco.GetDictionaryValue("Accept")</button>
+        <button id="consentReject" class="consent-banner__btn consent-banner__btn--reject" type="button">@Umbraco.GetDictionaryValue("Decline")</button>
     </div>
 </div>
