@@ -55,7 +55,7 @@
     @Html.RenderSections(HtmlSectionBlockExtensions.Position.BodyTop)
     @{
         await Html.RenderPartialAsync(PathFileViews.Partials_HtmlManage, nameof(GlobalPageScriptSetting.BodyOpeningScripts));
-        await Html.RenderPartialAsync("_Nav.cshtml", homePage);
+        await Html.RenderPartialAsync("_Nav.cshtml");
     }
     <main class="page-wrapper">
         @RenderBody()

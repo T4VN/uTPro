@@ -19,9 +19,13 @@ else
         {
             <div class="col-6 col-12-medium">
                 <section>
-                    @await Component.InvokeAsync("uTProSimpleForm", new { alias = Model.Content.ContactForm })
+                    @await Component.InvokeAsync("uTProSimpleForm", new
+                    {
+                        alias = Model.Content.ContactForm,
+                        submitBtnText = @Umbraco.GetDictionaryValue("Submit"),
+                        resetBtnText = @Umbraco.GetDictionaryValue("Reset"),
+                    })
                 </section>
-
             </div>
         }
         <div class="col-6 col-12-medium">
