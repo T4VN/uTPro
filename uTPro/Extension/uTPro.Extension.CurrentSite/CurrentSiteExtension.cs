@@ -148,7 +148,7 @@ namespace uTPro.Extension.CurrentSite
                     return _cachedAllDomains;
                 }
 
-                var all = UContext?.Domains?.GetAll(true)?.ToList() ?? [];
+                var all = UContext?.Domains?.GetAll(true)?.OrderByDescending(x => x.Name)?.ToList() ?? [];
                 lock (_domainsLock)
                 {
                     _cachedAllDomains = all;

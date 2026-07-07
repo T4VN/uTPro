@@ -1,13 +1,20 @@
 ﻿@using System.Text
 @using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<UTpro__PageHome>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
-    if (Model == null || Model.NavigationLink == null)
+    if (Model == null)
     {
         return;
     }
+
+    UTpro__PageHome? homePage = CurrentSite.GetItem().PageHome as UTpro__PageHome;
+    if (homePage == null || homePage?.NavigationLink == null)
+    {
+        return;
+    }
+
     var culs = CurrentSite.GetCultures();
-    var navItems = (GlobalFolderNavigationLinkForSite)Model.NavigationLink;
+    var navItems = (GlobalFolderNavigationLinkForSite)homePage.NavigationLink;
     var (optionHtml, hrefHtml) = BuildLanguageHtml();
 
     bool ActiveMenu(GlobalNavigationItem item)
@@ -17,7 +24,7 @@
             var guid = item.NavLink?.Udi?.ToGuid();
             if (guid != null)
             {
-                return Model.Key == guid ? true : Umbraco.Content(guid)?.IsAncestorOrSelf(Model) ?? false;
+                return Model.Key == guid ? true : Umbraco.Content(guid)?.IsAncestorOrSelf(homePage) ?? false;
             }
         }
         return false;
@@ -37,10 +44,9 @@
                 var url = CurrentSite.GetUrlWithCulture(Model, item.Culture, UrlMode.Auto);
                 if (url == "#" || string.IsNullOrEmpty(url))
                 {
-                    var pageHome = CurrentSite.GetItem().PageHome;
-                    if (pageHome != null)
+                    if (homePage != null)
                     {
-                        url = CurrentSite.GetUrlWithCulture(pageHome, item.Culture, UrlMode.Auto);
+                        url = CurrentSite.GetUrlWithCulture(homePage, item.Culture, UrlMode.Auto);
                     }
                 }
                 if (string.IsNullOrEmpty(url))
