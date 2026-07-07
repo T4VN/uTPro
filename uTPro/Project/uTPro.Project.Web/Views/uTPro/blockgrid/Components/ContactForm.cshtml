@@ -15,32 +15,15 @@ else
 }
 <section class="container contactform">
     <div class="row">
-        <div class="col-6 col-12-medium">
+        @if (!string.IsNullOrEmpty(Model.Content.ContactForm))
+        {
+            <div class="col-6 col-12-medium">
+                <section>
+                    @await Component.InvokeAsync("uTProSimpleForm", new { alias = Model.Content.ContactForm })
+                </section>
 
-            <!-- Contact Form -->
-            <section>
-                <form method="post" action="#">
-                    <div class="row gtr-50">
-                        <div class="col-6 col-12-small">
-                            <input type="text" name="name" id="contact-name" placeholder="Name">
-                        </div>
-                        <div class="col-6 col-12-small">
-                            <input type="text" name="email" id="contact-email" placeholder="Email">
-                        </div>
-                        <div class="col-12">
-                            <textarea name="message" id="contact-message" placeholder="Message" rows="4"></textarea>
-                        </div>
-                        <div class="col-12">
-                            <ul class="actions">
-                                <li><input type="submit" class="style1" value="Send"></li>
-                                <li><input type="reset" class="style2" value="Reset"></li>
-                            </ul>
-                        </div>
-                    </div>
-                </form>
-            </section>
-
-        </div>
+            </div>
+        }
         <div class="col-6 col-12-medium">
 
             <!-- Contact -->
