@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="uTPro.Feature.AuditLog" Version="4.0.1" />
     <PackageReference Include="uTPro.Feature.FileManager" Version="2.0.0" />
-    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="2.0.2" />
+    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="2.1.0" />
   </ItemGroup>
 
 </Project>
