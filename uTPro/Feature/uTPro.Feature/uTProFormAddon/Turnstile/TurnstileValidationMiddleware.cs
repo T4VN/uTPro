@@ -10,11 +10,12 @@ namespace uTPro.Feature.uTProFormAddon.Turnstile;
 
 /// <summary>
 /// Verifies a Cloudflare Turnstile token on the SimpleFormBuilder submit endpoint
-/// (<c>POST /api/utpro/simple-form/submit</c>). This is a uTPro-specific field type that only
-/// uses the builder's built-in field settings (no package edits): the public Site Key is the
-/// field's Default Value, the Secret Key is its Placeholder, and the Failure Message is its
-/// Validation Message. Whatever a field leaves blank falls back to appsettings
-/// (<c>uTProFormAddon:Turnstile</c>), so forms can share global keys or override them individually.
+/// (<c>POST /api/utpro/simple-form/submit</c>). This uTPro-specific field type declares its own
+/// Site Key / Secret Key settings (see TurnstileComposer), stored in the field's Attributes:
+/// the public Site Key is <c>siteKey</c>, the Secret Key is <c>secretKey</c>, and the Failure
+/// Message reuses the field's built-in Validation Message. Whatever a field leaves blank falls
+/// back to appsettings (<c>uTProFormAddon:Turnstile</c>), so forms can share global keys or
+/// override them individually.
 /// </summary>
 public sealed class TurnstileValidationMiddleware(RequestDelegate next)
 {
@@ -50,8 +51,8 @@ public sealed class TurnstileValidationMiddleware(RequestDelegate next)
                 var opts = options.Value;
                 foreach (var field in EnumerateFields(form).Where(f => f.Type == FieldType))
                 {
-                    // Secret Key: field value (Placeholder) first, then appsettings fallback.
-                    var secret = FirstNonEmpty(field.Placeholder, opts.SecretKey);
+                    // Secret Key: field value (secretKey attribute) first, then appsettings fallback.
+                    var secret = FirstNonEmpty(GetAttr(field, "secretKey"), opts.SecretKey);
                     if (string.IsNullOrWhiteSpace(secret)) continue; // display-only / not configured
 
                     data.TryGetValue(field.Name, out var token);
@@ -77,6 +78,11 @@ public sealed class TurnstileValidationMiddleware(RequestDelegate next)
 
     private static string? FirstNonEmpty(string? primary, string? fallback)
         => !string.IsNullOrWhiteSpace(primary) ? primary : (string.IsNullOrWhiteSpace(fallback) ? null : fallback);
+
+    private static string? GetAttr(FormFieldViewModel field, string key)
+        => field.Attributes is not null && field.Attributes.TryGetValue(key, out var v)
+            ? v
+            : null;
 
     private static IEnumerable<FormFieldViewModel> EnumerateFields(FormViewModel form)
     {

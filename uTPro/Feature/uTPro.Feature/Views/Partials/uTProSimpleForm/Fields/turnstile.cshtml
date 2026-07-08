@@ -1,12 +1,13 @@
 @* Cloudflare Turnstile widget (uTPro custom field type — lives in uTPro.Feature).
 
-   This is a uTPro-specific custom field type (not part of the SimpleFormBuilder package), so it
-   only uses the builder's built-in field settings — no package edits required. Keys resolve with
+   This is a uTPro-specific custom field type. It registers its own Site Key / Secret Key
+   settings via AdduTProSimpleFormFieldType (see TurnstileComposer), so the form builder shows
+   dedicated labelled inputs and stores the values in the field's Attributes. Keys resolve with
    this precedence: value entered on the form field (UI) first, then appsettings fallback
    (uTProFormAddon:Turnstile), otherwise treated as empty (widget not rendered). Mapping:
-     • Default Value      → Site Key   (public, rendered here)
-     • Placeholder        → Secret Key (server-side only; used by the verify middleware, never emitted)
-     • Validation Message → Failure Message shown when verification fails
+     • Attribute "siteKey"   → Site Key   (public, rendered here)
+     • Attribute "secretKey" → Secret Key (server-side only; used by the verify middleware, never emitted)
+     • Validation Message    → Failure Message shown when verification fails
 
    Per form: whatever the field leaves blank falls back to appsettings, so most forms can rely
    on the global keys while a specific form can still override them.
@@ -20,15 +21,16 @@
 @model uTPro.Feature.SimpleFormBuilder.Models.FormFieldViewModel
 @{
     var h = new FieldHelper(Model, ViewData);
-    // Field value (Default Value) first, then appsettings fallback, then treated as empty.
-    var siteKey = !string.IsNullOrWhiteSpace(Model.DefaultValue)
-        ? Model.DefaultValue
+    // Field value (siteKey attribute) first, then appsettings fallback, then treated as empty.
+    var fieldSiteKey = h.Attr("siteKey");
+    var siteKey = !string.IsNullOrWhiteSpace(fieldSiteKey)
+        ? fieldSiteKey
         : TurnstileOptions.Value.SiteKey;
 }
 
 @if (string.IsNullOrWhiteSpace(siteKey))
 {
-    <!-- Turnstile field has no Site Key (set it in the field's "Default Value" or in appsettings uTProFormAddon:Turnstile:SiteKey). -->
+    <!-- Turnstile field has no Site Key (set it in the field's "Site Key" setting or in appsettings uTProFormAddon:Turnstile:SiteKey). -->
 }
 else
 {
