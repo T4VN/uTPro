@@ -22,8 +22,8 @@ else
                     @await Component.InvokeAsync("uTProSimpleForm", new
                     {
                         alias = Model.Content.ContactForm,
-                        submitBtnText = @Umbraco.GetDictionaryValue("Submit"),
-                        resetBtnText = @Umbraco.GetDictionaryValue("Reset"),
+                        submitBtnText = Umbraco.GetDictionaryValue("Submit"),
+                        resetBtnText = Umbraco.GetDictionaryValue("Reset"),
                     })
                 </section>
             </div>
