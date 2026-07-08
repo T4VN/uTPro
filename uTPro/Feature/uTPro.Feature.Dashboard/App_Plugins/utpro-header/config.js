@@ -10,7 +10,7 @@ export const UTPRO = {
     title: 'uTPro',
     subtitle: 'Umbraco Turbo Pro',
     versionApi: `${API_BASE}/version`,                       // installed + latest + updateAvailable
-    versionRefreshApi: `${API_BASE}/version/refresh`,        // force a fresh GitHub lookup (clears server cache)
+    versionRefreshApi: `${API_BASE}/version?refresh=true`,   // force a fresh GitHub lookup (clears server cache)
     statsApi: `${API_BASE}/stats`,                           // site statistics
     currentUserApi: `${API_BASE}/current-user`,              // backoffice user
     recentActivityApi: `${API_BASE}/recent-activity`,        // all users' recent activity
@@ -84,7 +84,7 @@ export async function fetchVersionInfo(authContext) {
 // shape as fetchVersionInfo. Falls back to the existing/default info if the call fails.
 export async function refreshVersionInfo(authContext) {
     _versionCache = null;
-    const data = await apiSend(UTPRO.versionRefreshApi, authContext, 'POST');
+    const data = await apiSend(UTPRO.versionRefreshApi, authContext, 'GET');
     if (!data) {
         return _versionCache || {
             installed: '', latest: '', updateAvailable: false,

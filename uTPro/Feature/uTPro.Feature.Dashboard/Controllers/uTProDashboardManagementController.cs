@@ -37,15 +37,16 @@ public class uTProDashboardManagementController(
     private const string GitHubRepo = "T4VN/uTPro";
     private const string LatestVersionCacheKey = "uTPro.Dashboard.LatestVersion";
 
+    // Installed + latest version info. Pass ?refresh=true (used by the "Check for Update"
+    // button) to drop the cached GitHub result and re-fetch immediately instead of waiting
+    // for the 1-hour cache to expire. Kept as a GET because it's idempotent and only
+    // invalidates a cache — no CSRF-sensitive state change, so no antiforgery token needed.
     [HttpGet("version")]
-    public Task<IActionResult> Version() => GetVersionResultAsync();
-
-    // Forces a fresh GitHub lookup: drops the cached latest-version value and re-fetches,
-    // instead of waiting for the 1-hour cache to expire. Used by the "Check for Update" button.
-    [HttpPost("version/refresh")]
-    public Task<IActionResult> RefreshVersion()
+    public Task<IActionResult> Version([FromQuery] bool refresh = false)
     {
-        memoryCache.Remove(LatestVersionCacheKey);
+        if (refresh)
+            memoryCache.Remove(LatestVersionCacheKey);
+
         return GetVersionResultAsync();
     }
 
