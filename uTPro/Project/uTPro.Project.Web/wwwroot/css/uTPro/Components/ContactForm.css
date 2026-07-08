@@ -104,3 +104,44 @@
         padding-top: 0;
     }
 }
+
+/* ── File attachment field (uTProForm file type) ── */
+.contactform form input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 0.65em 0.75em;
+    color: var(--utp-text);
+    background: var(--utp-bg-input);
+    border: none;
+    border-radius: var(--utp-radius);
+    box-shadow: inset 0 0 0 1px var(--utp-border-input);
+    font-size: 0.95em;
+    line-height: 1.5em;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+    .contactform form input[type="file"]:focus {
+        outline: none;
+        background: var(--utp-bg-input-active);
+    }
+
+    /* "Choose File" button */
+    .contactform form input[type="file"]::file-selector-button {
+        margin-right: 1em;
+        padding: 0.5em 1.25em;
+        color: var(--utp-text-white);
+        background: var(--utp-dark-btn);
+        border: none;
+        border-radius: var(--utp-radius);
+        box-shadow: inset 0 0 2px 0 rgba(255, 255, 255, 0.5);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: background 0.2s ease-in-out;
+    }
+
+        .contactform form input[type="file"]::file-selector-button:hover {
+            background: var(--utp-text);
+        }

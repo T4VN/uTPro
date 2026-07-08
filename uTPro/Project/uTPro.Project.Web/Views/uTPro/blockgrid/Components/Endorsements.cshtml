@@ -34,7 +34,7 @@ else
                             <h3><a href="@content.Link?.Url" target="_blank" rel="noopener">@content.Title</a></h3>
                             <p>@content.Description</p>
                             <ul class="actions">
-                                <li><a href="@content.Link?.Url" target="_blank" class="button style3">Learn More</a></li>
+                                <li><a href="@content.Link?.Url" target="_blank" class="button style3">@Umbraco.GetDictionaryValue("LearnMore")</a></li>
                             </ul>
                         </section>
                     </div>
