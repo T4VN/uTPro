@@ -1,0 +1,32 @@
+{
+    "name": "uTPro Header App",
+    "version": "1.0.0",
+    "extensions": [
+        {
+            "type": "headerApp",
+            "alias": "uTPro.HeaderApp",
+            "name": "uTPro Header App",
+            "element": "/App_Plugins/utpro-header/header-app.element.js",
+            "elementName": "utpro-header-app",
+            "weight": -1000
+        },
+        {
+            "type": "dashboard",
+            "alias": "uTPro.Dashboard",
+            "name": "uTPro Dashboard",
+            "element": "/App_Plugins/utpro-header/dashboard.element.js",
+            "elementName": "utpro-dashboard",
+            "weight": 1000,
+            "meta": {
+                "label": "uTPro",
+                "pathname": "utpro"
+            },
+            "conditions": [
+                {
+                    "alias": "Umb.Condition.SectionAlias",
+                    "match": "Umb.Section.Content"
+                }
+            ]
+        }
+    ]
+}

@@ -41,12 +41,12 @@
             {
                 bool isSelected = CurrentSite.CurrentCulture.Name.Equals(item.Culture, StringComparison.OrdinalIgnoreCase);
 
-                var url = CurrentSite.GetUrlWithCulture(Model, item.Culture, UrlMode.Auto);
+                var url = CurrentSite.GetUrlWithCulture(Model, item.Culture, UrlMode.Absolute);
                 if (url == "#" || string.IsNullOrEmpty(url))
                 {
                     if (homePage != null)
                     {
-                        url = CurrentSite.GetUrlWithCulture(homePage, item.Culture, UrlMode.Auto);
+                        url = CurrentSite.GetUrlWithCulture(homePage, item.Culture, UrlMode.Absolute);
                     }
                 }
                 if (string.IsNullOrEmpty(url))

@@ -159,6 +159,10 @@ textarea {
 	appearance: none;
 }
 
+textarea {
+	resize: vertical;
+}
+
 /* Basic */
 
 @-ms-viewport {

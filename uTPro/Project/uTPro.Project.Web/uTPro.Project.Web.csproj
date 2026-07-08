@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<CompressionEnabled>false</CompressionEnabled>
-		<!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
+    <Version>17.0.5</Version>
   </PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="Controllers\Api\**" />
@@ -13,8 +13,6 @@
 		<None Remove="Controllers\Api\**" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Content Include="App_Plugins\assets\img\bkg-login.jpg" />
-	  <Content Include="App_Plugins\assets\img\logo.svg" />
 	  <Content Include="App_Plugins\cms-screen\index.js" />
 	  <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
 	  <Content Include="App_Plugins\cms-screen\style.css" />
@@ -32,6 +30,7 @@
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.21.0" />
 		<ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
 		<ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
+		<ProjectReference Include="..\..\Feature\uTPro.Feature.Dashboard\uTPro.Feature.Dashboard.csproj" />
 		<ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
 		<ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
 		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
@@ -45,5 +44,18 @@
 		<RazorCompileOnPublish>true</RazorCompileOnPublish>
 	</PropertyGroup>
 
+	<!-- Sync the uTPro Dashboard feature's backoffice assets into this web app's App_Plugins
+	     so Umbraco serves them directly from the content root. Source of truth lives in
+	     uTPro.Feature.Dashboard/App_Plugins; this copy runs on every build (static files are
+	     not locked by the running site, unlike DLLs). -->
+	<Target Name="CopyUtproDashboardAppPlugins" BeforeTargets="BeforeBuild;Build;BeforePublish;Publish">
+		<ItemGroup>
+			<_UtproDashboardAppPlugins Include="$(MSBuildThisFileDirectory)..\..\Feature\uTPro.Feature.Dashboard\App_Plugins\**\*.*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(_UtproDashboardAppPlugins)"
+			  DestinationFiles="@(_UtproDashboardAppPlugins-&gt;'$(MSBuildThisFileDirectory)App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')"
+			  SkipUnchangedFiles="true"
+			  OverwriteReadOnlyFiles="true" />
+	</Target>
 
 </Project>

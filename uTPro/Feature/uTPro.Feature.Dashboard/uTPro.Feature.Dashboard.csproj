@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Serve wwwroot at the site root so App_Plugins/utpro-header resolves at
+         its declared absolute path (/App_Plugins/utpro-header/...). -->
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="App_Plugins\cms-screen\index.js" />
+    <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
+    <Content Include="App_Plugins\cms-screen\style.css" />
+    <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
+    <Content Include="App_Plugins\utpro-header\umbraco-package.json" />
+    <Content Include="App_Plugins\utpro-header\config.js" />
+    <Content Include="App_Plugins\utpro-header\dashboard.element.js" />
+    <Content Include="App_Plugins\utpro-header\header-app.element.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\uTPro.Common\uTPro.Common.csproj" />
+  </ItemGroup>
+
+</Project>

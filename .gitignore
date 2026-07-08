@@ -481,3 +481,8 @@ umbraco-package-schema.json
 
 **/usync/Snapshots
 /Deploy
+
+# uTPro backoffice assets are generated into the web app's App_Plugins at build time
+# (CopyUtproDashboardAppPlugins target). Source of truth lives in
+# uTPro.Feature.Dashboard/App_Plugins — do not commit the generated web copy.
+/uTPro/Project/uTPro.Project.Web/App_Plugins/
