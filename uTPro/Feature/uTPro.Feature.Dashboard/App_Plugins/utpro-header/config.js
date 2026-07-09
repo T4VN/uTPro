@@ -15,6 +15,8 @@ export const UTPRO = {
     currentUserApi: `${API_BASE}/current-user`,              // backoffice user
     recentActivityApi: `${API_BASE}/recent-activity`,        // all users' recent activity
     myActivityApi: `${API_BASE}/my-activity`,                // current user's recent activity
+    recentTrailApi: `${API_BASE}/recent-trail`,              // all users' recent audit trail
+    myTrailApi: `${API_BASE}/my-trail`,                      // current user's recent audit trail
     releasesUrl: 'https://github.com/T4VN/uTPro/releases',   // "Update" target
     website: 'https://github.com/T4VN/uTPro',                // "Website" target
     dashboardPath: '/umbraco/section/content/dashboard/utpro', // uTPro dashboard tab
@@ -117,4 +119,12 @@ export async function fetchRecentActivity(authContext) {
 }
 export async function fetchMyActivity(authContext) {
     return (await apiGet(UTPRO.myActivityApi, authContext)) || [];
+}
+
+// Recent audit trail (umbracoAudit): sign-in, save, user management, etc.
+export async function fetchRecentTrail(authContext) {
+    return (await apiGet(UTPRO.recentTrailApi, authContext)) || [];
+}
+export async function fetchMyTrail(authContext) {
+    return (await apiGet(UTPRO.myTrailApi, authContext)) || [];
 }

@@ -1,7 +1,7 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { UTPRO, fetchVersionInfo, refreshVersionInfo, fetchStats, fetchCurrentUser, fetchRecentActivity, fetchMyActivity } from './config.js';
+import { UTPRO, fetchVersionInfo, refreshVersionInfo, fetchStats, fetchCurrentUser, fetchRecentActivity, fetchMyActivity, fetchRecentTrail, fetchMyTrail } from './config.js';
 
 // "08 Jul 2026 04:36"
 const fmtDate = (value) => {
@@ -32,6 +32,22 @@ const ACTION_BADGES = {
 };
 const actionInfo = (type) => ACTION_BADGES[(type || '').toLowerCase()] || { label: type || 'Action', color: 'default' };
 
+// Friendly label for the audited entity type (e.g. "Document" -> "Content").
+const ENTITY_LABELS = {
+    document: 'Content',
+    media: 'Media',
+    member: 'Member',
+    dictionaryitem: 'Dictionary',
+    template: 'Template',
+    datatype: 'Data Type',
+    contenttype: 'Document Type',
+    mediatype: 'Media Type',
+    language: 'Language',
+    user: 'User',
+    usergroup: 'User Group',
+};
+const entityTypeLabel = (entityType) => ENTITY_LABELS[(entityType || '').toLowerCase()] || entityType;
+
 // Built from the server-provided website/releases URLs (single source of truth: the repo
 // configured on the backend), with the static Umbraco docs link.
 const buildResources = (website, releasesUrl) => [
@@ -53,6 +69,9 @@ export class UtproDashboardElement extends UmbLitElement {
         _user: { state: true },
         _myActivity: { state: true },
         _allActivity: { state: true },
+        _myTrail: { state: true },
+        _allTrail: { state: true },
+        _collapsed: { state: true },
     };
 
     constructor() {
@@ -67,6 +86,10 @@ export class UtproDashboardElement extends UmbLitElement {
         this._user = null;
         this._myActivity = null;
         this._allActivity = null;
+        this._myTrail = null;
+        this._allTrail = null;
+        // Per-card collapsed state. Trail cards start collapsed; activity cards expanded.
+        this._collapsed = { myTrail: true, allTrail: true, myActivity: false, allActivity: false };
         this._authContext = null;
 
         // All data comes from the authenticated management API, so load once auth is ready.
@@ -83,6 +106,8 @@ export class UtproDashboardElement extends UmbLitElement {
             this._user = await fetchCurrentUser(ctx);
             this._myActivity = await fetchMyActivity(ctx);
             this._allActivity = await fetchRecentActivity(ctx);
+            this._myTrail = await fetchMyTrail(ctx);
+            this._allTrail = await fetchRecentTrail(ctx);
         });
     }
 
@@ -171,10 +196,35 @@ export class UtproDashboardElement extends UmbLitElement {
                 </div>
             </uui-box>
             <div class="activity-grid">
-                ${this.#activityCard('Your recent activity', this._myActivity, false)}
-                ${this.#activityCard('All recent activity', this._allActivity, true)}
+                ${this.#trailCard('myTrail', 'Your recent trail', this._myTrail, false)}
+                ${this.#trailCard('allTrail', 'All recent trail', this._allTrail, true)}
+            </div>
+            <div class="activity-grid">
+                ${this.#activityCard('myActivity', 'Your recent activity', this._myActivity, false)}
+                ${this.#activityCard('allActivity', 'All recent activity', this._allActivity, true)}
             </div>
         `;
+    }
+
+    // Toggles a card's collapsed state (new object so Lit re-renders).
+    #toggleCollapse(key) {
+        this._collapsed = { ...this._collapsed, [key]: !this._collapsed[key] };
+    }
+
+    // Header toggle button placed in the box's header-actions slot. Uses uui-symbol-expand,
+    // an animated caret that points down when collapsed and rotates up when open.
+    #collapseToggle(key) {
+        const collapsed = this._collapsed[key];
+        return html`
+            <uui-button
+                slot="header-actions"
+                look="default"
+                compact
+                label=${collapsed ? 'Expand' : 'Collapse'}
+                title=${collapsed ? 'Expand' : 'Collapse'}
+                @click=${() => this.#toggleCollapse(key)}>
+                <uui-symbol-expand ?open=${!collapsed}></uui-symbol-expand>
+            </uui-button>`;
     }
 
     // Backoffice edit URL for a content/media node (null for other entity types).
@@ -183,15 +233,16 @@ export class UtproDashboardElement extends UmbLitElement {
         const t = (entityType || '').toLowerCase();
         if (t === 'document') return `/umbraco/section/content/workspace/document/edit/${nodeKey}`;
         if (t === 'media') return `/umbraco/section/media/workspace/media/edit/${nodeKey}`;
+        if (t === 'dictionaryitem') return `/umbraco/section/translation/workspace/dictionary/edit/${nodeKey}`;
         return null;
     }
 
     // A "recent activity" card. items === null while loading; [] when empty.
-    #activityCard(headline, items, showUser) {
+    #activityCard(key, headline, items, showUser) {
         return html`
             <uui-box class="activity-box" headline=${headline}>
-                <uui-icon slot="header-actions" name="icon-time"></uui-icon>
-                ${items === null
+                ${this.#collapseToggle(key)}
+                ${this._collapsed[key] ? nothing : (items === null
                     ? html`<div class="muted">Loading…</div>`
                     : items.length === 0
                         ? html`<div class="muted">No activity yet.</div>`
@@ -209,12 +260,38 @@ export class UtproDashboardElement extends UmbLitElement {
                                             : html`<span class="act-detail">${a.action}</span>`}
                                     </div>
                                     <div class="act-meta">
-                                        ${fmtDate(a.date)}${showUser && a.user ? html` · ${a.user}` : ''}
+                                        ${fmtDate(a.date)}${showUser && a.user ? html` · ${a.user}` : ''}${a.entityType ? html` · <span class="act-type">${entityTypeLabel(a.entityType)}</span>` : ''}
                                     </div>
                                 </div>
                                 <uui-tag look="secondary" color=${b.color} class="act-tag">${b.label}</uui-tag>
                             </div>`;
-                        })}
+                        }))}
+            </uui-box>
+        `;
+    }
+
+    // An audit-trail card (from umbracoAudit): the raw eventType is the headline, with the
+    // details/affected as a subtitle and the timestamp + optional user in the meta line.
+    #trailCard(key, headline, items, showUser) {
+        return html`
+            <uui-box class="activity-box" headline=${headline}>
+                ${this.#collapseToggle(key)}
+                ${this._collapsed[key] ? nothing : (items === null
+                    ? html`<div class="muted">Loading…</div>`
+                    : items.length === 0
+                        ? html`<div class="muted">No trail yet.</div>`
+                        : items.map((a) => html`
+                            <div class="act">
+                                <div class="act-main">
+                                    <div class="act-action">
+                                        <span class="act-detail">${a.details || a.affected || a.type}</span>
+                                    </div>
+                                    <div class="act-meta">
+                                        ${fmtDate(a.date)}${showUser && a.user ? html` · ${a.user}` : ''}
+                                    </div>
+                                </div>
+                                <uui-tag look="secondary" color="default" class="act-tag">${a.type}</uui-tag>
+                            </div>`))}
             </uui-box>
         `;
     }
@@ -344,6 +421,9 @@ export class UtproDashboardElement extends UmbLitElement {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 18px;
+            /* Size each card to its own content so a collapsed card doesn't stretch
+               to match a taller expanded sibling. */
+            align-items: start;
         }
         .act {
             display: flex;
@@ -364,6 +444,7 @@ export class UtproDashboardElement extends UmbLitElement {
         }
         .act-action a:hover { text-decoration: underline; }
         .act-meta { font-size: 0.75rem; color: var(--uui-color-text-alt, #868686); margin-top: 2px; }
+        .act-type { font-weight: 600; }
 
         .card { width: 100%; }
 

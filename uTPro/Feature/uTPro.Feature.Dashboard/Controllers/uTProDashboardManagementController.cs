@@ -37,6 +37,12 @@ public class uTProDashboardManagementController(
     private const string GitHubRepo = "T4VN/uTPro";
     private const string LatestVersionCacheKey = "uTPro.Dashboard.LatestVersion";
 
+    // umbracoLog.entityType value Umbraco writes for dictionary item audit entries
+    // (Create/Update/Delete DictionaryItem). Its NodeId is the dictionary item's integer id,
+    // which maps to cmsDictionary.pk (not umbracoNode.id), so the name/key must be resolved
+    // from cmsDictionary instead of umbracoNode.
+    private const string DictionaryEntityType = "DictionaryItem";
+
     // Installed + latest version info. Pass ?refresh=true (used by the "Check for Update"
     // button) to drop the cached GitHub result and re-fetch immediately instead of waiting
     // for the 1-hour cache to expire. Kept as a GET because it's idempotent and only
@@ -118,15 +124,22 @@ public class uTProDashboardManagementController(
         string L(string c) => "l." + syntax.GetQuotedColumnName(c);
         string U(string c) => "u." + syntax.GetQuotedColumnName(c);
         string N(string c) => "n." + syntax.GetQuotedColumnName(c);
+        string D(string c) => "d." + syntax.GetQuotedColumnName(c);
+
+        // Dictionary items are not umbracoNode rows: resolve their name (the dictionary key,
+        // e.g. "uTPro.Form.ContactUs.Message") and edit key (guid) from cmsDictionary instead.
+        var nodeName = $"CASE WHEN {L("entityType")} = '{DictionaryEntityType}' THEN {D("key")} ELSE {N("text")} END";
+        var nodeKey = $"CASE WHEN {L("entityType")} = '{DictionaryEntityType}' THEN {D("id")} ELSE {N("uniqueId")} END";
 
         var sql = scope.SqlContext.Sql()
             .Select($@"{L("Datestamp")} AS Datestamp, {L("userId")} AS UserId,
                        {L("logHeader")} AS LogHeader, {L("logComment")} AS LogComment,
                        {L("entityType")} AS EntityType, {U("userName")} AS UserName,
-                       {N("text")} AS NodeName, {N("uniqueId")} AS NodeKey")
+                       {nodeName} AS NodeName, {nodeKey} AS NodeKey")
             .From($"{syntax.GetQuotedTableName("umbracoLog")} l")
             .LeftJoin($"{syntax.GetQuotedTableName("umbracoUser")} u").On($"{U("id")} = {L("userId")}")
             .LeftJoin($"{syntax.GetQuotedTableName("umbracoNode")} n").On($"{N("id")} = {L("NodeId")}")
+            .LeftJoin($"{syntax.GetQuotedTableName("cmsDictionary")} d").On($"{D("pk")} = {L("NodeId")}")
             // Skip noise ("Open" = just viewing a node in the backoffice).
             .Where($"{L("logHeader")} <> @0", "Open");
 
@@ -158,6 +171,75 @@ public class uTProDashboardManagementController(
         if (!string.IsNullOrWhiteSpace(r.LogComment))
             return r.LogComment!;
         return r.LogHeader ?? string.Empty;
+    }
+
+    // Recent audit trail across all users (from umbracoAudit — logins, saves, user changes, etc.).
+    [HttpGet("recent-trail")]
+    public IActionResult RecentTrail() => Ok(GetAuditTrail(null));
+
+    // The current user's own recent audit trail.
+    [HttpGet("my-trail")]
+    public IActionResult MyTrail()
+    {
+        var user = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (user == null) return Unauthorized();
+        return Ok(GetAuditTrail(user.Id));
+    }
+
+    // Reads the newest entries from umbracoAudit (the "Audit Trail"), joined to the performing
+    // user for a display name. These are cross-cutting events (sign-in, save, user management)
+    // rather than content actions.
+    private IEnumerable<object> GetAuditTrail(int? userId)
+    {
+        using var scope = scopeProvider.CreateScope(autoComplete: true);
+        var syntax = scope.SqlContext.SqlSyntax;
+
+        string A(string c) => "au." + syntax.GetQuotedColumnName(c);
+        string P(string c) => "p." + syntax.GetQuotedColumnName(c);
+
+        var sql = scope.SqlContext.Sql()
+            .Select($@"{A("eventDateUtc")} AS EventDateUtc, {A("performingUserId")} AS UserId,
+                       {A("eventType")} AS EventType, {A("eventDetails")} AS EventDetails,
+                       {A("performingIp")} AS PerformingIp, {A("affectedDetails")} AS AffectedDetails,
+                       {A("performingDetails")} AS PerformingDetails, {P("userName")} AS UserName")
+            .From($"{syntax.GetQuotedTableName("umbracoAudit")} au")
+            .LeftJoin($"{syntax.GetQuotedTableName("umbracoUser")} p").On($"{P("id")} = {A("performingUserId")}");
+
+        if (userId.HasValue)
+            sql = sql.Where($"{A("performingUserId")} = @0", userId.Value);
+
+        sql = sql.OrderBy($"{A("eventDateUtc")} DESC, {A("id")} DESC");
+
+        var rows = scope.Database.Page<AuditTrailRow>(1, ActivityTake, sql).Items;
+
+        return rows.Select(r => new
+        {
+            date = DateTime.SpecifyKind(r.EventDateUtc, DateTimeKind.Utc),
+            user = ResolveUser(r.UserName, r.PerformingDetails, r.UserId),
+            type = r.EventType ?? string.Empty,
+            details = r.EventDetails ?? string.Empty,
+            ip = r.PerformingIp ?? string.Empty,
+            affected = r.AffectedDetails ?? string.Empty,
+        }).ToList();
+    }
+
+    private static string ResolveUser(string? userName, string? performingDetails, int? userId)
+    {
+        if (!string.IsNullOrWhiteSpace(userName)) return userName!;
+        if (!string.IsNullOrWhiteSpace(performingDetails)) return performingDetails!;
+        return userId.HasValue ? $"User {userId}" : "SYSTEM";
+    }
+
+    private class AuditTrailRow
+    {
+        public DateTime EventDateUtc { get; set; }
+        public int? UserId { get; set; }
+        public string? EventType { get; set; }
+        public string? EventDetails { get; set; }
+        public string? PerformingIp { get; set; }
+        public string? AffectedDetails { get; set; }
+        public string? PerformingDetails { get; set; }
+        public string? UserName { get; set; }
     }
 
     private class ActivityRow
