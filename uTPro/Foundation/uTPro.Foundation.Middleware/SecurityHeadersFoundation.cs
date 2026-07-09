@@ -107,7 +107,14 @@ namespace uTPro.Foundation.Middleware
 
                 return result.Count > 0 ? result : null;
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
+            {
+                // Fail open (no headers) rather than 500 — a settings/content lookup issue
+                // must never take the frontend down.
+                logger.LogWarning(ex, "Failed to resolve security headers; skipping for this request.");
+                return null;
+            }
+            catch (ArgumentException ex)
             {
                 // Fail open (no headers) rather than 500 — a settings/content lookup issue
                 // must never take the frontend down.
@@ -126,7 +133,8 @@ namespace uTPro.Foundation.Middleware
         private static IGlobalSecurityHeadersSettings? TryRead(Func<IPublishedContent?> getter)
         {
             try { return getter() as IGlobalSecurityHeadersSettings; }
-            catch { return null; }
+            catch (InvalidOperationException) { return null; }
+            catch (ObjectDisposedException) { return null; }
         }
 
         private string[] GetBackofficeHosts()

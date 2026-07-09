@@ -64,7 +64,17 @@ namespace uTPro.Foundation
                 var safeFileName = guidFile + "-" + FileNameHelper.GetValidFileName(filename);
                 return type + "/" + safeFileName;
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return base.GetFilePath(fileSystem, itemGuid, propertyGuid, filename);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return base.GetFilePath(fileSystem, itemGuid, propertyGuid, filename);
+            }
+            catch (FormatException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return base.GetFilePath(fileSystem, itemGuid, propertyGuid, filename);
@@ -93,11 +103,11 @@ namespace uTPro.Foundation
                 var parsedDirectories = fileSystem.GetDirectories(type)
                     .Select(directory => (Parsed: long.TryParse(directory, out var folderNumber), FolderNumber: folderNumber))
                     .Where(x => x.Parsed);
-                foreach (var directory in parsedDirectories)
-                {
-                    if (directory.FolderNumber > _folderCounter)
-                        _folderCounter = directory.FolderNumber;
-                }
+                var maxFolderNumber = parsedDirectories
+                    .Select(x => x.FolderNumber)
+                    .DefaultIfEmpty(_folderCounter)
+                    .Max();
+                _folderCounter = Math.Max(_folderCounter, maxFolderNumber);
 
                 // note: not multi-domains ie LB safe as another domain could create directories
                 // while we read and parse them - don't fix, move to new scheme eventually

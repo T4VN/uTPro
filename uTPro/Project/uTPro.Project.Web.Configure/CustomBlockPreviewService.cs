@@ -30,14 +30,10 @@ namespace uTPro.Project.Web.Configure
             var blockGrid = CustomPathViews.GetPathViewBlockGridPreview("~/Views/Partials/blockgrid/Components/" + context.ContentAlias, isCheckSiteName: false);
             if (!string.IsNullOrEmpty(blockGrid))
             {
-                if (string.IsNullOrEmpty(Path.GetExtension(blockGrid)))
-                {
-                    return _razorViewEngine.GetView("", viewPath: blockGrid + ".cshtml", isMainPage: false);
-                }
-                else
-                {
-                    return _razorViewEngine.GetView("", viewPath: blockGrid, isMainPage: false);
-                }
+                return _razorViewEngine.GetView(
+                    "",
+                    viewPath: string.IsNullOrEmpty(Path.GetExtension(blockGrid)) ? blockGrid + ".cshtml" : blockGrid,
+                    isMainPage: false);
             }
             return base.GetViewResult(context);
         }
