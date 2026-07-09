@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
 		<CompressionEnabled>true</CompressionEnabled>
-    <Version>17.1.0</Version>
+    <Version>17.2.0</Version>
   </PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="Controllers\Api\**" />
