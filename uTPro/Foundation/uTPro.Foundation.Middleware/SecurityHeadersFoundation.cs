@@ -133,7 +133,9 @@ namespace uTPro.Foundation.Middleware
         private static IGlobalSecurityHeadersSettings? TryRead(Func<IPublishedContent?> getter)
         {
             try { return getter() as IGlobalSecurityHeadersSettings; }
-            catch { return null; }
+            catch (InvalidOperationException) { return null; }
+            catch (ObjectDisposedException) { return null; }
+            catch (NullReferenceException) { return null; }
         }
 
         private string[] GetBackofficeHosts()
