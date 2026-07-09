@@ -316,9 +316,9 @@ export class UtproDashboardElement extends UmbLitElement {
                         : this.#checkButton()}
                 </div>
                 <hr>
-                ${this.#row('Engine Components', html`<uui-icon name="icon-chip"></uui-icon>`)}
-                ${this.#row('Runtime', s ? s.runtimeVersion : '…')}
-                ${this.#row('Core CMS', s ? 'Umbraco ' + s.umbracoVersion : '…')}
+                ${this.#row('Platform & Dependencies', html`<uui-icon name="icon-chip"></uui-icon>`)}
+                ${this.#row('Runtime environment', s ? s.runtimeVersion : '…')}
+                ${this.#row('Base CMS', s ? 'Umbraco ' + s.umbracoVersion : '…')}
             </uui-box>
 
             <uui-box class="card" headline="Site">

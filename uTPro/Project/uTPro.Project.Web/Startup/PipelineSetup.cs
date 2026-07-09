@@ -13,6 +13,10 @@ public static class PipelineSetup
 {
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
+        // Must run first: rewrites RemoteIpAddress/scheme from X-Forwarded-* so everything
+        // downstream (HTTPS redirect, rate limiting, logging) sees the real client.
+        app.UseForwardedHeadersIfEnabled();
+
         app.UseFrontendCaching();
         app.UseHttpsRedirection();
 
