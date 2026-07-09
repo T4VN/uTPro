@@ -175,10 +175,9 @@ namespace uTPro.Extension
                 return null;
             });
 
-            foreach (var value in parsedValues)
+            foreach (var value in parsedValues.Where(v => v > 0))
             {
-                if (value > 0)
-                    set.Add(value.Value);
+                set.Add(value!.Value);
             }
         }
 
