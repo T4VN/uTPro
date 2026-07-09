@@ -64,7 +64,17 @@ namespace uTPro.Foundation
                 var safeFileName = guidFile + "-" + FileNameHelper.GetValidFileName(filename);
                 return type + "/" + safeFileName;
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return base.GetFilePath(fileSystem, itemGuid, propertyGuid, filename);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return base.GetFilePath(fileSystem, itemGuid, propertyGuid, filename);
+            }
+            catch (FormatException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return base.GetFilePath(fileSystem, itemGuid, propertyGuid, filename);
