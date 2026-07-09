@@ -1,29 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.PublishedModels;
 
 namespace uTPro.Extension.CurrentSite
 {
-    class DICurrentItemExtension : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-            => builder.Services.AddScoped<ICurrentItemExtension, CurrentItemExtension>();
-    }
-
-    public interface ICurrentItemExtension
-    {
-        GlobalRoot Root { get; }
-        GlobalFolderSites FolderSite { get; }
-        GlobalFolderSettings FolderSettings { get; }
-        IPublishedContent? Current { get; }
-        IPublishedContent? PageHome { get; }
-        IPublishedContent? PageErrors { get; }
-    }
-
     /// <summary>
     /// Scoped service that resolves the current site's content tree nodes.
     /// All properties are memoized per-request to avoid repeated tree traversals

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using System.Xml.Linq;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.PublishedModels;
 using uTPro.Common.Constants;
@@ -11,17 +9,6 @@ using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Foundation.Sitemap
 {
-    class DISitemapFoundation : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-            => builder.Services.AddScoped<ISitemapFoundation, SitemapFoundation>();
-    }
-
-    public interface ISitemapFoundation
-    {
-        string Generate();
-    }
-
     internal class SitemapFoundation : ISitemapFoundation
     {
         private const string FileSitemapXSL = "sitemap.xsl";

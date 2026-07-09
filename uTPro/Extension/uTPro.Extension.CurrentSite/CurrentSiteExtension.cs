@@ -15,28 +15,6 @@ using static Umbraco.Cms.Core.Constants.Conventions;
 
 namespace uTPro.Extension.CurrentSite
 {
-    class DICurrentSiteExtension : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-            => builder.Services.AddScoped<ICurrentSiteExtension, CurrentSiteExtension>();
-    }
-
-    public interface ICurrentSiteExtension
-    {
-        IConfiguration Configuration { get; }
-        IWebHostEnvironment WebHostEnvironment { get; }
-        string DefaultCulture { get; }
-        CultureInfo CurrentCulture { get; }
-        string CurrentPage { get; }
-        IEnumerable<PublishedCultureInfo> GetCultures();
-        IUmbracoContext UContext { get; }
-        string GetDictionaryValue(string key, string valueDefault = "", bool showKey = false);
-        void SetCurrentCulture(CultureInfo cul);
-        ICurrentItemExtension GetItem();
-        IReadOnlyList<Domain> GetDomains(bool isGetAll);
-        string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default);
-    }
-
     internal class CurrentSiteExtension : ICurrentSiteExtension
     {
         private readonly ILogger<CurrentSiteExtension> _logger;

@@ -30,7 +30,9 @@ else
                 {
                     <div class="col-4 col-12-medium">
                         <section class="highlight">
-                            <a href="@content.Link?.Url" target="_blank" rel="noopener" class="image featured"><img src="@content.Image?.Url()" alt="@content.Title" loading="lazy" decoding="async" /></a>
+                            <a href="@content.Link?.Url" target="_blank" rel="noopener" class="image featured">
+                                @content.Image.ResponsiveImg(content.Title)
+                            </a>
                             <h3><a href="@content.Link?.Url" target="_blank" rel="noopener">@content.Title</a></h3>
                             <p>@content.Description</p>
                             <ul class="actions">

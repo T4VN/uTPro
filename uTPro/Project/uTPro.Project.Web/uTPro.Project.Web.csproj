@@ -3,8 +3,9 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<CompressionEnabled>false</CompressionEnabled>
-    <Version>17.1.0</Version>
+		<!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
+		<CompressionEnabled>true</CompressionEnabled>
+    <Version>17.2.1</Version>
   </PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="Controllers\Api\**" />
@@ -12,13 +13,6 @@
 		<EmbeddedResource Remove="Controllers\Api\**" />
 		<None Remove="Controllers\Api\**" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="App_Plugins\cms-screen\index.js" />
-	  <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
-	  <Content Include="App_Plugins\cms-screen\style.css" />
-	  <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
 		<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />
@@ -30,7 +24,6 @@
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.21.0" />
 		<ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
 		<ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
-		<ProjectReference Include="..\..\Feature\uTPro.Feature.Dashboard\uTPro.Feature.Dashboard.csproj" />
 		<ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
 		<ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
 		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />

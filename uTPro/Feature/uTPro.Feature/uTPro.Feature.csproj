@@ -16,8 +16,12 @@
 
   <ItemGroup>
     <PackageReference Include="uTPro.Feature.AuditLog" Version="4.0.3" />
-    <PackageReference Include="uTPro.Feature.FileManager" Version="2.0.1" />
-    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="2.2.0" />
+    <PackageReference Include="uTPro.Feature.FileManager" Version="2.1.0" />
+    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\uTPro.Feature.Dashboard\uTPro.Feature.Dashboard.csproj" />
   </ItemGroup>
 
 </Project>
