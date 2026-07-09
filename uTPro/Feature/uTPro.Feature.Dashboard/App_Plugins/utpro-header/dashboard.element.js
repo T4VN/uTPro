@@ -305,7 +305,6 @@ export class UtproDashboardElement extends UmbLitElement {
                 <uui-icon slot="header-actions" name="icon-brackets"></uui-icon>
                 ${this.#row('Product Name', UTPRO.subtitle)}
                 ${this.#row('Short Name', UTPRO.title)}
-                ${this.#row('Core version', s ? s.umbracoVersion : '…')}
                 ${this.#row('Installed version', this._current || '—')}
                 ${this.#row('Latest release', this._latest || 'unknown')}
                 <div class="card-actions">
@@ -316,6 +315,10 @@ export class UtproDashboardElement extends UmbLitElement {
                             </uui-button>`
                         : this.#checkButton()}
                 </div>
+                <hr>
+                ${this.#row('Engine Components', html`<uui-icon name="icon-chip"></uui-icon>`)}
+                ${this.#row('Runtime', s ? s.runtimeVersion : '…')}
+                ${this.#row('Core CMS', s ? 'Umbraco ' + s.umbracoVersion : '…')}
             </uui-box>
 
             <uui-box class="card" headline="Site">
