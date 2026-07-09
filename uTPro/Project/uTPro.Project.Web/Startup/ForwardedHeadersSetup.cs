@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.HttpOverrides;
 using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
@@ -59,17 +60,17 @@ public static class ForwardedHeadersSetup
             // (single reverse proxy); raise it for chained proxies (e.g. CDN -> nginx).
             options.ForwardLimit = forwardLimit ?? 1;
 
-            foreach (var proxy in knownProxies)
-            {
-                if (IPAddress.TryParse(proxy, out var ip))
-                    options.KnownProxies.Add(ip);
-            }
+            var parsedProxies = knownProxies
+                .Select(proxy => (Ok: IPAddress.TryParse(proxy, out var ip), Ip: ip))
+                .Where(x => x.Ok);
+            foreach (var (_, ip) in parsedProxies)
+                options.KnownProxies.Add(ip);
 
-            foreach (var network in knownNetworks)
-            {
-                if (TryParseNetwork(network, out var net))
-                    options.KnownNetworks.Add(net);
-            }
+            var parsedNetworks = knownNetworks
+                .Select(network => (Ok: TryParseNetwork(network, out var net), Net: net))
+                .Where(x => x.Ok);
+            foreach (var (_, net) in parsedNetworks)
+                options.KnownNetworks.Add(net);
         });
 
         return services;

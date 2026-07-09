@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
@@ -58,7 +59,10 @@ namespace uTPro.Foundation
                 Guid combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
                 var guidFile = GuidUtils.ToBase32String(combinedGuid, 4);
 
-                return Path.Combine(type, guidFile + "-" + FileNameHelper.GetValidFileName(filename)).Replace('\\', '/');
+                // Build the relative path with a fixed '/' separator instead of Path.Combine,
+                // which can silently drop the first segment if the file part looks rooted.
+                var safeFileName = guidFile + "-" + FileNameHelper.GetValidFileName(filename);
+                return type + "/" + safeFileName;
             }
             catch (Exception ex)
             {
@@ -86,11 +90,13 @@ namespace uTPro.Foundation
                 if (_folderCounterInitialized) return;
 
                 _folderCounter = 1000; // seed
-                var directories = fileSystem.GetDirectories(type);
-                foreach (var directory in directories)
+                var parsedDirectories = fileSystem.GetDirectories(type)
+                    .Select(directory => (Parsed: long.TryParse(directory, out var folderNumber), FolderNumber: folderNumber))
+                    .Where(x => x.Parsed);
+                foreach (var directory in parsedDirectories)
                 {
-                    if (long.TryParse(directory, out var folderNumber) && folderNumber > _folderCounter)
-                        _folderCounter = folderNumber;
+                    if (directory.FolderNumber > _folderCounter)
+                        _folderCounter = directory.FolderNumber;
                 }
 
                 // note: not multi-domains ie LB safe as another domain could create directories

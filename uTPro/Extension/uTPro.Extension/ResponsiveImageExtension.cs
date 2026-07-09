@@ -166,11 +166,19 @@ namespace uTPro.Extension
             if (raw == null)
                 return;
 
-            foreach (var item in raw)
+            var parsedValues = raw.Select(item =>
             {
                 var match = _leadingInt.Match(item ?? string.Empty);
-                if (match.Success && int.TryParse(match.Value, out var value) && value > 0)
-                    set.Add(value);
+                if (match.Success && int.TryParse(match.Value, out var value))
+                    return (int?)value;
+
+                return null;
+            });
+
+            foreach (var value in parsedValues)
+            {
+                if (value > 0)
+                    set.Add(value.Value);
             }
         }
 
@@ -190,7 +198,7 @@ namespace uTPro.Extension
                 var item = services?.GetService<ICurrentItemExtension>();
                 return item?.FolderSettings as IGlobalResponsiveImageSettings;
             }
-            catch
+            catch (InvalidOperationException)
             {
                 // No request/site context (or settings node missing) → use code defaults.
                 return null;
