@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using uTPro.Feature.SimpleFormBuilder.Models;
 using uTPro.Feature.SimpleFormBuilder.Services;
 
@@ -13,11 +11,11 @@ namespace uTPro.Feature.uTProFormAddon.Turnstile;
 /// SimpleFormBuilder package that uses only its public extension points (no package edits):
 ///   • registers a "turnstile" field type — with its own Site Key / Secret Key settings —
 ///     so it appears in the form builder's picker with dedicated labelled inputs,
-///   • registers an HttpClient + the submit-verification middleware.
+///   • registers an HttpClient + a submit-verification handler (IFormSubmissionHandler).
 ///
 /// The widget is rendered by Views/Partials/uTProSimpleForm/Fields/turnstile.cshtml. Keys are
 /// entered per form in the field's Site Key / Secret Key settings (stored in the field's
-/// Attributes) and fall back to appsettings (uTProFormAddon:Turnstile) when left blank. The
+/// Attributes) and fall back to appsettings (uTPro:Feature:Form:Addon:Turnstile) when left blank. The
 /// Failure Message reuses the field's built-in Validation Message.
 /// </summary>
 public sealed class TurnstileComposer : IComposer
@@ -33,11 +31,8 @@ public sealed class TurnstileComposer : IComposer
         builder.Services.Configure<TurnstileOptions>(
             builder.Config.GetSection(TurnstileOptions.SectionPath));
 
-        // Verify the token server-side before the SimpleFormBuilder submit endpoint runs.
-        builder.Services.Configure<UmbracoPipelineOptions>(options =>
-            options.AddFilter(new UmbracoPipelineFilter(nameof(TurnstileComposer))
-            {
-                PostRouting = app => app.UseMiddleware<TurnstileValidationMiddleware>()
-            }));
+        // Verify the token server-side as a step in the SimpleFormBuilder submission pipeline,
+        // before the entry is stored (replaces the previous PostRouting middleware).
+        builder.Services.AddSingleton<IFormSubmissionHandler, TurnstileSubmissionHandler>();
     }
 }
