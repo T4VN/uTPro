@@ -64,25 +64,19 @@ namespace uTPro.Extension
             if (item == null)
                 return null;
 
-            if (true)
+            // Auto performance media: images are served through GetCropUrl (resized + WebP);
+            // any other media type falls back to its absolute URL untouched.
+            if (item.ContentType.Alias == Constants.Conventions.MediaTypes.Image)
             {
-                //turn on auto performance media
-                switch (item.ContentType.Alias)
-                {
-                    case Constants.Conventions.MediaTypes.Image:
-                        return item.GetCropUrl(
-                            width: width
-                            , height: null
-                            , imageCropMode: Umbraco.Cms.Core.Models.ImageCropMode.Min
-                            , quality: quality
-                            , furtherOptions: "&format=" + format
-                            );
-                    default:
-                        break;
-                }
+                return item.GetCropUrl(
+                    width: width
+                    , height: null
+                    , imageCropMode: Umbraco.Cms.Core.Models.ImageCropMode.Min
+                    , quality: quality
+                    , furtherOptions: "&format=" + format
+                    );
             }
 
-            //turn off auto performance media
             return item.MediaUrl(mode: UrlMode.Absolute);
         }
     }

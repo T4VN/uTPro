@@ -44,12 +44,9 @@ namespace uTPro.Project.Web.Configure
                 return null;
 
             var cacheKey = string.Concat(type, blockType, "|", viewName + "|", siteName ?? string.Empty, "|", isCheckSiteName ? "1" : "0");
-            if (s_pathCache.TryGetValue(cacheKey, out var cached))
+            if (s_pathCache.TryGetValue(cacheKey, out var cached) && cached != null)
             {
-                if (cached != null)
-                {
-                    return cached;
-                }
+                return cached;
             }
 
             string result = viewName;
@@ -76,8 +73,8 @@ namespace uTPro.Project.Web.Configure
                 }
                 else
                 {
-                    var siteNameWithFolderTemplate = site.Split("/") ?? [];
-                    if (siteNameWithFolderTemplate.Length > 1 && siteNameWithFolderTemplate?.FirstOrDefault()?.Equals(blockType, StringComparison.OrdinalIgnoreCase) == true)
+                    var siteNameWithFolderTemplate = site.Split("/");
+                    if (siteNameWithFolderTemplate.Length > 1 && string.Equals(siteNameWithFolderTemplate[0], blockType, StringComparison.OrdinalIgnoreCase))
                     {
                         result = $"~/Views/{siteNameWithFolderTemplate[1]}/{blockType}/Templates/{string.Join("/", fileName.Split(Prefix.PrefixData))}.cshtml";
                     }

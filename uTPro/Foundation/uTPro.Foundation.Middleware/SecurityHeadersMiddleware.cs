@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -63,12 +64,8 @@ namespace uTPro.Foundation.Middleware
             if (!path.HasValue)
                 return false;
 
-            foreach (var prefix in _excludedPathPrefixes)
-            {
-                if (path.StartsWithSegments(prefix, StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-            return false;
+            return _excludedPathPrefixes.Any(prefix =>
+                path.StartsWithSegments(prefix, StringComparison.OrdinalIgnoreCase));
         }
 
         private static bool IsHtmlResponse(HttpResponse response)
