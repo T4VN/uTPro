@@ -1,7 +1,9 @@
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.HttpOverrides;
-using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
+// .NET 10: Microsoft.AspNetCore.HttpOverrides.IPNetwork and ForwardedHeadersOptions.KnownNetworks
+// are obsolete (ASPDEPR005) — use System.Net.IPNetwork and KnownIPNetworks instead.
+using IPNetwork = System.Net.IPNetwork;
 
 namespace uTPro.Project.Web.Startup;
 
@@ -42,7 +44,7 @@ public static class ForwardedHeadersSetup
 
             // ASP.NET Core trusts only loopback out of the box. Clear the defaults so the
             // operator opts into exactly the proxies/networks the app sits behind.
-            options.KnownNetworks.Clear();
+            options.KnownIPNetworks.Clear();
             options.KnownProxies.Clear();
 
             if (trustAllProxies)
@@ -51,8 +53,8 @@ public static class ForwardedHeadersSetup
                 // WARNING: only safe when the app is NOT directly reachable by clients.
                 // If it is, X-Forwarded-For can be spoofed to bypass per-IP limits.
                 options.ForwardLimit = forwardLimit; // null = unlimited hops
-                options.KnownNetworks.Add(new IPNetwork(IPAddress.Any, 0));
-                options.KnownNetworks.Add(new IPNetwork(IPAddress.IPv6Any, 0));
+                options.KnownIPNetworks.Add(new IPNetwork(IPAddress.Any, 0));
+                options.KnownIPNetworks.Add(new IPNetwork(IPAddress.IPv6Any, 0));
                 return;
             }
 
@@ -60,17 +62,19 @@ public static class ForwardedHeadersSetup
             // (single reverse proxy); raise it for chained proxies (e.g. CDN -> nginx).
             options.ForwardLimit = forwardLimit ?? 1;
 
+            // OfType<IPAddress>() both filters out the entries that failed to parse (null)
+            // and yields a non-nullable IPAddress, so Add() gets no null-reference warning.
             var parsedProxies = knownProxies
-                .Select(proxy => (Ok: IPAddress.TryParse(proxy, out var ip), Ip: ip))
-                .Where(x => x.Ok);
-            foreach (var (_, ip) in parsedProxies)
+                .Select(proxy => IPAddress.TryParse(proxy, out var ip) ? ip : null)
+                .OfType<IPAddress>();
+            foreach (var ip in parsedProxies)
                 options.KnownProxies.Add(ip);
 
             var parsedNetworks = knownNetworks
                 .Select(network => (Ok: TryParseNetwork(network, out var net), Net: net))
                 .Where(x => x.Ok);
             foreach (var (_, net) in parsedNetworks)
-                options.KnownNetworks.Add(net);
+                options.KnownIPNetworks.Add(net);
         });
 
         return services;

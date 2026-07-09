@@ -18,7 +18,7 @@ namespace uTPro.Foundation
     // scheme: path is "<number>/<filename>" where number is an incremented counter
     public class OriginalMediaPathScheme : UniqueMediaPathScheme, IMediaPathScheme
     {
-        private readonly object _folderCounterLock = new object();
+        private readonly Lock _folderCounterLock = new();
         private long _folderCounter;
         private bool _folderCounterInitialized;
         private readonly ILogger<OriginalMediaPathScheme> _logger;
@@ -118,7 +118,7 @@ namespace uTPro.Foundation
 
         private string GetMimeMapping(string fileName)
         {
-            return MimeTypeMap.TryGetMimeType(fileName, out var result) ? result : "unknown";
+            return MimeTypeMap.TryGetMimeType(fileName, out var result) ? result ?? "unknown" : "unknown";
         }
 
         private string GetNameFolderType(string type)
