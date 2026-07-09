@@ -24,7 +24,6 @@
 		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.21.0" />
 		<ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
 		<ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
-		<ProjectReference Include="..\..\Feature\uTPro.Feature.Dashboard\uTPro.Feature.Dashboard.csproj" />
 		<ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
 		<ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
 		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />

@@ -20,4 +20,8 @@
     <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="2.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\uTPro.Feature.Dashboard\uTPro.Feature.Dashboard.csproj" />
+  </ItemGroup>
+
 </Project>
