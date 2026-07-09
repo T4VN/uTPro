@@ -16,18 +16,6 @@ using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Project.Web.Configure
 {
-    public static partial class InitConfigure
-    {
-        public static void AddRenderingDefaults(this IServiceCollection services)
-        {
-            // Configure Umbraco Render Controller Type
-            services?.Configure<UmbracoRenderingDefaultsOptions>(c =>
-            {
-                c.DefaultControllerType = typeof(ConfigureRenderController);
-            });
-        }
-    }
-
     public class ConfigureRenderController : RenderController
     {
         readonly ICurrentSiteExtension _currentSite;
@@ -89,74 +77,6 @@ namespace uTPro.Project.Web.Configure
                     UmbracoRouteValues?.PublishedRequest?.PublishedContent?.ContentType?.Alias);
                 return new ActionResultPageError(_currentSite);
             }
-        }
-    }
-
-    public class ErrorController : ControllerBase
-    {
-        private readonly ICurrentSiteExtension _currentSite;
-
-        public ErrorController(ICurrentSiteExtension currentSite)
-        {
-            _currentSite = currentSite;
-        }
-
-        [Route("/error")]
-        [Route("/error/{code:int}")]
-        public IActionResult Index(int? code = null)
-        {
-            var statusCode = code ?? StatusCodes.Status404NotFound;
-            var (titlePage, message) = statusCode switch
-            {
-                StatusCodes.Status404NotFound => ("PAGE NOT FOUND", "The page you requested could not be found."),
-                StatusCodes.Status500InternalServerError => ("SERVER ERROR", "An unexpected error occurred."),
-                StatusCodes.Status403Forbidden => ("ACCESS DENIED", "You do not have permission to view this page."),
-                _ => ("PAGE ERROR", "Please contact admin for more details")
-            };
-            return new ActionResultPageError(_currentSite, titlePage: titlePage, message: message, statusCode: statusCode);
-        }
-    }
-
-    internal class ErrorPage : IContentLastChanceFinder
-    {
-        private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly IPublishedContentQueryAccessor _queryAccessor;
-
-        public ErrorPage(IUmbracoContextFactory umbracoContextFactory, IPublishedContentQueryAccessor queryAccessor)
-        {
-            _umbracoContextFactory = umbracoContextFactory;
-            _queryAccessor = queryAccessor;
-        }
-
-        public Task<bool> TryFindContent(IPublishedRequestBuilder request)
-        {
-            // In the rare case that an umbracoContext cannot be built from the request,
-            // we will not be able to find the page
-            if (_queryAccessor.TryGetValue(out IPublishedContentQuery? query) && query != null)
-            {
-                // Find the first notFound page at the root level through the published content cache by its documentTypeAlias
-                // You can make this search as complex as you want, you can return different pages based on anything in the original request
-                var notFoundPage = query.ContentAtRoot().FirstOrDefault(c => c.ContentType.Alias.Equals(nameof(GlobalPageError), StringComparison.OrdinalIgnoreCase));
-                if (notFoundPage != null)
-                {
-                    //Set the content on the request and mark our search as successful
-                    request.SetIs404();
-                    request.SetPublishedContent(notFoundPage);
-                    return Task.FromResult(request.PublishedContent != null);
-                }
-            }
-            //request.SetIs404();
-            request.SetRedirect("/error");
-            return Task.FromResult(request.PublishedContent != null);
-        }
-    }
-
-    // ContentFinders need to be registered into the DI container through a composer
-    public class ErrorPageComposer : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-        {
-            builder.SetContentLastChanceFinder<ErrorPage>();
         }
     }
 }

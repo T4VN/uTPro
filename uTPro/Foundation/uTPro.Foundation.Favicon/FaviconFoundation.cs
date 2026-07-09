@@ -1,22 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Web.Common.PublishedModels;
+﻿using Umbraco.Cms.Web.Common.PublishedModels;
 using uTPro.Extension;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Foundation.Favicon
 {
-    class DIFaviconFoundation : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-            => builder.Services.AddScoped<IFaviconFoundation, FaviconFoundation>();
-    }
-
-    public interface IFaviconFoundation
-    {
-        string Generate();
-    }
-
     internal class FaviconFoundation : IFaviconFoundation
     {
         readonly ICurrentSiteExtension _currentSite;

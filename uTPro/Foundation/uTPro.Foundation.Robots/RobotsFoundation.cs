@@ -1,22 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Web.Common.PublishedModels;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Foundation.Robots
 {
-    class DIRobotsFoundation : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-            => builder.Services.AddScoped<IRobotsFoundation, RobotsFoundation>();
-    }
-
-    public interface IRobotsFoundation
-    {
-        string Generate();
-    }
-
     internal class RobotsFoundation : IRobotsFoundation
     {
         readonly IHttpContextAccessor _httpContextAccessor;
