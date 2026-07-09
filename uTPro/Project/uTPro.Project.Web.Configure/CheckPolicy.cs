@@ -1,21 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
-using Umbraco.Cms.Core.Composing;
 
 namespace uTPro.Project.Web.Configure
 {
-    class DIICheckPolicy : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-            => builder.Services.AddScoped<ICheckPolicy, CheckPolicy>();
-    }
-
-    public interface ICheckPolicy
-    {
-        string Check(HttpContext httpContext);
-    }
-
     internal class CheckPolicy : ICheckPolicy
     {
         private struct Policy

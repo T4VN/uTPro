@@ -1,16 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace uTPro.Foundation.Middleware
 {
-    public static class UseBufferingMiddleware
-    {
-        public static IApplicationBuilder UseBuffering(this IApplicationBuilder app)
-        {
-            return app.UseMiddleware<BufferingMiddleware>();
-        }
-    }
-
     internal class BufferingMiddleware
     {
         private readonly RequestDelegate _next;

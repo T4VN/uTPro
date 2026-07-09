@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -90,7 +91,8 @@ public class uTProDashboardManagementController(
         return Ok(new
         {
             utproVersion = GetAppVersion(),
-            umbracoVersion = umbracoVersion.SemanticVersion.ToString(),
+            runtimeVersion = RuntimeInformation.FrameworkDescription,
+            umbracoVersion = umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild(),
             publishedContent = contentService.CountPublished(),
             contentInRecycleBin = contentInBin,
             mediaInRecycleBin = mediaInBin,

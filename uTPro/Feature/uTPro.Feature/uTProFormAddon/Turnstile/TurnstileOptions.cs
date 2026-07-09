@@ -2,7 +2,7 @@ namespace uTPro.Feature.uTProFormAddon.Turnstile;
 
 /// <summary>
 /// Optional global fallback for the Cloudflare Turnstile field, bound from the
-/// <c>uTProFormAddon:Turnstile</c> section of appsettings.
+/// <c>uTPro:Feature:Form:Addon:Turnstile</c> section of appsettings.
 ///
 /// Precedence is always: value entered on the form field (UI) first, then this appsettings
 /// value. So a form can override globally-configured keys, and forms that leave a key blank
@@ -10,7 +10,7 @@ namespace uTPro.Feature.uTProFormAddon.Turnstile;
 /// </summary>
 public sealed class TurnstileOptions
 {
-    public const string SectionPath = "uTProFormAddon:Turnstile";
+    public const string SectionPath = "uTPro:Feature:Form:Addon:Turnstile";
 
     /// <summary>Public Site Key used to render the widget when the field leaves it blank.</summary>
     public string? SiteKey { get; set; }

@@ -15,6 +15,9 @@ builder.Services.AddPerformanceServices(builder.Environment);
 // 4. Security (DataProtection, Form/IIS/Kestrel limits)
 builder.Services.AddSecurityServices(builder);
 
+// 4b. Forwarded headers (real client IP/scheme behind reverse proxy / load balancer)
+builder.Services.AddForwardedHeadersConfig(builder);
+
 // 5. MVC + Rendering
 builder.Services.AddRenderingDefaults();
 builder.Services.AddControllers();

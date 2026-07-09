@@ -3,7 +3,8 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<CompressionEnabled>false</CompressionEnabled>
+		<!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
+		<CompressionEnabled>true</CompressionEnabled>
     <Version>17.1.0</Version>
   </PropertyGroup>
 	<ItemGroup>
@@ -12,13 +13,6 @@
 		<EmbeddedResource Remove="Controllers\Api\**" />
 		<None Remove="Controllers\Api\**" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="App_Plugins\cms-screen\index.js" />
-	  <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
-	  <Content Include="App_Plugins\cms-screen\style.css" />
-	  <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
 		<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />

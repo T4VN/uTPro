@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Global - Folder Sites</summary>
 	[PublishedModel("globalFolderSites")]
-	public partial class GlobalFolderSites : PublishedContentModel
+	public partial class GlobalFolderSites : PublishedContentModel, IGlobalSecurityHeadersSettings
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -80,5 +80,87 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("siteName")]
 		public virtual global::SeoVisualizer.SeoValues SiteName => this.Value<global::SeoVisualizer.SeoValues>(_publishedValueFallback, "siteName");
+
+		///<summary>
+		/// Content-Security-Policy (CSP): Defines which sources of content are allowed to load (defends against XSS/injection). Very powerful but easy to break the site — test with Report-Only first. If set without frame-ancestors, it is appended automatically so preview keeps working. Blank: the system auto-generates frame-ancestors to allow backoffice preview.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("contentSecurityPolicyCsp")]
+		public virtual string ContentSecurityPolicyCsp => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetContentSecurityPolicyCsp(this, _publishedValueFallback);
+
+		///<summary>
+		/// Content-Security-Policy-Report-Only: On = the CSP only reports violations without blocking (safe for testing).  Off = the CSP is enforced (actually blocks).  
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[ImplementPropertyType("contentSecurityPolicyReportOnly")]
+		public virtual bool ContentSecurityPolicyReportOnly => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetContentSecurityPolicyReportOnly(this, _publishedValueFallback);
+
+		///<summary>
+		/// Enabled: Master switch for this site's security headers. When off, no security headers are sent at all. Must be on for the settings below to take effect.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[ImplementPropertyType("enabled")]
+		public virtual bool Enabled => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetEnabled(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hsts Enabled: Forces browsers to always use HTTPS for this domain. Sent only over HTTPS connections. Use with care: once sent with a long duration it is hard to undo.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[ImplementPropertyType("hstsEnabled")]
+		public virtual bool HstsEnabled => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetHstsEnabled(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hsts Include Sub Domains: Applies HSTS to all subdomains.  Enable only when every subdomain serves HTTPS.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[ImplementPropertyType("hstsIncludeSubDomains")]
+		public virtual bool HstsIncludeSubDomains => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetHstsIncludeSubDomains(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hsts Max Age Seconds: How long (in seconds) the browser remembers to use HTTPS only.  Blank or 0 = default 31536000 (1 year).
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[ImplementPropertyType("hstsMaxAgeSeconds")]
+		public virtual int HstsMaxAgeSeconds => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetHstsMaxAgeSeconds(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hsts Preload: Requests inclusion in the browsers' HSTS preload list.  Enable only if you understand the implications (requires max-age ≥ 1 year + includeSubDomains, and is hard to remove from the list).
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[ImplementPropertyType("hstsPreload")]
+		public virtual bool HstsPreload => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetHstsPreload(this, _publishedValueFallback);
+
+		///<summary>
+		/// Permissions-Policy: Restricts access to browser features (camera, microphone, geolocation, etc.). Example: camera=(), microphone=(), geolocation=().
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("permissionsPolicy")]
+		public virtual string PermissionsPolicy => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetPermissionsPolicy(this, _publishedValueFallback);
+
+		///<summary>
+		/// Referrer-Policy: Controls how much referrer information is sent when navigating away. Recommended: strict-origin-when-cross-origin.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("referrerPolicy")]
+		public virtual string ReferrerPolicy => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetReferrerPolicy(this, _publishedValueFallback);
+
+		///<summary>
+		/// X-Content-Type-Options: Stops browsers from MIME-sniffing (guessing a file's type). Leave blank to use the default nosniff (recommended).  Only nosniff or blank is meaningful.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("xContentTypeOptions")]
+		public virtual string XContentTypeOptions => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetXContentTypeOptions(this, _publishedValueFallback);
+
+		///<summary>
+		/// X-Frame-Options: Prevents the site from being embedded in an iframe (clickjacking).  Blank = SAMEORIGIN.  Note: this applies only when no CSP is set and no backoffice host is configured; when a backoffice host exists the system uses CSP frame-ancestors instead and ignores this field.  Valid values: SAMEORIGIN or DENY.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("xFrameOptions")]
+		public virtual string XFrameOptions => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalSecurityHeadersSettings.GetXFrameOptions(this, _publishedValueFallback);
 	}
 }

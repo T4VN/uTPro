@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Global - Folder Settings</summary>
 	[PublishedModel("globalFolderSettings")]
-	public partial class GlobalFolderSettings : PublishedContentModel, IGlobalSmtpSettings
+	public partial class GlobalFolderSettings : PublishedContentModel, IGlobalResponsiveImageSettings, IGlobalSmtpSettings
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -55,42 +55,6 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
 		[ImplementPropertyType("rememberLanguageDisable")]
 		public virtual bool RememberLanguageDisable => this.Value<bool>(_publishedValueFallback, "rememberLanguageDisable");
-
-		///<summary>
-		/// Turn Off Responsive Image: Turn on: Image url links will be resized and converted to .webp format.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
-		[ImplementPropertyType("repImgEnable")]
-		public virtual bool RepImgEnable => this.Value<bool>(_publishedValueFallback, "repImgEnable");
-
-		///<summary>
-		/// Extend Sizes SrcSet: Additional dimensions used for the img tag's srcset data If not entered, default will only take 3 sizes for srcset
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("repImgExtendSizesSrcSet")]
-		public virtual global::System.Collections.Generic.IEnumerable<string> RepImgExtendSizesSrcSet => this.Value<global::System.Collections.Generic.IEnumerable<string>>(_publishedValueFallback, "repImgExtendSizesSrcSet");
-
-		///<summary>
-		/// Max Width Desktop (px): Default: 1920px
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
-		[ImplementPropertyType("repImgMaxWidthDesktop")]
-		public virtual int RepImgMaxWidthDesktop => this.Value<int>(_publishedValueFallback, "repImgMaxWidthDesktop");
-
-		///<summary>
-		/// Max Width Mobile (px): Default: 768px
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
-		[ImplementPropertyType("repImgMaxWidthMobile")]
-		public virtual int RepImgMaxWidthMobile => this.Value<int>(_publishedValueFallback, "repImgMaxWidthMobile");
-
-		///<summary>
-		/// Max Width Table (px): Default: 1024px
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
-		[ImplementPropertyType("repImgMaxWidthTable")]
-		public virtual int RepImgMaxWidthTable => this.Value<int>(_publishedValueFallback, "repImgMaxWidthTable");
 
 		///<summary>
 		/// Content
@@ -129,6 +93,21 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
 		[ImplementPropertyType("turnOffAppSettings")]
 		public virtual bool TurnOffAppSettings => this.Value<bool>(_publishedValueFallback, "turnOffAppSettings");
+
+		///<summary>
+		/// Extend Sizes SrcSet: Additional dimensions used for the img tag's srcset data If not entered, default will only take 3 sizes for srcset Default: 1200w (Desktop), 1024w (Table), 768w (Mobile)
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("repImgExtendSizesSrcSet")]
+		public virtual global::System.Collections.Generic.IEnumerable<string> RepImgExtendSizesSrcSet => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalResponsiveImageSettings.GetRepImgExtendSizesSrcSet(this, _publishedValueFallback);
+
+		///<summary>
+		/// Turn Off Responsive Image: When ON, responsive images are disabled — Image url links will be resized and converted to .webp format.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.2+b2c9b29")]
+		[ImplementPropertyType("repImgTurnOffResponsiveImage")]
+		public virtual bool RepImgTurnOffResponsiveImage => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalResponsiveImageSettings.GetRepImgTurnOffResponsiveImage(this, _publishedValueFallback);
 
 		///<summary>
 		/// Credential Password
