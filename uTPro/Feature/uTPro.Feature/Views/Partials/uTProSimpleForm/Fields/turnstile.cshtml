@@ -1,0 +1,51 @@
+@* Cloudflare Turnstile widget (uTPro custom field type — lives in uTPro.Feature).
+
+   This is a uTPro-specific custom field type. It registers its own Site Key / Secret Key
+   settings via AdduTProSimpleFormFieldType (see TurnstileComposer), so the form builder shows
+   dedicated labelled inputs and stores the values in the field's Attributes. Keys resolve with
+   this precedence: value entered on the form field (UI) first, then appsettings fallback
+   (uTProFormAddon:Turnstile), otherwise treated as empty (widget not rendered). Mapping:
+     • Attribute "siteKey"   → Site Key   (public, rendered here)
+     • Attribute "secretKey" → Secret Key (server-side only; used by the verify middleware, never emitted)
+     • Validation Message    → Failure Message shown when verification fails
+
+   Per form: whatever the field leaves blank falls back to appsettings, so most forms can rely
+   on the global keys while a specific form can still override them.
+
+   Only the Site Key is sent to the browser. The token is submitted under this field's Name
+   (data-response-field-name) so the "Required" option and server verification both work. *@
+@using Microsoft.Extensions.Options
+@using uTPro.Feature.SimpleFormBuilder.Helpers
+@using uTPro.Feature.uTProFormAddon.Turnstile
+@inject IOptions<TurnstileOptions> TurnstileOptions
+@model uTPro.Feature.SimpleFormBuilder.Models.FormFieldViewModel
+@{
+    var h = new FieldHelper(Model, ViewData);
+    // Field value (siteKey attribute) first, then appsettings fallback, then treated as empty.
+    var fieldSiteKey = h.Attr("siteKey");
+    var siteKey = !string.IsNullOrWhiteSpace(fieldSiteKey)
+        ? fieldSiteKey
+        : TurnstileOptions.Value.SiteKey;
+}
+
+@if (string.IsNullOrWhiteSpace(siteKey))
+{
+    <!-- Turnstile field has no Site Key (set it in the field's "Site Key" setting or in appsettings uTProFormAddon:Turnstile:SiteKey). -->
+}
+else
+{
+    if (!string.IsNullOrWhiteSpace(Model.Label))
+    {
+        @h.Label()
+    }
+    <div class="cf-turnstile uTProForm-turnstile"
+         data-sitekey="@siteKey"
+         data-response-field-name="@h.Name"></div>
+    @h.Error()
+
+    @if (Context.Items["uTProForm-turnstile-api"] is not true)
+    {
+        Context.Items["uTProForm-turnstile-api"] = true;
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    }
+}

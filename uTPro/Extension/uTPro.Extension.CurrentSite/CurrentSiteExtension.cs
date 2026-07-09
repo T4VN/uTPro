@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.UmbracoContext;
+using static Umbraco.Cms.Core.Constants.Conventions;
 
 namespace uTPro.Extension.CurrentSite
 {
@@ -189,7 +190,12 @@ namespace uTPro.Extension.CurrentSite
                     {
                         if (url == "/")
                             return $"/{segment}";
-
+                        else if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                            || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                            )
+                        {
+                            return url;
+                        }
                         return $"/{segment}{url}";
                     }
                 }

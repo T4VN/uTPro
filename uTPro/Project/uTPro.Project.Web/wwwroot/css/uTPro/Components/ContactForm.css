@@ -145,3 +145,18 @@
         .contactform form input[type="file"]::file-selector-button:hover {
             background: var(--utp-text);
         }
+
+/* ── Field spacing: keep every field evenly separated ── */
+.contactform .uTProForm-group-field {
+    margin-bottom: 1.5em;
+}
+
+    /* Avoid a trailing gap under the last field in a column */
+    .contactform .uTProForm-group-field:last-child {
+        margin-bottom: 0;
+    }
+
+/* ── Cloudflare Turnstile widget ── */
+.contactform .uTProForm-turnstile {
+    margin: 0.5em 0 0 0;
+}
