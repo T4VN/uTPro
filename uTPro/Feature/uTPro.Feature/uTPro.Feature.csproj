@@ -15,6 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MimeKit" Version="4.15.1" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
     <PackageReference Include="uTPro.Feature.AuditLog" Version="4.0.3" />
     <PackageReference Include="uTPro.Feature.FileManager" Version="2.0.1" />
     <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="2.2.0" />

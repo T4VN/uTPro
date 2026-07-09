@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
     <PackageReference Include="Umbraco.Cms" Version="17.5.2" />
     <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.4.3" />
     <PackageReference Include="UmbracoSeoVisualizer" Version="17.0.0" />
