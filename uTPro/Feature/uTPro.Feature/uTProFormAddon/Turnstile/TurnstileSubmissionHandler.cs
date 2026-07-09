@@ -96,10 +96,28 @@ public sealed class TurnstileSubmissionHandler(
             return doc.RootElement.TryGetProperty("success", out var success)
                 && success.ValueKind == JsonValueKind.True;
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
             // Fail closed: a broken verification call must not let a submission through.
             logger.LogWarning(ex, "Turnstile verification request failed.");
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            // Fail closed: timeout/cancellation during outbound verification.
+            logger.LogWarning(ex, "Turnstile verification request timed out or was canceled.");
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            // Fail closed: invalid verification payload.
+            logger.LogWarning(ex, "Turnstile verification response could not be parsed.");
+            return false;
+        }
+        catch (OperationCanceledException ex) when (ct.IsCancellationRequested)
+        {
+            // Fail closed on caller-requested cancellation to preserve existing behavior.
+            logger.LogWarning(ex, "Turnstile verification canceled.");
             return false;
         }
     }
