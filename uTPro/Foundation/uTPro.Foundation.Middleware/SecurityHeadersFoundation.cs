@@ -132,9 +132,10 @@ namespace uTPro.Foundation.Middleware
 
         private static IGlobalSecurityHeadersSettings? TryRead(Func<IPublishedContent?> getter)
         {
+            // ObjectDisposedException derives from InvalidOperationException, so a single
+            // InvalidOperationException clause covers both (no request/site context available).
             try { return getter() as IGlobalSecurityHeadersSettings; }
             catch (InvalidOperationException) { return null; }
-            catch (ObjectDisposedException) { return null; }
         }
 
         private string[] GetBackofficeHosts()
