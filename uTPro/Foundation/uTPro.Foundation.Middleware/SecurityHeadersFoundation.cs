@@ -135,7 +135,6 @@ namespace uTPro.Foundation.Middleware
             try { return getter() as IGlobalSecurityHeadersSettings; }
             catch (InvalidOperationException) { return null; }
             catch (ObjectDisposedException) { return null; }
-            catch (NullReferenceException) { return null; }
         }
 
         private string[] GetBackofficeHosts()
