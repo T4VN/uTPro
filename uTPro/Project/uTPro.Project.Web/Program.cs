@@ -3,8 +3,11 @@ using uTPro.Project.Web.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Hosting (TMP/TEMP override for multi-site IIS)
+// 1. Hosting (TMP/TEMP + wwwroot/media override for multi-site / multi-app deployments)
+builder.ConfigureAppSettings();
 builder.ConfigureTempPath();
+builder.ConfigureRootPath();
+builder.ConfigureMediaPath();
 
 // 2. Umbraco CMS
 builder.ConfigureUmbraco();
