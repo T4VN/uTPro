@@ -43,32 +43,45 @@ public static class HostingSetup
     }
 
     /// <summary>
-    /// Override the web root (wwwroot) from appsettings (uTPro:Hosting:RootPath).
-    /// Lets multiple apps (e.g. a backoffice app and a front-end app) point at the same
-    /// physical wwwroot so uploaded media / static files are shared between them.
-    /// A relative value is resolved against ContentRootPath. Empty = default ./wwwroot.
-    /// Must run before ConfigureUmbraco() so Umbraco picks up the correct web root.
+    /// Build the <see cref="WebApplicationOptions"/> for <c>WebApplication.CreateBuilder</c>,
+    /// applying the web root (wwwroot) override from appsettings (uTPro:Hosting:RootPath).
+    /// The web root MUST be set here: <c>WebApplicationBuilder</c> does not allow changing it
+    /// afterwards (builder.WebHost.UseWebRoot throws NotSupportedException). A small bootstrap
+    /// configuration is read first (appsettings.json + appsettings.{env}.json + the UTPRO_APP
+    /// overlay + environment variables) so the value can come from any of those, including the
+    /// per-app overlay. A relative value is resolved against the content root. Empty = default ./wwwroot.
     /// </summary>
-    public static WebApplicationBuilder ConfigureRootPath(this WebApplicationBuilder builder)
+    public static WebApplicationOptions BuildWebApplicationOptions(string[] args)
     {
-        var customRootPath = builder.Configuration["uTPro:Hosting:RootPath"];
+        var contentRoot = Directory.GetCurrentDirectory();
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? "Production";
+
+        var bootstrap = new ConfigurationBuilder()
+            .SetBasePath(contentRoot)
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true);
+
+        var appVariant = Environment.GetEnvironmentVariable("UTPRO_APP")
+            ?? bootstrap.Build()["uTPro:App"];
+        if (!string.IsNullOrWhiteSpace(appVariant))
+        {
+            bootstrap
+                .AddJsonFile($"appsettings.{appVariant}.json", optional: true)
+                .AddJsonFile($"appsettings.{appVariant}.{environment}.json", optional: true);
+        }
+
+        var customRootPath = bootstrap.AddEnvironmentVariables().Build()["uTPro:Hosting:RootPath"];
         if (string.IsNullOrWhiteSpace(customRootPath))
-            return builder;
+            return new WebApplicationOptions { Args = args };
 
         if (!Path.IsPathRooted(customRootPath))
-        {
-            customRootPath = Path.GetFullPath(
-                Path.Combine(builder.Environment.ContentRootPath, customRootPath));
-        }
+            customRootPath = Path.GetFullPath(Path.Combine(contentRoot, customRootPath));
 
         Directory.CreateDirectory(customRootPath);
 
-        // Deferred by WebApplicationBuilder until Build(), so it correctly rebuilds
-        // the WebRootFileProvider used by static files and Umbraco.
-        builder.WebHost.UseWebRoot(customRootPath);
-        builder.Environment.WebRootPath = customRootPath;
-
-        return builder;
+        return new WebApplicationOptions { Args = args, WebRootPath = customRootPath };
     }
 
     /// <summary>
