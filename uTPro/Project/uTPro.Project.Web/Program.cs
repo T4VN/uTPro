@@ -1,10 +1,22 @@
+using uTPro.Common.Constants;
 using uTPro.Project.Web.Configure;
 using uTPro.Project.Web.Startup;
 
-var builder = WebApplication.CreateBuilder(args);
+// Web root (uTPro:Hosting:RootPath) must be applied via options — it cannot be changed
+// after the builder is created.
+var setup = HostingSetup.BuildWebApplicationOptions(args);
+var builder = WebApplication.CreateBuilder(setup);
 
-// 1. Hosting (TMP/TEMP override for multi-site IIS)
+// Expose the resolved web/content root to PathFolder (a DI-less static helper) so code
+// that locates files via PathFolder respects the configured RootPath instead of assuming
+// the default wwwroot under the process current directory.
+PathFolder.WebRootPathOverride = builder.Environment.WebRootPath;
+PathFolder.ContentRootPathOverride = builder.Environment.ContentRootPath;
+
+// 1. Hosting (TMP/TEMP + media override for multi-site / multi-app deployments)
+builder.ConfigureAppSettings();
 builder.ConfigureTempPath();
+builder.ConfigureMediaPath();
 
 // 2. Umbraco CMS
 builder.ConfigureUmbraco();
