@@ -77,7 +77,7 @@ public static class HostingSetup
             return new WebApplicationOptions { Args = args };
 
         if (!Path.IsPathRooted(customRootPath))
-            customRootPath = Path.GetFullPath(Path.Combine(contentRoot, customRootPath));
+            customRootPath = Path.GetFullPath(Path.Join(contentRoot, customRootPath));
 
         Directory.CreateDirectory(customRootPath);
 
