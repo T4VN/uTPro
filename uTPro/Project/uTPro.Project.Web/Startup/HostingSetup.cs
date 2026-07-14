@@ -77,7 +77,7 @@ public static class HostingSetup
             return new WebApplicationOptions { Args = args };
 
         if (!Path.IsPathRooted(customRootPath))
-            customRootPath = Path.GetFullPath(Path.Combine(contentRoot, customRootPath));
+            customRootPath = Path.GetFullPath(Path.Join(contentRoot, customRootPath));
 
         Directory.CreateDirectory(customRootPath);
 
@@ -101,7 +101,9 @@ public static class HostingSetup
         if (!Path.IsPathRooted(customMediaPath))
         {
             customMediaPath = Path.GetFullPath(
-                Path.Combine(builder.Environment.ContentRootPath, customMediaPath));
+                Path.Combine(
+                    builder.Environment.ContentRootPath,
+                    customMediaPath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)));
         }
 
         Directory.CreateDirectory(customMediaPath);
