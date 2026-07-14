@@ -101,7 +101,9 @@ public static class HostingSetup
         if (!Path.IsPathRooted(customMediaPath))
         {
             customMediaPath = Path.GetFullPath(
-                Path.Combine(builder.Environment.ContentRootPath, customMediaPath));
+                Path.Combine(
+                    builder.Environment.ContentRootPath,
+                    customMediaPath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)));
         }
 
         Directory.CreateDirectory(customMediaPath);
