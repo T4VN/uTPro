@@ -35,6 +35,24 @@ public class uTProDashboardManagementController(
     IMemoryCache memoryCache) : ManagementApiControllerBase
 {
     private const int ActivityTake = 20;
+
+    // How many detail rows the audit-trail list shows (the chart summarises the whole range).
+    private const int TrailListTake = 20;
+    private const string DefaultTrailRange = "month";
+
+    // How the chart groups events across the selected window.
+    private enum TrailBucket { Daily, Weekly, Monthly }
+
+    // Named ranges for the audit-trail chart: window length (days) + bucket granularity.
+    private static readonly Dictionary<string, (int Days, TrailBucket Bucket)> TrailRanges =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["week"] = (7, TrailBucket.Daily),
+            ["month"] = (30, TrailBucket.Daily),
+            ["quarter"] = (90, TrailBucket.Weekly),
+            ["year"] = (365, TrailBucket.Monthly),
+        };
+
     private const string GitHubRepo = "T4VN/uTPro";
     private const string LatestVersionCacheKey = "uTPro.Dashboard.LatestVersion";
 
@@ -176,45 +194,70 @@ public class uTProDashboardManagementController(
     }
 
     // Recent audit trail across all users (from umbracoAudit — logins, saves, user changes, etc.).
+    // ?range=week|month|quarter|year (default month) selects the chart/detail window.
     [HttpGet("recent-trail")]
-    public IActionResult RecentTrail() => Ok(GetAuditTrail(null));
+    public IActionResult RecentTrail([FromQuery] string? range = null) => Ok(GetAuditTrail(null, range));
 
     // The current user's own recent audit trail.
     [HttpGet("my-trail")]
-    public IActionResult MyTrail()
+    public IActionResult MyTrail([FromQuery] string? range = null)
     {
         var user = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
         if (user == null) return Unauthorized();
-        return Ok(GetAuditTrail(user.Id));
+        return Ok(GetAuditTrail(user.Id, range));
     }
 
-    // Reads the newest entries from umbracoAudit (the "Audit Trail"), joined to the performing
-    // user for a display name. These are cross-cutting events (sign-in, save, user management)
-    // rather than content actions.
-    private IEnumerable<object> GetAuditTrail(int? userId)
+    // Reads umbracoAudit (the "Audit Trail") for the selected time window and returns both a
+    // per-bucket chart series (all events grouped by day/week/month) and the newest detail rows.
+    // These are cross-cutting events (sign-in, save, user management) rather than content actions.
+    private object GetAuditTrail(int? userId, string? range)
     {
+        // Resolve the requested range, falling back to the default when unknown.
+        if (string.IsNullOrWhiteSpace(range) || !TrailRanges.TryGetValue(range, out var window))
+        {
+            range = DefaultTrailRange;
+            window = TrailRanges[DefaultTrailRange];
+        }
+
+        var to = DateTime.UtcNow;
+        var from = to.Date.AddDays(-(window.Days - 1)); // inclusive of today, going back Days-1
+
         using var scope = scopeProvider.CreateScope(autoComplete: true);
         var syntax = scope.SqlContext.SqlSyntax;
 
         string A(string c) => "au." + syntax.GetQuotedColumnName(c);
         string P(string c) => "p." + syntax.GetQuotedColumnName(c);
 
+        // 1) Lightweight date-only pull of every event in the window → chart series + total.
+        var dateSql = scope.SqlContext.Sql()
+            .Select($"{A("eventDateUtc")} AS EventDateUtc")
+            .From($"{syntax.GetQuotedTableName("umbracoAudit")} au")
+            .Where($"{A("eventDateUtc")} >= @0", from);
+
+        if (userId.HasValue)
+            dateSql = dateSql.Where($"{A("performingUserId")} = @0", userId.Value);
+
+        var dates = scope.Database.Fetch<TrailDateRow>(dateSql).Select(r => r.EventDateUtc).ToList();
+        var series = BuildTrailSeries(window.Bucket, from, to, dates);
+
+        // 2) Newest N full rows in the window for the detail list.
         var sql = scope.SqlContext.Sql()
             .Select($@"{A("eventDateUtc")} AS EventDateUtc, {A("performingUserId")} AS UserId,
                        {A("eventType")} AS EventType, {A("eventDetails")} AS EventDetails,
                        {A("performingIp")} AS PerformingIp, {A("affectedDetails")} AS AffectedDetails,
                        {A("performingDetails")} AS PerformingDetails, {P("userName")} AS UserName")
             .From($"{syntax.GetQuotedTableName("umbracoAudit")} au")
-            .LeftJoin($"{syntax.GetQuotedTableName("umbracoUser")} p").On($"{P("id")} = {A("performingUserId")}");
+            .LeftJoin($"{syntax.GetQuotedTableName("umbracoUser")} p").On($"{P("id")} = {A("performingUserId")}")
+            .Where($"{A("eventDateUtc")} >= @0", from);
 
         if (userId.HasValue)
             sql = sql.Where($"{A("performingUserId")} = @0", userId.Value);
 
         sql = sql.OrderBy($"{A("eventDateUtc")} DESC, {A("id")} DESC");
 
-        var rows = scope.Database.Page<AuditTrailRow>(1, ActivityTake, sql).Items;
+        var rows = scope.Database.Page<AuditTrailRow>(1, TrailListTake, sql).Items;
 
-        return rows.Select(r => new
+        var items = rows.Select(r => new
         {
             date = DateTime.SpecifyKind(r.EventDateUtc, DateTimeKind.Utc),
             user = ResolveUser(r.UserName, r.PerformingDetails, r.UserId),
@@ -223,6 +266,49 @@ public class uTProDashboardManagementController(
             ip = r.PerformingIp ?? string.Empty,
             affected = r.AffectedDetails ?? string.Empty,
         }).ToList();
+
+        return new
+        {
+            range,
+            from = DateTime.SpecifyKind(from, DateTimeKind.Utc),
+            to = DateTime.SpecifyKind(to, DateTimeKind.Utc),
+            total = dates.Count,
+            series,
+            items,
+        };
+    }
+
+    // Groups the event dates into contiguous buckets (day/week/month) spanning [from, to] so
+    // the chart always has a continuous x-axis, even for days/weeks/months with no events.
+    private static List<object> BuildTrailSeries(
+        TrailBucket bucket, DateTime from, DateTime to, IEnumerable<DateTime> dates)
+    {
+        var boundaries = new List<(DateTime Start, DateTime End, string Label)>();
+
+        switch (bucket)
+        {
+            case TrailBucket.Monthly:
+                for (var cursor = new DateTime(from.Year, from.Month, 1); cursor <= to; cursor = cursor.AddMonths(1))
+                    boundaries.Add((cursor, cursor.AddMonths(1), cursor.ToString("MMM yyyy")));
+                break;
+            case TrailBucket.Weekly:
+                for (var cursor = from.Date; cursor <= to; cursor = cursor.AddDays(7))
+                    boundaries.Add((cursor, cursor.AddDays(7), cursor.ToString("dd MMM")));
+                break;
+            default: // Daily
+                for (var cursor = from.Date; cursor <= to.Date; cursor = cursor.AddDays(1))
+                    boundaries.Add((cursor, cursor.AddDays(1), cursor.ToString("dd MMM")));
+                break;
+        }
+
+        var ordered = dates.OrderBy(d => d).ToList();
+
+        return boundaries.Select(b => (object)new
+        {
+            date = DateTime.SpecifyKind(b.Start, DateTimeKind.Utc),
+            label = b.Label,
+            count = ordered.Count(d => d >= b.Start && d < b.End),
+        }).ToList();
     }
 
     private static string ResolveUser(string? userName, string? performingDetails, int? userId)
@@ -230,6 +316,12 @@ public class uTProDashboardManagementController(
         if (!string.IsNullOrWhiteSpace(userName)) return userName!;
         if (!string.IsNullOrWhiteSpace(performingDetails)) return performingDetails!;
         return userId.HasValue ? $"User {userId}" : "SYSTEM";
+    }
+
+    // Single-column projection used for the lightweight chart-series query.
+    private class TrailDateRow
+    {
+        public DateTime EventDateUtc { get; set; }
     }
 
     private class AuditTrailRow

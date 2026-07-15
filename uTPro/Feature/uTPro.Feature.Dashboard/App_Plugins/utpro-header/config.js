@@ -122,9 +122,14 @@ export async function fetchMyActivity(authContext) {
 }
 
 // Recent audit trail (umbracoAudit): sign-in, save, user management, etc.
-export async function fetchRecentTrail(authContext) {
-    return (await apiGet(UTPRO.recentTrailApi, authContext)) || [];
+// Returns { range, from, to, total, series: [{date,label,count}], items: [...] } for the
+// requested window (week|month|quarter|year, default month). emptyTrail() keeps the shape
+// stable when auth isn't ready yet, so the dashboard can render without null checks everywhere.
+const emptyTrail = (range) => ({ range, from: null, to: null, total: 0, series: [], items: [] });
+
+export async function fetchRecentTrail(authContext, range = 'month') {
+    return (await apiGet(`${UTPRO.recentTrailApi}?range=${encodeURIComponent(range)}`, authContext)) || emptyTrail(range);
 }
-export async function fetchMyTrail(authContext) {
-    return (await apiGet(UTPRO.myTrailApi, authContext)) || [];
+export async function fetchMyTrail(authContext, range = 'month') {
+    return (await apiGet(`${UTPRO.myTrailApi}?range=${encodeURIComponent(range)}`, authContext)) || emptyTrail(range);
 }
