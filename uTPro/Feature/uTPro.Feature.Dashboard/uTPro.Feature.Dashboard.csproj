@@ -18,6 +18,7 @@
     <Content Include="App_Plugins\utpro-header\config.js" />
     <Content Include="App_Plugins\utpro-header\dashboard.element.js" />
     <Content Include="App_Plugins\utpro-header\header-app.element.js" />
+    <Content Include="App_Plugins\utpro-header\vendor\frappe-charts.min.esm.js" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UTPRO, fetchVersionInfo, refreshVersionInfo, fetchStats, fetchCurrentUser, fetchRecentActivity, fetchMyActivity, fetchRecentTrail, fetchMyTrail } from './config.js';
+// Vendored locally (MIT) — no CDN/runtime external call, matching config.js' philosophy.
+import { Chart } from './vendor/frappe-charts.min.esm.js';
 
 // "08 Jul 2026 04:36"
 const fmtDate = (value) => {
@@ -48,6 +50,15 @@ const ENTITY_LABELS = {
 };
 const entityTypeLabel = (entityType) => ENTITY_LABELS[(entityType || '').toLowerCase()] || entityType;
 
+// Time windows for the audit-trail chart. Values must match the server (TrailRanges).
+const TRAIL_RANGES = [
+    { value: 'week', name: 'This week' },
+    { value: 'month', name: 'This month' },
+    { value: 'quarter', name: 'Last 3 months' },
+    { value: 'year', name: 'This year' },
+];
+const TRAIL_RANGE_LABEL = Object.fromEntries(TRAIL_RANGES.map((r) => [r.value, r.name]));
+
 // Built from the server-provided website/releases URLs (single source of truth: the repo
 // configured on the backend), with the static Umbraco docs link.
 const buildResources = (website, releasesUrl) => [
@@ -69,9 +80,11 @@ export class UtproDashboardElement extends UmbLitElement {
         _user: { state: true },
         _myActivity: { state: true },
         _allActivity: { state: true },
-        _myTrail: { state: true },
-        _allTrail: { state: true },
-        _collapsed: { state: true },
+        _trailAll: { state: true },
+        _trailMy: { state: true },
+        _trailScope: { state: true },
+        _trailRange: { state: true },
+        _detailsOpen: { state: true },
     };
 
     constructor() {
@@ -86,11 +99,18 @@ export class UtproDashboardElement extends UmbLitElement {
         this._user = null;
         this._myActivity = null;
         this._allActivity = null;
-        this._myTrail = null;
-        this._allTrail = null;
-        // Per-card collapsed state. Trail cards start collapsed; activity cards expanded.
-        this._collapsed = { myTrail: true, allTrail: true, myActivity: false, allActivity: false };
+        // Single trail card: the chart always compares both scopes (All vs You) as grouped
+        // bars; the scope toggle only drives the detail list + summary below. Both datasets are
+        // loaded together per window, so toggling scope needs no refetch.
+        this._trailAll = null;
+        this._trailMy = null;
+        this._trailScope = 'all';
+        this._trailRange = 'month';
+        // The detail list (scope tabs + rows) starts hidden; the "Details" caret reveals it.
+        this._detailsOpen = false;
         this._authContext = null;
+        // Live Frappe Chart instance for the trail card.
+        this._chart = null;
 
         // All data comes from the authenticated management API, so load once auth is ready.
         this.consumeContext(UMB_AUTH_CONTEXT, async (ctx) => {
@@ -106,8 +126,7 @@ export class UtproDashboardElement extends UmbLitElement {
             this._user = await fetchCurrentUser(ctx);
             this._myActivity = await fetchMyActivity(ctx);
             this._allActivity = await fetchRecentActivity(ctx);
-            this._myTrail = await fetchMyTrail(ctx);
-            this._allTrail = await fetchRecentTrail(ctx);
+            this.#loadTrail();
         });
     }
 
@@ -195,36 +214,12 @@ export class UtproDashboardElement extends UmbLitElement {
                         </a>`)}
                 </div>
             </uui-box>
-            <div class="activity-grid">
-                ${this.#trailCard('myTrail', 'Your recent trail', this._myTrail, false)}
-                ${this.#trailCard('allTrail', 'All recent trail', this._allTrail, true)}
-            </div>
+            ${this.#trailCard()}
             <div class="activity-grid">
                 ${this.#activityCard('myActivity', 'Your recent activity', this._myActivity, false)}
                 ${this.#activityCard('allActivity', 'All recent activity', this._allActivity, true)}
             </div>
         `;
-    }
-
-    // Toggles a card's collapsed state (new object so Lit re-renders).
-    #toggleCollapse(key) {
-        this._collapsed = { ...this._collapsed, [key]: !this._collapsed[key] };
-    }
-
-    // Header toggle button placed in the box's header-actions slot. Uses uui-symbol-expand,
-    // an animated caret that points down when collapsed and rotates up when open.
-    #collapseToggle(key) {
-        const collapsed = this._collapsed[key];
-        return html`
-            <uui-button
-                slot="header-actions"
-                look="default"
-                compact
-                label=${collapsed ? 'Expand' : 'Collapse'}
-                title=${collapsed ? 'Expand' : 'Collapse'}
-                @click=${() => this.#toggleCollapse(key)}>
-                <uui-symbol-expand ?open=${!collapsed}></uui-symbol-expand>
-            </uui-button>`;
     }
 
     // Backoffice edit URL for a content/media node (null for other entity types).
@@ -241,8 +236,7 @@ export class UtproDashboardElement extends UmbLitElement {
     #activityCard(key, headline, items, showUser) {
         return html`
             <uui-box class="activity-box" headline=${headline}>
-                ${this.#collapseToggle(key)}
-                ${this._collapsed[key] ? nothing : (items === null
+                ${items === null
                     ? html`<div class="muted">Loading…</div>`
                     : items.length === 0
                         ? html`<div class="muted">No activity yet.</div>`
@@ -265,33 +259,182 @@ export class UtproDashboardElement extends UmbLitElement {
                                 </div>
                                 <uui-tag look="secondary" color=${b.color} class="act-tag">${b.label}</uui-tag>
                             </div>`;
-                        }))}
+                        })}
             </uui-box>
         `;
     }
 
-    // An audit-trail card (from umbracoAudit): the raw eventType is the headline, with the
-    // details/affected as a subtitle and the timestamp + optional user in the meta line.
-    #trailCard(key, headline, items, showUser) {
-        return html`
-            <uui-box class="activity-box" headline=${headline}>
-                ${this.#collapseToggle(key)}
-                ${this._collapsed[key] ? nothing : (items === null
-                    ? html`<div class="muted">Loading…</div>`
-                    : items.length === 0
-                        ? html`<div class="muted">No trail yet.</div>`
-                        : items.map((a) => html`
-                            <div class="act">
-                                <div class="act-main">
-                                    <div class="act-action">
-                                        <span class="act-detail">${a.details || a.affected || a.type}</span>
-                                    </div>
-                                    <div class="act-meta">
-                                        ${fmtDate(a.date)}${showUser && a.user ? html` · ${a.user}` : ''}
-                                    </div>
+    // Fetches both scopes (all + current user) for the window in parallel — the chart compares
+    // them, and the list uses whichever scope is active.
+    async #loadTrail() {
+        if (!this._authContext) return;
+        const [all, my] = await Promise.all([
+            fetchRecentTrail(this._authContext, this._trailRange),
+            fetchMyTrail(this._authContext, this._trailRange),
+        ]);
+        this._trailAll = all;
+        this._trailMy = my;
+    }
+
+    // Range <uui-select> change: remember the window, show loading and refetch both scopes.
+    #onRangeChange(event) {
+        const range = event.target.value;
+        if (!range || range === this._trailRange) return;
+        this._trailRange = range;
+        this._trailAll = null;
+        this._trailMy = null;
+        this.#loadTrail();
+    }
+
+    // Scope toggle (All / Yours): only switches the detail list + summary. Both datasets are
+    // already loaded, so no refetch is needed.
+    #onScopeChange(scope) {
+        if (scope === this._trailScope) return;
+        this._trailScope = scope;
+    }
+
+    // Shows/hides the detail section (scope tabs + rows) under the chart.
+    #toggleDetails() {
+        this._detailsOpen = !this._detailsOpen;
+    }
+
+    // After each render, (re)draw the Frappe bar chart. Frappe renders imperatively into a real
+    // DOM node, so we can't express it declaratively in the template.
+    updated(changed) {
+        super.updated?.(changed);
+        this.#syncTrailChart();
+    }
+
+    // Frappe's BaseChart attaches a window 'resize' listener per instance and exposes no
+    // destroy(), so recreating on every render would leak listeners. The chart shows two
+    // grouped-bar datasets (All vs You), so the signature ignores the scope toggle (which only
+    // affects the list) and only rebuilds when the data or the host actually change.
+    #syncTrailChart() {
+        const host = this.renderRoot?.querySelector('#chart-trail');
+        if (!host) return; // loading or empty state — nothing to draw into
+        const all = this._trailAll;
+        const my = this._trailMy;
+        if (!all || !my) return;
+
+        const allSeries = all.series ?? [];
+        if (allSeries.length === 0) return;
+
+        // Both scopes share the same range → identical buckets, so align 'my' counts by index.
+        const labels = allSeries.map((s) => s.label);
+        const allValues = allSeries.map((s) => s.count);
+        const myValues = labels.map((_, i) => my.series?.[i]?.count ?? 0);
+
+        const sig = `${all.range}:${allValues.join(',')}|${myValues.join(',')}`;
+        if (host.dataset.sig === sig && host.firstElementChild) return; // already current
+
+        host.textContent = '';
+        host.dataset.sig = sig;
+
+        // Two theme colours so the chart tracks light/dark mode: accent for All, a warm tone for You.
+        const cs = getComputedStyle(this);
+        const colorAll = cs.getPropertyValue('--uui-color-selected').trim() || '#3544b1';
+        const colorMy = cs.getPropertyValue('--uui-color-warning').trim() || '#f0ad4e';
+
+        this._chart = new Chart(host, {
+            type: 'bar',
+            height: 220,
+            animate: true,
+            colors: [colorAll, colorMy],
+            axisOptions: { xAxisMode: 'tick', xIsSeries: true },
+            barOptions: { spaceRatio: allSeries.length > 20 ? 0.3 : 0.6 },
+            tooltipOptions: {
+                formatTooltipY: (v) => `${v} event${v === 1 ? '' : 's'}`,
+            },
+            data: {
+                labels,
+                datasets: [
+                    { name: 'All', values: allValues },
+                    { name: 'You', values: myValues },
+                ],
+            },
+        });
+    }
+
+    // The single audit-trail card (from umbracoAudit). A scope toggle (All / Yours) + a range
+    // picker drive one bar chart summarising the window, followed by the newest detail rows.
+    #trailCard() {
+        const scope = this._trailScope;
+        const showUser = scope === 'all';
+        // The list + summary reflect the active scope; the chart (below) always shows both.
+        const data = scope === 'my' ? this._trailMy : this._trailAll;
+        const loading = this._trailAll === null || this._trailMy === null;
+
+        // Clickable "Details" row with a caret. Reveals/hides the scope tabs + list below.
+        const detailsHead = html`
+            <button
+                class="trail-list-head"
+                type="button"
+                aria-expanded=${this._detailsOpen ? 'true' : 'false'}
+                title=${this._detailsOpen ? 'Hide details' : 'Show details'}
+                @click=${() => this.#toggleDetails()}>
+                <span class="trail-list-label">Details</span>
+                <uui-symbol-expand ?open=${this._detailsOpen}></uui-symbol-expand>
+            </button>`;
+
+        // Only shown while the details are open: the scope tabs + the detail rows.
+        const detailsBody = html`
+            <uui-button-group class="trail-scope">
+                <uui-button
+                    look=${scope === 'all' ? 'primary' : 'default'}
+                    label="All" @click=${() => this.#onScopeChange('all')}>All</uui-button>
+                <uui-button
+                    look=${scope === 'my' ? 'primary' : 'default'}
+                    label="Yours" @click=${() => this.#onScopeChange('my')}>Yours</uui-button>
+            </uui-button-group>
+            ${(data?.items?.length)
+                ? html`<div class="trail-list">
+                    ${data.items.map((a) => html`
+                        <div class="act">
+                            <div class="act-main">
+                                <div class="act-action">
+                                    <span class="act-detail">${a.details || a.affected || a.type}</span>
                                 </div>
-                                <uui-tag look="secondary" color="default" class="act-tag">${a.type}</uui-tag>
-                            </div>`))}
+                                <div class="act-meta">
+                                    ${fmtDate(a.date)}${showUser && a.user ? html` · ${a.user}` : ''}
+                                </div>
+                            </div>
+                            <uui-tag look="secondary" color="default" class="act-tag">${a.type}</uui-tag>
+                        </div>`)}
+                </div>`
+                : html`<div class="muted">No trail yet.</div>`}`;
+
+        const rangeSelect = html`
+            <uui-select
+                slot="header-actions"
+                label="Range"
+                title="Time range"
+                .options=${TRAIL_RANGES.map((r) => ({ ...r, selected: r.value === this._trailRange }))}
+                @change=${(e) => this.#onRangeChange(e)}>
+            </uui-select>`;
+
+        // The chart shows both scopes, so it appears whenever either has any events.
+        const hasSeries = (this._trailAll?.series?.some((s) => s.count > 0))
+            || (this._trailMy?.series?.some((s) => s.count > 0));
+        const allTotal = this._trailAll?.total ?? 0;
+        const myTotal = this._trailMy?.total ?? 0;
+        const body = loading
+            ? html`<div class="muted">Loading…</div>`
+            : html`
+                <div class="trail-summary">
+                    <span class="sum sum-all"><strong>${allTotal}</strong> All</span>
+                    <span class="sum sum-my"><strong>${myTotal}</strong> You</span>
+                    <span class="sum-range">${TRAIL_RANGE_LABEL[this._trailRange] || this._trailRange}</span>
+                </div>
+                ${hasSeries
+                    ? html`<div id="chart-trail" class="chart-host"></div>`
+                    : html`<div class="muted chart-empty">No events in this period.</div>`}
+                ${detailsHead}
+                ${this._detailsOpen ? detailsBody : nothing}`;
+
+        return html`
+            <uui-box class="activity-box" headline="Recent trail">
+                ${rangeSelect}
+                ${body}
             </uui-box>
         `;
     }
@@ -424,8 +567,8 @@ export class UtproDashboardElement extends UmbLitElement {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 18px;
-            /* Size each card to its own content so a collapsed card doesn't stretch
-               to match a taller expanded sibling. */
+            /* Size each card to its own content so a shorter card doesn't stretch
+               to match a taller sibling. */
             align-items: start;
         }
         .act {
@@ -448,6 +591,91 @@ export class UtproDashboardElement extends UmbLitElement {
         .act-action a:hover { text-decoration: underline; }
         .act-meta { font-size: 0.75rem; color: var(--uui-color-text-alt, #868686); margin-top: 2px; }
         .act-type { font-weight: 600; }
+
+        /* Audit-trail chart */
+        .trail-summary {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            font-size: 0.85rem;
+            color: var(--uui-color-text-alt, #868686);
+            margin-bottom: 4px;
+        }
+        .trail-summary strong { color: var(--uui-color-text, #1b264f); font-size: 1rem; }
+        /* Colour dots matching the chart datasets (All = accent, You = warning). */
+        .sum { display: inline-flex; align-items: center; gap: 6px; }
+        .sum::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex: none;
+        }
+        .sum-all::before { background: var(--uui-color-selected, #3544b1); }
+        .sum-my::before { background: var(--uui-color-warning, #f0ad4e); }
+        .sum-range { color: var(--uui-color-text-alt, #868686); }
+        .chart-host { width: 100%; min-height: 200px; }
+        .chart-empty { text-align: center; padding: 24px 0; }
+        /* Clickable "Details" row (a caret toggles the section below). */
+        .trail-list-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px 0 0;
+            border: none;
+            border-top: 1px solid var(--uui-color-divider, #eee);
+            background: none;
+            font: inherit;
+            color: inherit;
+            cursor: pointer;
+            text-align: left;
+        }
+        .trail-list-label { font-weight: 700; color: var(--uui-color-text, #1b264f); }
+        .trail-scope { margin-top: 10px; }
+        .trail-list { margin-top: 6px; }
+        /* Keep the range picker compact in the box header. */
+        uui-select[slot='header-actions'] { font-size: 0.8rem; }
+
+        /* Frappe Charts styles (v1.6.2, MIT). The library injects its CSS into document.head,
+           which can't reach this shadow root, so the needed rules live here and use theme
+           variables so the chart follows light/dark mode. */
+        .chart-container {
+            position: relative;
+            font-family: inherit;
+        }
+        .chart-container .axis,
+        .chart-container .chart-label { fill: var(--uui-color-text-alt, #868686); }
+        .chart-container .axis line,
+        .chart-container .chart-label line { stroke: var(--uui-color-divider, #eee); }
+        .chart-container line.dashed { stroke-dasharray: 5, 3; }
+        .chart-container .axis-line .specific-value { text-anchor: start; }
+        .chart-container .axis-line .y-line { text-anchor: end; }
+        .chart-container .axis-line .x-line { text-anchor: middle; }
+        .chart-container .legend-dataset-text { fill: var(--uui-color-text, #1b264f); font-weight: 600; }
+        .graph-svg-tip {
+            position: absolute;
+            z-index: 99999;
+            padding: 10px;
+            font-size: 12px;
+            color: #959da5;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 3px;
+        }
+        .graph-svg-tip ul { padding-left: 0; display: flex; margin: 0; }
+        .graph-svg-tip ul.data-point-list li { min-width: 90px; flex: 1; font-weight: 600; }
+        .graph-svg-tip strong { color: #dfe2e5; font-weight: 600; }
+        .graph-svg-tip .svg-pointer {
+            position: absolute;
+            height: 5px;
+            margin: 0 0 0 -5px;
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.85);
+        }
 
         .card { width: 100%; }
 
