@@ -1,51 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
-		<CompressionEnabled>true</CompressionEnabled>
-    <Version>17.5.0</Version>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
+    <CompressionEnabled>true</CompressionEnabled>
+    <Version>17.6.0</Version>
   </PropertyGroup>
-	<ItemGroup>
-		<Compile Remove="Controllers\Api\**" />
-		<Content Remove="Controllers\Api\**" />
-		<EmbeddedResource Remove="Controllers\Api\**" />
-		<None Remove="Controllers\Api\**" />
-	</ItemGroup>
-	<ItemGroup>
-		<!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-		<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.10" />
-		<PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-		<!-- Default database provider (umbracoDbDSN_ProviderName = "Npgsql2"). Remove this if switching to SQL Server / SQLite. -->
-		<PackageReference Include="Our.Umbraco.PostgreSql" Version="17.5.0" />
-		<PackageReference Include="uSync" Version="17.3.6" />
-		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.0" />
-		<ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
-		<ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
-		<ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
-		<ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
-		<RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\Api\**" />
+    <Content Remove="Controllers\Api\**" />
+    <EmbeddedResource Remove="Controllers\Api\**" />
+    <None Remove="Controllers\Api\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.10" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <!-- Default database provider (umbracoDbDSN_ProviderName = "Npgsql2"). Remove this if switching to SQL Server / SQLite. -->
+    <PackageReference Include="Our.Umbraco.PostgreSql" Version="17.5.0" />
+    <PackageReference Include="uSync" Version="17.3.6" />
+    <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.0" />
+    <ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
+    <ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
+    <ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
+    <ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
 
-	<PropertyGroup>
-		<!-- Razor files are needed for the backoffice to work correctly -->
-		<CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
-		<!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
-		<RazorCompileOnBuild>true</RazorCompileOnBuild>
-		<RazorCompileOnPublish>true</RazorCompileOnPublish>
-	</PropertyGroup>
+  <PropertyGroup>
+    <!-- Razor files are needed for the backoffice to work correctly -->
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
+    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <RazorCompileOnPublish>true</RazorCompileOnPublish>
+  </PropertyGroup>
 
-	<!-- Sync the uTPro Dashboard feature's backoffice assets into this web app's App_Plugins
+  <!-- Sync the uTPro Dashboard feature's backoffice assets into this web app's App_Plugins
 	     so Umbraco serves them directly from the content root. Source of truth lives in
 	     uTPro.Feature.Dashboard/App_Plugins; this copy runs on every build (static files are
 	     not locked by the running site, unlike DLLs). -->
-	<Target Name="CopyUtproDashboardAppPlugins" BeforeTargets="BeforeBuild;Build;BeforePublish;Publish">
-		<ItemGroup>
-			<_UtproDashboardAppPlugins Include="$(MSBuildThisFileDirectory)..\..\Feature\uTPro.Feature.Dashboard\App_Plugins\**\*.*" />
-		</ItemGroup>
-		<Copy SourceFiles="@(_UtproDashboardAppPlugins)" DestinationFiles="@(_UtproDashboardAppPlugins->'$(MSBuildThisFileDirectory)App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
-	</Target>
+  <Target Name="CopyUtproDashboardAppPlugins" BeforeTargets="BeforeBuild;Build;BeforePublish;Publish">
+    <ItemGroup>
+      <_UtproDashboardAppPlugins Include="$(MSBuildThisFileDirectory)..\..\Feature\uTPro.Feature.Dashboard\App_Plugins\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UtproDashboardAppPlugins)" DestinationFiles="@(_UtproDashboardAppPlugins->'$(MSBuildThisFileDirectory)App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+  </Target>
 
 </Project>

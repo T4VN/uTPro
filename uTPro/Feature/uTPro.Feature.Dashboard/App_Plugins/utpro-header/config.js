@@ -20,6 +20,7 @@ export const UTPRO = {
     releasesUrl: 'https://github.com/T4VN/uTPro/releases',   // "Update" target
     website: 'https://github.com/T4VN/uTPro',                // "Website" target
     dashboardPath: '/umbraco/section/content/dashboard/utpro', // uTPro dashboard tab
+    createSiteApi: `${API_BASE}/create-site`,                 // create a new site skeleton in Content
     fallbackVersion: '1.0.0',
 };
 
@@ -132,4 +133,23 @@ export async function fetchRecentTrail(authContext, range = 'month') {
 }
 export async function fetchMyTrail(authContext, range = 'month') {
     return (await apiGet(`${UTPRO.myTrailApi}?range=${encodeURIComponent(range)}`, authContext)) || emptyTrail(range);
+}
+
+// Creates a new site skeleton (root + Sites + Navigation Link) in the Content tree.
+// Returns { ok, status, body } — body.success + body.rootKey on success, body.error on failure.
+export async function createSite(authContext, name) {
+    const init = await authInit(authContext);
+    if (!init) return { ok: false, status: 0, body: { error: 'Not authenticated yet — try again.' } };
+    try {
+        const resp = await fetch(UTPRO.createSiteApi, {
+            ...init,
+            method: 'POST',
+            headers: { ...init.headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name }),
+        });
+        const body = await resp.json().catch(() => null);
+        return { ok: resp.ok, status: resp.status, body };
+    } catch (e) {
+        return { ok: false, status: 0, body: { error: String(e) } };
+    }
 }

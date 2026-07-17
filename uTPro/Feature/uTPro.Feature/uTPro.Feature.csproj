@@ -16,9 +16,10 @@
 
   <ItemGroup>
     <PackageReference Include="uTPro.Feature.AuditLog" Version="4.0.5" />
-    <PackageReference Include="uTPro.Feature.FileManager" Version="3.0.0" />
+    <PackageReference Include="uTPro.Feature.FileManager" Version="4.0.0" />
     <PackageReference Include="uTPro.Feature.JobMonitor" Version="1.0.0" />
     <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="3.0.0" />
+    <!--<PackageReference Include="uTPro.Feature.UrlViewer" Version="1.0.0" />-->
   </ItemGroup>
 
   <ItemGroup>

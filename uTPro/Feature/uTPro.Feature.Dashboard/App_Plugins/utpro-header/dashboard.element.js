@@ -1,7 +1,11 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { UTPRO, fetchVersionInfo, refreshVersionInfo, fetchStats, fetchCurrentUser, fetchRecentActivity, fetchMyActivity, fetchRecentTrail, fetchMyTrail } from './config.js';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UTPRO, fetchVersionInfo, refreshVersionInfo, fetchStats, fetchCurrentUser, fetchRecentActivity, fetchMyActivity, fetchRecentTrail, fetchMyTrail, createSite } from './config.js';
+import { discoverApps, canUsePackage } from './packages-config.js';
 // Vendored locally (MIT) — no CDN/runtime external call, matching config.js' philosophy.
 import { Chart } from './vendor/frappe-charts.min.esm.js';
 
@@ -85,6 +89,12 @@ export class UtproDashboardElement extends UmbLitElement {
         _trailScope: { state: true },
         _trailRange: { state: true },
         _detailsOpen: { state: true },
+        _sectionExts: { state: true },
+        _menuExts: { state: true },
+        _allowedSections: { state: true },
+        _showCreate: { state: true },
+        _siteName: { state: true },
+        _creating: { state: true },
     };
 
     constructor() {
@@ -111,6 +121,36 @@ export class UtproDashboardElement extends UmbLitElement {
         this._authContext = null;
         // Live Frappe Chart instance for the trail card.
         this._chart = null;
+
+        // "uTPro Apps" card. We auto-discover sibling uTPro packages by watching the extension
+        // registry for the entry points they register (sections + Settings menu items). Cards
+        // appear/disappear as packages are installed/removed — no hard-coded list, no server call.
+        this._sectionExts = [];
+        this._menuExts = [];
+        this._allowedSections = null;
+
+        this.observe(umbExtensionsRegistry.byType('section'), (exts) => {
+            this._sectionExts = exts ?? [];
+        }, 'utpro-sections');
+
+        this.observe(umbExtensionsRegistry.byType('menuItem'), (exts) => {
+            this._menuExts = exts ?? [];
+        }, 'utpro-menu-items');
+
+        // The current user's allowed sections drive per-package permission (admins get all).
+        this.consumeContext(UMB_CURRENT_USER_CONTEXT, (ctx) => {
+            if (!ctx) return;
+            this.observe(ctx.currentUser, (user) => {
+                this._allowedSections = user?.allowedSections ?? [];
+            }, 'utpro-current-user');
+        });
+
+        // "Create Site" dialog state.
+        this._showCreate = false;
+        this._siteName = '';
+        this._creating = false;
+        this._notificationContext = null;
+        this.consumeContext(UMB_NOTIFICATION_CONTEXT, (ctx) => { this._notificationContext = ctx; });
 
         // All data comes from the authenticated management API, so load once auth is ready.
         this.consumeContext(UMB_AUTH_CONTEXT, async (ctx) => {
@@ -174,7 +214,101 @@ export class UtproDashboardElement extends UmbLitElement {
                     <div class="side">${this.#renderSide()}</div>
                 </div>
             </div>
+            ${this._showCreate ? this.#createModal() : nothing}
         `;
+    }
+
+    #notify(color, message) {
+        this._notificationContext?.peek(color, { data: { message } });
+    }
+
+    #openCreate() {
+        this._siteName = '';
+        this._showCreate = true;
+    }
+
+    #closeCreate() {
+        if (this._creating) return; // don't close mid-request
+        this._showCreate = false;
+    }
+
+    async #submitCreate() {
+        const name = (this._siteName || '').trim();
+        if (!name) {
+            this.#notify('warning', 'Please enter a site name.');
+            return;
+        }
+        if (!this._authContext) {
+            this.#notify('danger', 'Not ready yet — try again.');
+            return;
+        }
+        this._creating = true;
+        try {
+            const res = await createSite(this._authContext, name);
+            if (res.ok && res.body?.success) {
+                this.#notify('positive', `Site "${name}" created.`);
+                this._showCreate = false;
+                await this.#reloadContentTree();
+            } else {
+                this.#notify('danger', res.body?.error || 'Could not create the site.');
+            }
+        } catch (e) {
+            console.error(e);
+            this.#notify('danger', 'Create request failed.');
+        } finally {
+            this._creating = false;
+        }
+    }
+
+    // Asks the backoffice to reload the Content tree root's children so the new site node
+    // appears immediately (the node was created via the management API, which the client-side
+    // tree doesn't know about otherwise). Best-effort: uses dynamic imports so a backoffice API
+    // change can only disable auto-reload, never break the dashboard from loading.
+    async #reloadContentTree() {
+        try {
+            const [{ UMB_ACTION_EVENT_CONTEXT }, { UmbRequestReloadChildrenOfEntityEvent }] = await Promise.all([
+                import('@umbraco-cms/backoffice/action'),
+                import('@umbraco-cms/backoffice/entity-action'),
+            ]);
+            const ctx = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+            if (!ctx) return;
+            ctx.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({
+                entityType: 'document-root',
+                unique: null,
+            }));
+        } catch (e) {
+            console.warn('uTPro: could not auto-reload the Content tree.', e);
+        }
+    }
+
+    // Lightweight modal dialog for entering the new site name.
+    #createModal() {
+        return html`
+            <div class="modal-backdrop" @click=${this.#closeCreate}>
+                <div class="modal" @click=${(e) => e.stopPropagation()}>
+                    <h3 class="modal-title">Create Site</h3>
+                    <p class="modal-desc">
+                        Creates a new site skeleton in Content:
+                        <strong>${this._siteName || 'SiteName'}</strong> › Sites › Navigation Link.
+                    </p>
+                    <uui-input
+                        label="Site name"
+                        placeholder="e.g. My New Site"
+                        .value=${this._siteName}
+                        ?disabled=${this._creating}
+                        @input=${(e) => this._siteName = e.target.value}
+                        @keydown=${(e) => { if (e.key === 'Enter') this.#submitCreate(); }}>
+                    </uui-input>
+                    <div class="modal-actions">
+                        <uui-button look="secondary" label="Cancel"
+                            ?disabled=${this._creating} @click=${this.#closeCreate}>Cancel</uui-button>
+                        <uui-button look="primary" color="positive" label="Create"
+                            ?disabled=${this._creating} @click=${this.#submitCreate}>
+                            ${this._creating ? 'Creating…' : 'Create'}
+                        </uui-button>
+                    </div>
+                </div>
+            </div>`;
     }
 
     // ── Left column: main content ──
@@ -202,6 +336,10 @@ export class UtproDashboardElement extends UmbLitElement {
                             <uui-button look="secondary" href=${this._website} target="_blank" label="Website">
                                 Website
                             </uui-button>
+                            <uui-button look="outline" color="default" label="Create Site"
+                                @click=${this.#openCreate}>
+                                <uui-icon name="icon-add"></uui-icon> Create Site
+                            </uui-button>
                         </div>
                     </div>
                 </div>
@@ -214,12 +352,52 @@ export class UtproDashboardElement extends UmbLitElement {
                         </a>`)}
                 </div>
             </uui-box>
+            ${this.#appsCard()}
             ${this.#trailCard()}
             <div class="activity-grid">
                 ${this.#activityCard('myActivity', 'Your recent activity', this._myActivity, false)}
                 ${this.#activityCard('allActivity', 'All recent activity', this._allActivity, true)}
             </div>
         `;
+    }
+
+    // Resolves a manifest label that may be an inline dictionary token (e.g. "#simpleForm_title").
+    #label(value) {
+        if (!value) return '';
+        return typeof value === 'string' && value.startsWith('#')
+            ? this.localize.string(value)
+            : value;
+    }
+
+    // uTPro apps this user should see: auto-discovered from the registry AND permitted for this
+    // user (admins pass every section). Sorted by their localized label.
+    #visiblePackages() {
+        return discoverApps(this._sectionExts, this._menuExts)
+            .filter((app) => canUsePackage(app, this._allowedSections))
+            .map((app) => ({ ...app, label: this.#label(app.label) }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    // "uTPro Apps" card: quick links to the sibling uTPro packages that are installed and that
+    // this user has access to. Hidden entirely when there's nothing to show, so it never appears
+    // as an empty box.
+    #appsCard() {
+        const items = this.#visiblePackages();
+        if (items.length === 0) return nothing;
+        return html`
+            <uui-box class="apps-box" headline="uTPro Apps">
+                <uui-icon slot="header-actions" name="icon-app"></uui-icon>
+                <div class="apps-grid">
+                    ${items.map((app) => html`
+                        <a class="app-tile" href=${app.href} title=${'Open ' + app.label}>
+                            <div class="app-head">
+                                <uui-icon class="app-icon" name=${app.icon}></uui-icon>
+                                <span class="app-title">${app.label}</span>
+                            </div>
+                            <span class="app-open">Open <uui-icon name="icon-arrow-right"></uui-icon></span>
+                        </a>`)}
+                </div>
+            </uui-box>`;
     }
 
     // Backoffice edit URL for a content/media node (null for other entity types).
@@ -561,6 +739,62 @@ export class UtproDashboardElement extends UmbLitElement {
         .res-tile:hover { background: var(--uui-color-surface-alt, #f7f7f7); }
         .res-title { font-weight: 700; }
         .res-desc { font-size: 0.85rem; color: var(--uui-color-text-alt, #868686); }
+
+        /* uTPro Apps — clickable tiles linking to installed sibling packages. */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .app-tile {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px;
+            border: 1px solid var(--uui-color-divider, #eee);
+            border-radius: var(--uui-border-radius, 3px);
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.1s ease, border-color 0.1s ease;
+        }
+        .app-tile:hover {
+            background: var(--uui-color-surface-alt, #f7f7f7);
+            border-color: var(--uui-color-border-emphasis, #c4c4c4);
+        }
+        .app-head { display: flex; align-items: center; gap: 8px; }
+        .app-icon { font-size: 1.2rem; color: var(--uui-color-interactive, #3544b1); }
+        .app-title { font-weight: 700; }
+        .app-open {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--uui-color-interactive, #3544b1);
+        }
+
+        /* Create Site modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: var(--uui-color-surface, #fff);
+            border-radius: var(--uui-border-radius, 3px);
+            box-shadow: var(--uui-shadow-depth-3, 0 8px 24px rgba(0, 0, 0, 0.25));
+            padding: 24px;
+            width: min(460px, 92vw);
+        }
+        .modal-title { margin: 0 0 6px; font-size: 1.15rem; font-weight: 700; }
+        .modal-desc { margin: 0 0 14px; color: var(--uui-color-text-alt, #868686); line-height: 1.5; }
+        .modal uui-input { width: 100%; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
 
         /* Recent activity — two cards side by side, stacking when narrow. */
         .activity-grid {
