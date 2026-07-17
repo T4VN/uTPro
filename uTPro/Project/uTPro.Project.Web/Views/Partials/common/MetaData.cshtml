@@ -174,10 +174,17 @@
         foreach (var item in ancestors)
         {
             var itemUrl = item.Url(mode: UrlMode.Absolute);
+            if (string.IsNullOrWhiteSpace(itemUrl))
+            {
+                continue;
+            }
+
             var itemName = WebUtility.HtmlEncode(item.Name());
             items.Add($@"{{""@type"":""ListItem"",""position"":{position},""name"":""{itemName}"",""item"":""{itemUrl}""}}");
             position++;
         }
+
+        if (items.Count == 0) return Html.Raw(string.Empty);
         var json = $@"{{""@context"":""https://schema.org"",""@type"":""BreadcrumbList"",""itemListElement"":[{string.Join(",", items)}]}}";
         return Html.Raw($"<script type=\"application/ld+json\">{json}</script>");
     }
