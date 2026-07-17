@@ -213,9 +213,11 @@ public class uTProDashboardManagementController(
         contentService.GetPagedContentInRecycleBin(0, 1, out var contentInBin);
         mediaService.GetPagedMediaInRecycleBin(0, 1, out var mediaInBin);
 
-        var users = userService.GetAll(0, int.MaxValue, out _).ToList();
-        var usersTotal = users.Count;
-        var usersDisabled = users.Count(u => !u.IsApproved);
+        // Count via aggregate queries instead of materialising every user row (mirrors the
+        // member counts below): disabled = total − approved.
+        var usersTotal = userService.GetCount(MemberCountType.All);
+        var usersApproved = userService.GetCount(MemberCountType.Approved);
+        var usersDisabled = Math.Max(0, usersTotal - usersApproved);
 
         var membersTotal = memberService.GetCount(MemberCountType.All);
         var membersApproved = memberService.GetCount(MemberCountType.Approved);
@@ -236,9 +238,15 @@ public class uTProDashboardManagementController(
         });
     }
 
-    // Recent activity across all users (audit trail from umbracoLog, like the Audit Log viewer).
+    // True when the current backoffice user is an administrator. Cross-user audit data
+    // (everyone's activity + IPs) must be restricted to admins.
+    private bool IsAdmin() =>
+        backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() == true;
+
+    // Recent activity across ALL users (audit trail from umbracoLog) — admin only, since it
+    // exposes other users' activity. Non-admins should use my-activity.
     [HttpGet("recent-activity")]
-    public IActionResult RecentActivity() => Ok(GetActivity(null));
+    public IActionResult RecentActivity() => IsAdmin() ? Ok(GetActivity(null)) : Forbid();
 
     // The current user's own recent activity.
     [HttpGet("my-activity")]
@@ -308,10 +316,12 @@ public class uTProDashboardManagementController(
         return r.LogHeader ?? string.Empty;
     }
 
-    // Recent audit trail across all users (from umbracoAudit — logins, saves, user changes, etc.).
+    // Recent audit trail across ALL users (from umbracoAudit — logins, saves, user changes, etc.).
+    // Admin only: it exposes other users' activity and source IP addresses.
     // ?range=week|month|quarter|year (default month) selects the chart/detail window.
     [HttpGet("recent-trail")]
-    public IActionResult RecentTrail([FromQuery] string? range = null) => Ok(GetAuditTrail(null, range));
+    public IActionResult RecentTrail([FromQuery] string? range = null) =>
+        IsAdmin() ? Ok(GetAuditTrail(null, range)) : Forbid();
 
     // The current user's own recent audit trail.
     [HttpGet("my-trail")]
