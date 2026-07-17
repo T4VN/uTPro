@@ -109,3 +109,6 @@ uTPro is **completely free and open source**, giving developers the freedom to *
 ## Development, but don't forget SEO
 
 <img width="2559" height="1378" alt="image" src="https://github.com/user-attachments/assets/251e4e1e-ceac-4782-8d4a-ca06c5315cd5" />
+
+## Dashboard uTPro
+<img width="1919" height="1062" alt="image" src="https://github.com/user-attachments/assets/fd0ba3fc-ee67-4e72-9d29-c8ad1f74546d" />
