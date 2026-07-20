@@ -6,11 +6,29 @@ namespace uTPro.Extension
 {
     public static class ToHtmlExtensions
     {
+        // Dangerous tags whose opening/closing markers are neutralised below.
         static readonly IEnumerable<string> lstNotShowHtml = new List<string>()
         {
             "script",
-            "style"
+            "style",
+            "iframe",
+            "object",
+            "embed",
+            "base",
+            "form"
         };
+
+        // NOTE: this is a best-effort neutraliser, NOT a full HTML sanitizer. It strips a few
+        // dangerous tags plus inline event handlers and javascript:/vbscript:/data: URIs. Do NOT
+        // rely on it as a security boundary for untrusted input — use a real allow-list sanitizer
+        // (e.g. Ganss.Xss/HtmlSanitizer) if you must render arbitrary user-supplied HTML.
+        static readonly System.Text.RegularExpressions.Regex _eventHandlerRegex =
+            new(@"\son\w+\s*=\s*(?:""[^""]*""|'[^']*'|[^\s>]+)",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        static readonly System.Text.RegularExpressions.Regex _dangerousUriRegex =
+            new(@"(?:javascript|vbscript|data)\s*:",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled);
 
         public static IHtmlContent ToHtml(this IHtmlEncodedString? valueHtml)
         {
@@ -46,9 +64,14 @@ namespace uTPro.Extension
         {
             foreach (var item in lstNotShowHtml)
             {
-                value = value.Replace($"<{item}", "&lt;");
-                value = value.Replace($"{item}>", "&gt;");
+                value = value.Replace($"<{item}", "&lt;", StringComparison.OrdinalIgnoreCase);
+                value = value.Replace($"{item}>", "&gt;", StringComparison.OrdinalIgnoreCase);
             }
+            // Strip inline event handlers (onclick, onerror, onload, …) and neutralise
+            // javascript:/vbscript:/data: URIs so a stray <img onerror=…> / href="javascript:…"
+            // can't execute.
+            value = _eventHandlerRegex.Replace(value, string.Empty);
+            value = _dangerousUriRegex.Replace(value, "blocked:");
             return value;
         }
 

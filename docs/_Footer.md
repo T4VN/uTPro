@@ -1,7 +1,7 @@
 
 #### Technologies Used
-- **Platform:** .NET 9 (SDK 9.0.11)
-- **CMS:** Umbraco CMS v16.5.1
+- **Platform:** .NET 10 (SDK 10.0.301)
+- **CMS:** Umbraco CMS v17.5.3
 - **Languages:** C#, Razor Views (.cshtml)
 - **License:** MIT License – completely free to use, modify, and distribute
 

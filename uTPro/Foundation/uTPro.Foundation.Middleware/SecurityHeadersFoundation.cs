@@ -24,15 +24,19 @@ namespace uTPro.Foundation.Middleware
     {
         private const string DefaultXContentTypeOptions = "nosniff";
         private const string DefaultXFrameOptions = "SAMEORIGIN";
+        private const string DefaultReferrerPolicy = "strict-origin-when-cross-origin";
         private const int DefaultHstsMaxAgeSeconds = 31536000;
 
         public IReadOnlyList<KeyValuePair<string, string>>? Resolve(HttpContext context)
         {
             try
             {
+                // Secure-by-default: even when no GlobalSecurityHeadersSettings node exists (or it
+                // is disabled), a safe baseline set of headers is still emitted. An enabled node
+                // overrides/extends the baseline. This avoids shipping frontend pages with no
+                // security headers at all on a fresh install.
                 var node = FindSettingsNode();
-                if (node is not { Enabled: true })
-                    return null;
+                var enabled = node is { Enabled: true };
 
                 var result = new List<KeyValuePair<string, string>>();
                 void Add(string name, string? value)
@@ -42,11 +46,21 @@ namespace uTPro.Foundation.Middleware
                         result.Add(new KeyValuePair<string, string>(name, clean));
                 }
 
-                // X-Content-Type-Options: node value, else the safe default "nosniff".
+                // X-Content-Type-Options: node value (when enabled), else the safe default "nosniff".
                 Add("X-Content-Type-Options",
-                    string.IsNullOrWhiteSpace(node.XContentTypeOptions) ? DefaultXContentTypeOptions : node.XContentTypeOptions);
-                Add("Referrer-Policy", node.ReferrerPolicy);
-                Add("Permissions-Policy", node.PermissionsPolicy);
+                    enabled && !string.IsNullOrWhiteSpace(node!.XContentTypeOptions)
+                        ? node.XContentTypeOptions
+                        : DefaultXContentTypeOptions);
+
+                // Referrer-Policy: node value when enabled, else a safe default.
+                Add("Referrer-Policy",
+                    enabled && !string.IsNullOrWhiteSpace(node!.ReferrerPolicy)
+                        ? node.ReferrerPolicy
+                        : DefaultReferrerPolicy);
+
+                // Permissions-Policy: only when explicitly configured on an enabled node.
+                if (enabled)
+                    Add("Permissions-Policy", node!.PermissionsPolicy);
 
                 // Framing: allow the trusted backoffice host(s) to frame pages so cross-domain
                 // backoffice preview works, while keeping clickjacking protection.
@@ -65,10 +79,12 @@ namespace uTPro.Foundation.Middleware
                         Add("Content-Security-Policy", frameAncestors);
                     else
                         Add("X-Frame-Options",
-                            string.IsNullOrWhiteSpace(node.XFrameOptions) ? DefaultXFrameOptions : node.XFrameOptions);
+                            enabled && !string.IsNullOrWhiteSpace(node!.XFrameOptions)
+                                ? node.XFrameOptions
+                                : DefaultXFrameOptions);
                 }
 
-                var cspClean = Sanitize(node.ContentSecurityPolicyCsp);
+                var cspClean = enabled ? Sanitize(node!.ContentSecurityPolicyCsp) : null;
                 if (string.IsNullOrWhiteSpace(cspClean))
                 {
                     AddFramingProtection();
@@ -83,7 +99,7 @@ namespace uTPro.Foundation.Middleware
                         finalCsp = finalCsp.TrimEnd(';', ' ') + "; " + frameAncestors;
                     }
 
-                    if (node.ContentSecurityPolicyReportOnly)
+                    if (node!.ContentSecurityPolicyReportOnly)
                     {
                         // Keep clickjacking protection ENFORCED while the full policy is only being
                         // tested in report-only mode (report-only headers don't block anything).
@@ -96,12 +112,13 @@ namespace uTPro.Foundation.Middleware
                     }
                 }
 
-                if (node.HstsEnabled && context.Request.IsHttps)
+                // HSTS: emitted on HTTPS by default (1 year). An enabled node can tune/disable it.
+                if (context.Request.IsHttps && (!enabled || node!.HstsEnabled))
                 {
-                    var maxAge = node.HstsMaxAgeSeconds > 0 ? node.HstsMaxAgeSeconds : DefaultHstsMaxAgeSeconds;
+                    var maxAge = enabled && node!.HstsMaxAgeSeconds > 0 ? node.HstsMaxAgeSeconds : DefaultHstsMaxAgeSeconds;
                     var hsts = $"max-age={maxAge}";
-                    if (node.HstsIncludeSubDomains) hsts += "; includeSubDomains";
-                    if (node.HstsPreload) hsts += "; preload";
+                    if (enabled && node!.HstsIncludeSubDomains) hsts += "; includeSubDomains";
+                    if (enabled && node!.HstsPreload) hsts += "; preload";
                     Add("Strict-Transport-Security", hsts);
                 }
 

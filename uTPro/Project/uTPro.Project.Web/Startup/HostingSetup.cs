@@ -90,7 +90,9 @@ public static class HostingSetup
     /// Prefer this over ConfigureRootPath when only uploaded media (logos, images, files)
     /// needs to be shared between apps — App_Plugins and compiled assets stay per-app.
     /// A relative value is resolved against ContentRootPath. Empty = default (~/media in wwwroot).
-    /// Must run before ConfigureUmbraco().
+    /// If the resolved path is INSIDE the web root it is applied as the virtual UmbracoMediaPath
+    /// (Umbraco crashes if an in-web-root path is passed as the absolute UmbracoMediaPhysicalRootPath);
+    /// paths outside the web root use UmbracoMediaPhysicalRootPath. Must run before ConfigureUmbraco().
     /// </summary>
     public static WebApplicationBuilder ConfigureMediaPath(this WebApplicationBuilder builder)
     {
@@ -108,11 +110,42 @@ public static class HostingSetup
 
         Directory.CreateDirectory(customMediaPath);
 
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        // If the media folder lives INSIDE the web root, configuring it as an absolute
+        // UmbracoMediaPhysicalRootPath makes Umbraco's EssentialDirectoryCreator call
+        // MapPathWebRoot() on an already-fully-qualified path and throw at startup
+        // ("The path appears to already be fully qualified"). In that case use the web-root-relative
+        // virtual path (UmbracoMediaPath) instead — same physical location, no crash. Only paths
+        // OUTSIDE the web root use UmbracoMediaPhysicalRootPath.
+        var webRoot = string.IsNullOrEmpty(builder.Environment.WebRootPath)
+            ? null
+            : Path.GetFullPath(builder.Environment.WebRootPath);
+
+        if (webRoot is not null && IsInside(webRoot, customMediaPath))
         {
-            ["Umbraco:CMS:Global:UmbracoMediaPhysicalRootPath"] = customMediaPath
-        });
+            var relative = Path.GetRelativePath(webRoot, customMediaPath).Replace('\\', '/').Trim('/');
+            builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Umbraco:CMS:Global:UmbracoMediaPath"] = relative.Length == 0 ? "~/" : "~/" + relative
+            });
+        }
+        else
+        {
+            builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Umbraco:CMS:Global:UmbracoMediaPhysicalRootPath"] = customMediaPath
+            });
+        }
 
         return builder;
+    }
+
+    /// <summary>True when <paramref name="path"/> is the same as, or nested under, <paramref name="root"/>.</summary>
+    private static bool IsInside(string root, string path)
+    {
+        var rootWithSep = root.EndsWith(Path.DirectorySeparatorChar)
+            ? root
+            : root + Path.DirectorySeparatorChar;
+        return path.Equals(root, StringComparison.OrdinalIgnoreCase)
+            || path.StartsWith(rootWithSep, StringComparison.OrdinalIgnoreCase);
     }
 }
