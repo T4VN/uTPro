@@ -93,6 +93,12 @@ public class uTProDashboardManagementController(
     private const string SitesFolderDocTypeAlias = "globalFolderSites";
     private const string NavigationLinkDocTypeAlias = "globalFolderNavigationLinkForSite";
 
+    // Super-user id fallback (-1) for the int-based ContentService audit column. Defined locally
+    // instead of Constants.Security.SuperUserId (obsolete, removed in Umbraco 18). These endpoints
+    // are section-authorized so CurrentUser is effectively always present; the fallback just keeps
+    // the call non-null-dependent.
+    private const int SuperUserIdFallback = -1;
+
     /// <summary>
     /// Creates a new site skeleton in the Content tree:
     /// <code>
@@ -115,7 +121,7 @@ public class uTProDashboardManagementController(
             return BadRequest(new { error = "Site name is required." });
         }
 
-        var userId = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+        var userId = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? SuperUserIdFallback;
 
         // Culture-variant doc types need the name set per language (not the invariant Name),
         // otherwise Save throws "Cannot save content with an empty name" on a multilingual site.

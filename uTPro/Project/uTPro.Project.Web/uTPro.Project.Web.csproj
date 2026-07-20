@@ -24,6 +24,10 @@
     <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.0" />
     <ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
     <ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
+    <!-- Local dev reference so the URL Viewer + Site/Node URL Scan feature can be tested inside
+         this site before it is consumed as a NuGet package. Its backoffice assets (App_Plugins)
+         are served automatically because it is a Razor class library. -->
+    <ProjectReference Include="..\..\..\..\uTPro.Feature.UrlViewer\src\uTPro.Feature.UrlViewer\uTPro.Feature.UrlViewer.csproj" />
     <ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
     <ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
