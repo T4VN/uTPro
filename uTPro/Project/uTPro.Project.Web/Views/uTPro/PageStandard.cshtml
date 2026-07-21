@@ -4,8 +4,58 @@
     var currentPage = Umbraco.AssignedContentItem;
     var top = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("topComponent");
     var bottom = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("bottomComponent");
+    var sidebar = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("sidebarComponent");
     var content = Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content");
+    var rootName = CurrentSite.GetItem().Root.Name;
+
+    // Effective layout: page's own `layout` -> Pages container `defaultLayout` -> "full".
+    var layout = Model.GetContentLayout();
+
+    // Sidebar column is only rendered for left/right layouts AND when there is sidebar content;
+    // otherwise the page falls back to the full-width arrangement.
+    var showSidebar = layout.HasSidebar() && sidebar is not null && sidebar.Any();
 }
-@await Html.GetBlockGridHtmlAsync(top, CurrentSite.GetItem().Root.Name)
-@await Html.GetBlockGridHtmlAsync(content, CurrentSite.GetItem().Root.Name)
-@await Html.GetBlockGridHtmlAsync(bottom, CurrentSite.GetItem().Root.Name)
+@await Html.GetBlockGridHtmlAsync(top, rootName)
+
+@if (showSidebar)
+{
+    <section class="wrapper style2">
+        <div class="container">
+            <div class="row gtr-150">
+                @if (layout == LayoutExtension.LayoutLeftSidebar)
+                {
+                    <div class="col-4 col-12-medium">
+                        <div class="sidebar">
+                            @await Html.GetBlockGridHtmlAsync(sidebar, rootName)
+                        </div>
+                    </div>
+                    <div class="col-8 col-12-medium imp-medium">
+                        <div class="content">
+                            @await Html.GetBlockGridHtmlAsync(content, rootName)
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-8 col-12-medium">
+                        <div class="content">
+                            @await Html.GetBlockGridHtmlAsync(content, rootName)
+                        </div>
+                    </div>
+                    <div class="col-4 col-12-medium">
+                        <div class="sidebar">
+                            @await Html.GetBlockGridHtmlAsync(sidebar, rootName)
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    @* Full layout: render the content block grid as before (full-bleed sections). *@
+    @await Html.GetBlockGridHtmlAsync(content, rootName)
+}
+
+@await Html.GetBlockGridHtmlAsync(bottom, rootName)

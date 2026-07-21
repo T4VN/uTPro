@@ -5,7 +5,7 @@ namespace uTPro.Extension.CurrentSite
 {
     public interface ICurrentItemExtension
     {
-        GlobalRoot Root { get; }
+        GlobalFolderRoot Root { get; }
         GlobalFolderSites FolderSite { get; }
         GlobalFolderSettings FolderSettings { get; }
         IPublishedContent? Current { get; }

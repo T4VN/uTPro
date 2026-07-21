@@ -16,7 +16,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Extensions;
+using Umbraco.Cms.Web.Common.PublishedModels;
 
 namespace uTPro.Feature.Dashboard.Controllers;
 
@@ -91,9 +91,11 @@ public class uTProDashboardManagementController(
     }
 
     // Document type aliases for the site skeleton created by "Create Site".
-    private const string RootDocTypeAlias = "globalRoot";
-    private const string SitesFolderDocTypeAlias = "globalFolderSites";
-    private const string NavigationLinkDocTypeAlias = "globalFolderNavigationLinkForSite";
+    // Use the generated model constants instead of hard-coded strings so a doc-type alias
+    // rename (e.g. globalRoot -> globalFolderRoot) is a compile-time change, not a silent break.
+    private const string RootDocTypeAlias = GlobalFolderRoot.ModelTypeAlias;
+    private const string SitesFolderDocTypeAlias = GlobalFolderSites.ModelTypeAlias;
+    private const string NavigationLinkDocTypeAlias = GlobalFolderNavigationLinkForSite.ModelTypeAlias;
 
     // Super-user id fallback (-1) for the int-based ContentService audit column. Defined locally
     // instead of Constants.Security.SuperUserId (obsolete, removed in Umbraco 18). These endpoints
@@ -102,12 +104,6 @@ public class uTProDashboardManagementController(
     private const int SuperUserIdFallback = -1;
 
     /// <summary>
-    /// Creates a new site skeleton in the Content tree:
-    /// <code>
-    /// {name}                (globalRoot)
-    ///   └─ Sites            (globalFolderSites)
-    ///        └─ Navigation Link (globalFolderNavigationLinkForSite)
-    /// </code>
     /// Nodes are saved as drafts (not published) so the editor can build pages under the
     /// structure and publish when ready. Requires Content section access.
     /// </summary>

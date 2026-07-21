@@ -21,7 +21,7 @@ namespace uTPro.Extension.CurrentSite
         private readonly ILogger<CurrentItemExtension> _logger = logger;
 
         // Memoization fields
-        private GlobalRoot? _root;
+        private GlobalFolderRoot? _root;
         private bool _rootResolved;
 
         private GlobalFolderSites? _folderSite;
@@ -39,13 +39,13 @@ namespace uTPro.Extension.CurrentSite
         private IPublishedContent? _pageErrors;
         private bool _pageErrorsResolved;
 
-        public GlobalRoot Root
+        public GlobalFolderRoot Root
         {
             get
             {
                 if (!_rootResolved)
                 {
-                    _root = (GlobalRoot)GetItemByAlias(Current, GlobalRoot.ModelTypeAlias, true);
+                    _root = (GlobalFolderRoot)GetItemByAlias(Current, GlobalFolderRoot.ModelTypeAlias, true);
                     _rootResolved = true;
                 }
                 return _root!;

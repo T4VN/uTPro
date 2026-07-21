@@ -6,7 +6,7 @@
     <!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
     <CompressionEnabled>true</CompressionEnabled>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
-    <Version>17.6.2</Version>
+    <Version>17.7.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Controllers\Api\**" />
