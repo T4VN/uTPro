@@ -16,6 +16,7 @@ using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Project.Web.Configure
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ConfigureRenderController : RenderController
     {
         readonly ICurrentSiteExtension _currentSite;

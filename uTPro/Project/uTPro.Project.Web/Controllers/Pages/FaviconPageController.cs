@@ -6,6 +6,7 @@ using uTPro.Foundation.Favicon;
 
 namespace uTPro.Project.Web.Controllers.Pages
 {
+    [Microsoft.AspNetCore.Mvc.ApiExplorerSettings(IgnoreApi = true)]
     public class FaviconPageController : UmbracoPageController
     {
         readonly IFaviconFoundation _foundation;

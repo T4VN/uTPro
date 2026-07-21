@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
@@ -26,7 +27,8 @@ namespace uTPro.Feature.Dashboard.Controllers;
 /// calls GitHub directly — avoids CORS, corporate proxies and rate-limit issues.
 /// </summary>
 [VersionedApiBackOfficeRoute("utpro/dashboard")]
-[ApiExplorerSettings(GroupName = "uTPro Dashboard")]
+[MapToApi(ConfigureDashboardSwaggerGenOptions.ApiName)]
+[ApiExplorerSettings(GroupName = "Dashboard")]
 public class uTProDashboardManagementController(
     IContentService contentService,
     IContentTypeService contentTypeService,

@@ -4,6 +4,7 @@ using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Project.Web.Configure
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : ControllerBase
     {
         private readonly ICurrentSiteExtension _currentSite;
