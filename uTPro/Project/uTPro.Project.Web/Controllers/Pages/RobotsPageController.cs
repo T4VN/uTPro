@@ -7,6 +7,7 @@ using uTPro.Foundation.Robots;
 
 namespace uTPro.Project.Web.Controllers.Pages
 {
+    [Microsoft.AspNetCore.Mvc.ApiExplorerSettings(IgnoreApi = true)]
     public class RobotsPageController : UmbracoPageController
     {
         readonly IRobotsFoundation _foundation;

@@ -8,6 +8,7 @@ using uTPro.Foundation.Sitemap;
 
 namespace uTPro.Project.Web.Controllers.Pages
 {
+    [Microsoft.AspNetCore.Mvc.ApiExplorerSettings(IgnoreApi = true)]
     public class SitemapPageController : UmbracoPageController
     {
         readonly ISitemapFoundation _foundation;
