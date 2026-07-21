@@ -1,10 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.PublishedModels;
-using uTPro.Common.Constants;
 using uTPro.Extension;
 using uTPro.Extension.CurrentSite;
 
@@ -12,7 +10,6 @@ namespace uTPro.Foundation.Sitemap
 {
     internal class SitemapFoundation : ISitemapFoundation
     {
-        private const string FileSitemapXSL = "sitemap.xsl";
         private const string CacheKeyPrefix = "uTPro:Sitemap:";
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
 
@@ -142,10 +139,6 @@ namespace uTPro.Foundation.Sitemap
         {
             var sw = new Utf8StringWriter();
             sw.WriteLine(document.Declaration?.ToString());
-            if (System.IO.File.Exists(Path.Combine(PathFolder.DirectoryWWWRoot, FileSitemapXSL)))
-            {
-                sw.WriteLine("<?xml-stylesheet type=\"text/xsl\" href=\"/" + FileSitemapXSL + "\"?>");
-            }
             sw.WriteLine(document.ToString());
             return sw.ToString();
         }
