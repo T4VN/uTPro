@@ -221,11 +221,16 @@ public class uTProDashboardManagementController(
         contentService.GetPagedContentInRecycleBin(0, 1, out var contentInBin);
         mediaService.GetPagedMediaInRecycleBin(0, 1, out var mediaInBin);
 
-        // Count via aggregate queries instead of materialising every user row (mirrors the
-        // member counts below): disabled = total − approved.
+        // Total users via an aggregate count (no need to materialise every row).
         var usersTotal = userService.GetCount(MemberCountType.All);
-        var usersApproved = userService.GetCount(MemberCountType.Approved);
-        var usersDisabled = Math.Max(0, usersTotal - usersApproved);
+
+        // Count disabled users by their actual state rather than deriving it from
+        // "total − approved": that heuristic wrongly flagged the built-in super-admin as
+        // disabled (GetCount(Approved) doesn't count it as expected) and also lumps in
+        // invited/pending users. GetAll returns the matching total via the out parameter,
+        // so we only fetch a single row.
+        userService.GetAll(0, 1, out var usersDisabled, "username", Direction.Ascending,
+            new[] { UserState.Disabled }, (string[]?)null, (string?)null);
 
         var membersTotal = memberService.GetCount(MemberCountType.All);
         var membersApproved = memberService.GetCount(MemberCountType.Approved);
