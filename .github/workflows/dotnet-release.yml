@@ -56,11 +56,18 @@ jobs:
           mv publish_output.zip "$NEW_NAME"
           echo "file_name=$NEW_NAME" >> $GITHUB_OUTPUT
 
+      # ✅ Lấy version từ <Version> trong uTPro.Project.Web.csproj
       - name: Set version tag
         id: version
         run: |
-          VERSION="v$(date +'%Y%m%d.%H%M')"
-          echo "version_tag=$VERSION" >> $GITHUB_OUTPUT
+          CSPROJ="./uTPro/Project/uTPro.Project.Web/uTPro.Project.Web.csproj"
+          VERSION=$(grep -oP '(?<=<Version>)[^<]+' "$CSPROJ" | head -n1)
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not find <Version> in $CSPROJ"
+            exit 1
+          fi
+          echo "Found version: $VERSION"
+          echo "version_tag=v$VERSION" >> $GITHUB_OUTPUT
           
       - name: Delete existing draft releases
         run: |
