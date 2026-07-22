@@ -6,7 +6,10 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.PublishedModels;
+using Umbraco.Extensions;
 
 namespace uTPro.Project.Web.Configure
 {
@@ -124,28 +127,172 @@ namespace uTPro.Project.Web.Configure
     {
         private readonly IPublishedUrlInfoProvider _inner;
         private readonly HiddenContainerAliases _hidden;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IDocumentUrlService _documentUrlService;
 
-        public HiddenContainerUrlInfoProvider(IPublishedUrlInfoProvider inner, HiddenContainerAliases hidden)
+        public HiddenContainerUrlInfoProvider(
+            IPublishedUrlInfoProvider inner,
+            HiddenContainerAliases hidden,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IDocumentUrlService documentUrlService)
         {
             _inner = inner;
             _hidden = hidden;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _documentUrlService = documentUrlService;
         }
 
-        public Task<ISet<UrlInfo>> GetAllAsync(Umbraco.Cms.Core.Models.IContent content)
+        public async Task<ISet<UrlInfo>> GetAllAsync(Umbraco.Cms.Core.Models.IContent content)
         {
+            // The container itself has no URL — show a single message instead of any link.
             if (_hidden.Contains(content.ContentType.Alias))
             {
-                // A message-type UrlInfo makes the panel show text instead of a navigable link.
-                // (Return an empty set instead if you prefer the panel to show no rows at all.)
-                ISet<UrlInfo> message = new HashSet<UrlInfo>
+                return new HashSet<UrlInfo>
                 {
                     UrlInfo.AsMessage("This node is a container and has no URL.", "uTProHiddenUrlProvider", null),
                 };
-
-                return Task.FromResult(message);
             }
 
-            return _inner.GetAllAsync(content);
+            var urls = await _inner.GetAllAsync(content);
+
+            // For a page that sits under a hidden container, the default provider still leaks the
+            // "raw" URL that includes the container segment (e.g. /pages/) via GetOtherUrls — the
+            // aggregate GetOtherUrls is a SelectMany, so an IUrlProvider cannot suppress it. Drop
+            // any URL that still contains a hidden-container segment; the transparent (clean) URL
+            // for each culture is already present in the set.
+            var containerSegments = GetAncestorContainerSegments(content, urls);
+            if (containerSegments.Count == 0)
+            {
+                return urls;
+            }
+
+            var result = new HashSet<UrlInfo>();
+            var seenPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            // Pass 1: keep messages and URLs that are already clean (no container segment).
+            foreach (var info in urls)
+            {
+                if (info.Url is null)
+                {
+                    result.Add(info);
+                    continue;
+                }
+
+                if (!PathContainsSegment(info.Url, containerSegments))
+                {
+                    result.Add(info);
+                    seenPaths.Add(PathKey(info.Culture, PathOf(info.Url)));
+                }
+            }
+
+            // Pass 2: for leaked URLs that still contain a container segment (e.g. /pages/),
+            // strip the container segment instead of dropping the URL — so the clean variant
+            // (e.g. /vi/huong-dan/page-test/) is preserved — and only add it if that clean path
+            // isn't already present.
+            foreach (var info in urls)
+            {
+                if (info.Url is null || !PathContainsSegment(info.Url, containerSegments))
+                {
+                    continue;
+                }
+
+                var cleanedPath = StripSegmentsFromPath(PathOf(info.Url), containerSegments);
+                if (!seenPaths.Add(PathKey(info.Culture, cleanedPath)))
+                {
+                    continue;
+                }
+
+                var cleanedUrl = info.Url.IsAbsoluteUri
+                    ? info.Url.GetLeftPart(UriPartial.Authority) + cleanedPath
+                    : cleanedPath;
+
+                var provider = string.IsNullOrEmpty(info.Provider) ? "uTProHiddenUrlProvider" : info.Provider;
+                result.Add(UrlInfo.AsUrl(cleanedUrl, provider, info.Culture));
+            }
+
+            return result.Count > 0 ? result : urls;
+        }
+
+        private static string PathKey(string? culture, string path) => (culture ?? string.Empty) + "|" + path;
+
+        private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
+
+        // Removes the given (container) segments from a URL path, preserving a trailing slash.
+        private static string StripSegmentsFromPath(string path, HashSet<string> segments)
+        {
+            var kept = path.Split('/', StringSplitOptions.RemoveEmptyEntries)
+                .Where(p => !segments.Contains(p));
+
+            var result = "/" + string.Join("/", kept);
+
+            if (path.EndsWith('/') && result.Length > 1)
+            {
+                result += "/";
+            }
+
+            return result;
+        }
+
+        // URL segments of this content's hidden-container ancestors, resolved for every culture
+        // present in the URL set (so both en-US and vi-VN container segments are covered).
+        private HashSet<string> GetAncestorContainerSegments(
+            Umbraco.Cms.Core.Models.IContent content, ISet<UrlInfo> urls)
+        {
+            var segments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
+                || umbracoContext.Content is null)
+            {
+                return segments;
+            }
+
+            var node = umbracoContext.Content.GetById(content.Key);
+            if (node is null)
+            {
+                return segments;
+            }
+
+            var containers = node.Ancestors().Where(a => _hidden.Contains(a.ContentType.Alias)).ToList();
+            if (containers.Count == 0)
+            {
+                return segments;
+            }
+
+            var cultures = urls.Select(u => u.Culture).Distinct().ToList();
+            if (cultures.Count == 0)
+            {
+                cultures.Add(null);
+            }
+
+            foreach (var container in containers)
+            {
+                foreach (var culture in cultures)
+                {
+                    var segment = _documentUrlService.GetUrlSegment(container.Key, culture ?? string.Empty, false);
+                    if (!string.IsNullOrEmpty(segment))
+                    {
+                        segments.Add(segment);
+                    }
+                }
+            }
+
+            return segments;
+        }
+
+        // True when any path segment of the URL equals one of the (container) segments.
+        private static bool PathContainsSegment(Uri url, HashSet<string> segments)
+        {
+            var path = url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
+
+            foreach (var part in path.Split('/', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (segments.Contains(part))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
@@ -169,7 +316,9 @@ namespace uTPro.Project.Web.Configure
             builder.Services.Replace(ServiceDescriptor.Transient<IPublishedUrlInfoProvider>(sp =>
                 new HiddenContainerUrlInfoProvider(
                     sp.GetRequiredService<PublishedUrlInfoProvider>(),
-                    sp.GetRequiredService<HiddenContainerAliases>())));
+                    sp.GetRequiredService<HiddenContainerAliases>(),
+                    sp.GetRequiredService<IUmbracoContextAccessor>(),
+                    sp.GetRequiredService<IDocumentUrlService>())));
 
             // Keep hidden-link nodes out of the front-end Examine ExternalIndex so site search
             // never returns them (see HiddenContainerIndexOptions).
