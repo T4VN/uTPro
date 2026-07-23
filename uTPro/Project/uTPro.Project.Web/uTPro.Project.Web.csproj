@@ -22,7 +22,7 @@
     <!-- Default database provider (umbracoDbDSN_ProviderName = "Npgsql2"). Remove this if switching to SQL Server / SQLite. -->
     <PackageReference Include="Our.Umbraco.PostgreSql" Version="17.5.0" />
     <PackageReference Include="uSync" Version="17.3.6" />
-    <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.0" />
+    <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.1" />
     <ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
     <ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
     <ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
