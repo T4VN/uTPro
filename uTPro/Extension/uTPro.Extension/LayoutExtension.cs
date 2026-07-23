@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.PublishedModels;
 using Umbraco.Extensions;
 
 namespace uTPro.Extension
@@ -22,7 +23,7 @@ namespace uTPro.Extension
         public const string LayoutRightSidebar = "right-sidebar";
 
         // Container document type that holds the child pages (see HiddenContainerAliases).
-        private const string PagesContainerAlias = "globalFolderPages";
+        private const string PagesContainerAlias = GlobalFolderPages.ModelTypeAlias;
         private const string LayoutPropertyAlias = "layout";
         private const string DefaultLayoutPropertyAlias = "defaultLayout";
 
