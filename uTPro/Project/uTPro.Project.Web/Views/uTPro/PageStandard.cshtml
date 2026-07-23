@@ -26,16 +26,16 @@
 
 @if (layout.HasSidebar())
 {
-    var sidebarFirst = layout == LayoutExtension.LayoutLeftSidebar ? "imp" : null;
+    var rowLayout = layout == LayoutExtension.LayoutLeftSidebar ? "sidebar-left" : "sidebar-right";
     <section class="wrapper style2">
         <div class="container">
-            <div class="row gtr-150">
-                <div class="col-8 col-12-medium">
+            <div class="row gtr-150 @rowLayout">
+                <div class="col-8 col-12-medium content-col">
                     <div class="content">
                         @await Html.GetBlockGridHtmlAsync(content, rootName)
                     </div>
                 </div>
-                <div class="col-4 col-12-medium @sidebarFirst">
+                <div class="col-4 col-12-medium sidebar-col">
                     <div class="sidebar">
                         @foreach (var region in sidebars)
                         {

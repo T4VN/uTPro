@@ -1,0 +1,15 @@
+/* Breadcrumb reusing the ".title" box (Views/uTPro/blockgrid/Components/Breadcrumbs.cshtml) —
+   inherit the title's colour/casing so it looks identical to the original static title. */
+.title.breadcrumbs a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.title.breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+.title.breadcrumbs .sep {
+    margin: 0 0.5em;
+    opacity: 0.5;
+}

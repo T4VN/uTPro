@@ -22,6 +22,17 @@
         return;
     }
 }
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Breadcrumbs.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Breadcrumbs.css" />
+    }
+}
 <section class="container breadcrumbs" aria-label="breadcrumb">
     @for (var i = 0; i < crumbs.Count; i++)
     {
