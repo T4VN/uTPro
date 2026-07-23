@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -61,6 +62,43 @@ namespace uTPro.Extension
         /// <summary>True when the layout renders a sidebar column beside the main content.</summary>
         public static bool HasSidebar(this string? layout)
             => layout == LayoutLeftSidebar || layout == LayoutRightSidebar;
+
+        /// <summary>
+        /// Resolves an inherited block-grid region (e.g. <c>topComponent</c>) as an ordered list of
+        /// block grids to render (outermost first).
+        ///
+        /// <para>By default the value from the nearest ancestor that defines it is used (override).
+        /// If that owner node has the <paramref name="appendFlagAlias"/> toggle ON, the region
+        /// inherited from further-out ancestors is ALSO included (append), so e.g. a container can
+        /// add a breadcrumb on top of the site-wide header instead of replacing it.</para>
+        /// </summary>
+        public static IReadOnlyList<BlockGridModel> GetInheritedRegion(
+            this IPublishedContent content, string regionAlias, string appendFlagAlias)
+        {
+            var models = new List<BlockGridModel>();
+
+            // Inherited() returns the nearest node (self first) that has a value for the alias.
+            var owner = content.Inherited(regionAlias);
+            while (owner is not null)
+            {
+                var model = owner.Value<BlockGridModel>(regionAlias);
+                if (model is not null && model.Any())
+                {
+                    // Outer levels are discovered later, so insert at the front to keep them on top.
+                    models.Insert(0, model);
+                }
+
+                // Only keep walking outwards when this owner opts to append its inherited region.
+                if (!owner.Value<bool>(appendFlagAlias))
+                {
+                    break;
+                }
+
+                owner = owner.Parent?.Inherited(regionAlias);
+            }
+
+            return models;
+        }
 
         // Returns one of the known layout values (case-insensitive match) or null when unset/invalid.
         private static string? Normalize(string? value)

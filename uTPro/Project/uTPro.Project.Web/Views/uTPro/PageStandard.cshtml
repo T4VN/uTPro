@@ -1,53 +1,48 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+﻿@using Umbraco.Cms.Core.Models.Blocks;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     var currentPage = Umbraco.AssignedContentItem;
-    var top = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("topComponent");
-    var bottom = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("bottomComponent");
-    var sidebar = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("sidebarComponent");
-    var content = Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content");
     var rootName = CurrentSite.GetItem().Root.Name;
+
+    // Shared regions resolved as ordered chains. With the container's "Append To Inherited"
+    // toggle ON, the outer (e.g. site header) region is kept AND the container's region is added;
+    // OFF = the nearest one overrides (default).
+    var tops = currentPage?.GetInheritedRegion("topComponent", "appendToInherited")
+        ?? new List<BlockGridModel>();
+    var bottoms = currentPage?.GetInheritedRegion("bottomComponent", "appendToInherited")
+        ?? new List<BlockGridModel>();
+    var sidebars = currentPage?.GetInheritedRegion("sidebarComponent", "appendToInherited")
+        ?? new List<BlockGridModel>();
+
+    var content = Model.Value<BlockGridModel>("content");
 
     // Effective layout: page's own `layout` -> Pages container `defaultLayout` -> "full".
     var layout = Model.GetContentLayout();
-
-    // Sidebar column is only rendered for left/right layouts AND when there is sidebar content;
-    // otherwise the page falls back to the full-width arrangement.
-    var showSidebar = layout.HasSidebar() && sidebar is not null && sidebar.Any();
 }
-@await Html.GetBlockGridHtmlAsync(top, rootName)
-
-@if (showSidebar)
+@foreach (var region in tops)
 {
+    @await Html.GetBlockGridHtmlAsync(region, rootName)
+}
+
+@if (layout.HasSidebar())
+{
+    var sidebarFirst = layout == LayoutExtension.LayoutLeftSidebar ? "imp" : null;
     <section class="wrapper style2">
         <div class="container">
             <div class="row gtr-150">
-                @if (layout == LayoutExtension.LayoutLeftSidebar)
-                {
-                    <div class="col-4 col-12-medium">
-                        <div class="sidebar">
-                            @await Html.GetBlockGridHtmlAsync(sidebar, rootName)
-                        </div>
+                <div class="col-8 col-12-medium">
+                    <div class="content">
+                        @await Html.GetBlockGridHtmlAsync(content, rootName)
                     </div>
-                    <div class="col-8 col-12-medium imp-medium">
-                        <div class="content">
-                            @await Html.GetBlockGridHtmlAsync(content, rootName)
-                        </div>
+                </div>
+                <div class="col-4 col-12-medium @sidebarFirst">
+                    <div class="sidebar">
+                        @foreach (var region in sidebars)
+                        {
+                            @await Html.GetBlockGridHtmlAsync(region, rootName)
+                        }
                     </div>
-                }
-                else
-                {
-                    <div class="col-8 col-12-medium">
-                        <div class="content">
-                            @await Html.GetBlockGridHtmlAsync(content, rootName)
-                        </div>
-                    </div>
-                    <div class="col-4 col-12-medium">
-                        <div class="sidebar">
-                            @await Html.GetBlockGridHtmlAsync(sidebar, rootName)
-                        </div>
-                    </div>
-                }
+                </div>
             </div>
         </div>
     </section>
@@ -58,4 +53,7 @@ else
     @await Html.GetBlockGridHtmlAsync(content, rootName)
 }
 
-@await Html.GetBlockGridHtmlAsync(bottom, rootName)
+@foreach (var region in bottoms)
+{
+    @await Html.GetBlockGridHtmlAsync(region, rootName)
+}

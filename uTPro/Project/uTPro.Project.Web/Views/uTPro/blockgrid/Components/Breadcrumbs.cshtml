@@ -1,0 +1,42 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Breadcrumbs>>
+@{
+    // Breadcrumb is built from the page currently being rendered (not from the block element),
+    // so this component can be dropped into any region and always reflects the current page.
+    var current = Umbraco.AssignedContentItem;
+    if (current is null)
+    {
+        return;
+    }
+
+    var crumbs = current.AncestorsOrSelf()
+        .Where(n =>
+        {
+            var u = n.Url(mode: UrlMode.Relative);
+            return !string.IsNullOrEmpty(u) && u != "#";
+        })
+        .Reverse()
+        .ToList();
+
+    if (crumbs.Count == 0)
+    {
+        return;
+    }
+}
+<section class="container breadcrumbs" aria-label="breadcrumb">
+    @for (var i = 0; i < crumbs.Count; i++)
+    {
+        var node = crumbs[i];
+        if (i > 0)
+        {
+            <span class="sep">/</span>
+        }
+        if (i == crumbs.Count - 1)
+        {
+            <span aria-current="page">@node.Name</span>
+        }
+        else
+        {
+            <a href="@node.Url()">@node.Name</a>
+        }
+    }
+</section>

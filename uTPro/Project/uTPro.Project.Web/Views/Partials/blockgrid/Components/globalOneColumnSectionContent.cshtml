@@ -1,0 +1,92 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<GlobalOneColumnSectionContent, GlobalOneColumnSectionSetting>>
+@{
+    var content = Model.Content;
+    var settings = Model.Settings;
+
+    var bkg = string.Empty;
+    var bkgImg = Model.Content?.BackgroundImage?.Url() ?? "";
+    var bkgColor = Model.Content?.BackgroundColor?.Color ?? "";
+    var bkgOpacity = Model.Content?.BackgroundOpacity ?? 1m;
+
+    if (!string.IsNullOrEmpty(bkgImg))
+    {
+        if (!string.IsNullOrEmpty(bkgColor) && bkgOpacity < 1)
+        {
+            var color = ColorHelper.HexToRgb(bkgColor);
+            if (color != null)
+            {
+                bkg = $@"
+--section-bg-color:rgba({color.Value.R}, {color.Value.G}, {color.Value.B}, {bkgOpacity.ToString(System.Globalization.CultureInfo.InvariantCulture)});
+--section-bg-url:url('{bkgImg}');
+background-image:linear-gradient(var(--section-bg-color), var(--section-bg-color)), var(--section-bg-url);
+background-position: bottom center;";
+            }
+        }
+        else
+        {
+            bkg = $@"
+--section-bg-url:url('{bkgImg}');
+background-image:var(--section-bg-url);
+background-position: bottom center;";
+        }
+    }
+    else if (!string.IsNullOrEmpty(bkgColor))
+    {
+        bkg = $@"
+--section-bg-color:{bkgColor};
+background-color:var(--section-bg-color);";
+        if (bkgOpacity < 1)
+        {
+            var color = ColorHelper.HexToRgb(bkgColor);
+            if (color != null)
+            {
+                bkg = $@"
+--section-bg-color:rgba({color.Value.R}, {color.Value.G}, {color.Value.B}, {bkgOpacity.ToString(System.Globalization.CultureInfo.InvariantCulture)});
+background-color:var(--section-bg-color);";
+            }
+        }
+    }
+
+    // Text color lives on the CONTENT element.
+    var textColor = $@"--section-text-color:{(!string.IsNullOrEmpty(content.TextColor?.Color) ? content.TextColor?.Color : "#000")};";
+
+    // Spacing/padding, anchor and custom classes live on the SETTINGS element.
+    var paddingStyle = (settings?.AddStyleSpacing) switch
+    {
+        "Remove Spacing" => "padding:0 !important;",
+        "Remove Spacing Top Only" => "padding-top:0 !important;",
+        "Remove Spacing Bottom Only" => "padding-bottom:0 !important;",
+        _ => string.Empty,
+    };
+
+    var anchorId = !string.IsNullOrEmpty(settings?.AdvancedAnchorName)
+        ? settings.AdvancedAnchorName.Replace(" ", "_")
+        : null;
+
+    var customClass = !string.IsNullOrEmpty(settings?.AdvancedCustomClasses)
+        ? settings.AdvancedCustomClasses
+        : null;
+}
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/wrapper.css" />
+}
+else
+{
+    @using (Html.SetSection(content.ContentType.Alias, HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/wrapper.css" />
+    }
+}
+<section class="globalOneColumnSection @customClass"
+         style="@(bkg + textColor)"
+         id="@anchorId">
+    <div class="wrapper" style="@paddingStyle">
+        @if (!string.IsNullOrEmpty(content.Title))
+        {
+            <div class="title">@content.Title</div>
+        }
+        @await Html.GetPreviewBlockGridItemAreasHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}areas")
+    </div>
+</section>
