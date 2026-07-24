@@ -31,7 +31,7 @@ namespace uTPro.Extension
         // RadioButtonList selection (which cannot be unselected in the UI). "inherit" is
         // intentionally NOT a known layout, so Normalize() returns null for it and the
         // resolver falls through to the container default / "full".
-        private static readonly string[] KnownLayouts = { LayoutFull, LayoutLeftSidebar, LayoutRightSidebar };
+        private static readonly string[] KnownLayouts = [LayoutFull, LayoutLeftSidebar, LayoutRightSidebar];
 
         /// <summary>Effective layout preset for the page. Never returns null; defaults to <c>full</c>.</summary>
         public static string GetContentLayout(this IPublishedContent content)
@@ -95,7 +95,7 @@ namespace uTPro.Extension
                     break;
                 }
 
-                owner = owner.Parent?.Inherited(regionAlias);
+                owner = owner.Parent()?.Inherited(regionAlias);
             }
 
             return models;
