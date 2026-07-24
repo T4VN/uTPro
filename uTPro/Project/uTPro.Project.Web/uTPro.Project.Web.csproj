@@ -6,7 +6,7 @@
     <!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
     <CompressionEnabled>true</CompressionEnabled>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
-    <Version>17.6.2</Version>
+    <Version>17.7.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Controllers\Api\**" />
@@ -22,7 +22,7 @@
     <!-- Default database provider (umbracoDbDSN_ProviderName = "Npgsql2"). Remove this if switching to SQL Server / SQLite. -->
     <PackageReference Include="Our.Umbraco.PostgreSql" Version="17.5.0" />
     <PackageReference Include="uSync" Version="17.3.6" />
-    <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.0" />
+    <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.1" />
     <ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
     <ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
     <ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
@@ -47,6 +47,16 @@
       <_UtproDashboardAppPlugins Include="$(MSBuildThisFileDirectory)..\..\Feature\uTPro.Feature.Dashboard\App_Plugins\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(_UtproDashboardAppPlugins)" DestinationFiles="@(_UtproDashboardAppPlugins->'$(MSBuildThisFileDirectory)App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+  </Target>
+
+  <!-- Sync the uTPro Block Preview Toggle feature's backoffice assets (frontend-only,
+	     no server code) into this web app's App_Plugins, same pattern as the Dashboard
+	     feature above. Source of truth lives in uTPro.Feature.BlockPreviewToggle/App_Plugins. -->
+  <Target Name="CopyUtproBlockPreviewToggleAppPlugins" BeforeTargets="BeforeBuild;Build;BeforePublish;Publish">
+    <ItemGroup>
+      <_UtproBlockPreviewToggleAppPlugins Include="$(MSBuildThisFileDirectory)..\..\Feature\uTPro.Feature.BlockPreviewToggle\App_Plugins\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UtproBlockPreviewToggleAppPlugins)" DestinationFiles="@(_UtproBlockPreviewToggleAppPlugins->'$(MSBuildThisFileDirectory)App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
   </Target>
 
 </Project>

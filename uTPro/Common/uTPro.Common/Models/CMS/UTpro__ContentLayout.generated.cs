@@ -27,6 +27,16 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel BottomComponent { get; }
 
+		/// <summary>Layout</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		string Layout { get; }
+
+		/// <summary>Sidebar Component</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel SidebarComponent { get; }
+
 		/// <summary>Top Component</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
@@ -76,6 +86,32 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		public static global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel GetBottomComponent(IUTpro__ContentLayout that, IPublishedValueFallback publishedValueFallback) => that.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(publishedValueFallback, "bottomComponent");
+
+		///<summary>
+		/// Layout: Page layout. Leave empty to inherit from the Pages container (default: full width).
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("layout")]
+		public virtual string Layout => GetLayout(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Layout</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static string GetLayout(IUTpro__ContentLayout that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "layout");
+
+		///<summary>
+		/// Sidebar Component: Shown beside the content when Layout is left/right. Inherited from the Pages container when empty.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("sidebarComponent")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel SidebarComponent => GetSidebarComponent(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Sidebar Component</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel GetSidebarComponent(IUTpro__ContentLayout that, IPublishedValueFallback publishedValueFallback) => that.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(publishedValueFallback, "sidebarComponent");
 
 		///<summary>
 		/// Top Component

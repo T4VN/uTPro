@@ -1552,3 +1552,10 @@ form {
 	}
 
 }
+
+
+@media screen and (min-width: 981px) {
+    .row.sidebar-left > .sidebar-col {
+        order: -1;
+    }
+}

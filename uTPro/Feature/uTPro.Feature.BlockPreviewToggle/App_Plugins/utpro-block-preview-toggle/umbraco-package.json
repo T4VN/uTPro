@@ -1,0 +1,37 @@
+{
+  "id": "utpro-block-preview-toggle",
+  "name": "uTPro Block Preview Toggle",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "backofficeEntryPoint",
+      "alias": "uTPro.BlockPreviewToggle.EntryPoint",
+      "name": "uTPro Block Preview Toggle Entry Point",
+      "js": "/App_Plugins/utpro-block-preview-toggle/entry-point.js"
+    },
+    {
+      "type": "globalContext",
+      "alias": "uTPro.BlockPreviewToggle.Context",
+      "name": "uTPro Block Preview Toggle Context",
+      "js": "/App_Plugins/utpro-block-preview-toggle/toggle-context.js"
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "uTPro.BlockPreviewToggle.GridView",
+      "name": "uTPro Block Grid Preview Toggle View",
+      "element": "/App_Plugins/utpro-block-preview-toggle/block-preview-toggle-views.js",
+      "elementName": "utpro-block-grid-preview-toggle",
+      "weight": 1000,
+      "forBlockEditor": "block-grid"
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "uTPro.BlockPreviewToggle.ListView",
+      "name": "uTPro Block List Preview Toggle View",
+      "element": "/App_Plugins/utpro-block-preview-toggle/block-preview-toggle-views.js",
+      "elementName": "utpro-block-list-preview-toggle",
+      "weight": 1000,
+      "forBlockEditor": "block-list"
+    }
+  ]
+}

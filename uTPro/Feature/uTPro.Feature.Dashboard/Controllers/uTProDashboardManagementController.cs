@@ -16,7 +16,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Extensions;
+using Umbraco.Cms.Web.Common.PublishedModels;
 
 namespace uTPro.Feature.Dashboard.Controllers;
 
@@ -91,9 +91,11 @@ public class uTProDashboardManagementController(
     }
 
     // Document type aliases for the site skeleton created by "Create Site".
-    private const string RootDocTypeAlias = "globalRoot";
-    private const string SitesFolderDocTypeAlias = "globalFolderSites";
-    private const string NavigationLinkDocTypeAlias = "globalFolderNavigationLinkForSite";
+    // Use the generated model constants instead of hard-coded strings so a doc-type alias
+    // rename (e.g. globalRoot -> globalFolderRoot) is a compile-time change, not a silent break.
+    private const string RootDocTypeAlias = GlobalFolderRoot.ModelTypeAlias;
+    private const string SitesFolderDocTypeAlias = GlobalFolderSites.ModelTypeAlias;
+    private const string NavigationLinkDocTypeAlias = GlobalFolderNavigationLinkForSite.ModelTypeAlias;
 
     // Super-user id fallback (-1) for the int-based ContentService audit column. Defined locally
     // instead of Constants.Security.SuperUserId (obsolete, removed in Umbraco 18). These endpoints
@@ -102,12 +104,6 @@ public class uTProDashboardManagementController(
     private const int SuperUserIdFallback = -1;
 
     /// <summary>
-    /// Creates a new site skeleton in the Content tree:
-    /// <code>
-    /// {name}                (globalRoot)
-    ///   └─ Sites            (globalFolderSites)
-    ///        └─ Navigation Link (globalFolderNavigationLinkForSite)
-    /// </code>
     /// Nodes are saved as drafts (not published) so the editor can build pages under the
     /// structure and publish when ready. Requires Content section access.
     /// </summary>
@@ -221,11 +217,16 @@ public class uTProDashboardManagementController(
         contentService.GetPagedContentInRecycleBin(0, 1, out var contentInBin);
         mediaService.GetPagedMediaInRecycleBin(0, 1, out var mediaInBin);
 
-        // Count via aggregate queries instead of materialising every user row (mirrors the
-        // member counts below): disabled = total − approved.
+        // Total users via an aggregate count (no need to materialise every row).
         var usersTotal = userService.GetCount(MemberCountType.All);
-        var usersApproved = userService.GetCount(MemberCountType.Approved);
-        var usersDisabled = Math.Max(0, usersTotal - usersApproved);
+
+        // Count disabled users by their actual state rather than deriving it from
+        // "total − approved": that heuristic wrongly flagged the built-in super-admin as
+        // disabled (GetCount(Approved) doesn't count it as expected) and also lumps in
+        // invited/pending users. GetAll returns the matching total via the out parameter,
+        // so we only fetch a single row.
+        userService.GetAll(0, 1, out var usersDisabled, "username", Direction.Ascending,
+            new[] { UserState.Disabled }, (string[]?)null, (string?)null);
 
         var membersTotal = memberService.GetCount(MemberCountType.All);
         var membersApproved = memberService.GetCount(MemberCountType.Approved);
