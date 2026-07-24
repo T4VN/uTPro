@@ -49,4 +49,14 @@
     <Copy SourceFiles="@(_UtproDashboardAppPlugins)" DestinationFiles="@(_UtproDashboardAppPlugins->'$(MSBuildThisFileDirectory)App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
   </Target>
 
+  <!-- Sync the uTPro Block Preview Toggle feature's backoffice assets (frontend-only,
+	     no server code) into this web app's App_Plugins, same pattern as the Dashboard
+	     feature above. Source of truth lives in uTPro.Feature.BlockPreviewToggle/App_Plugins. -->
+  <Target Name="CopyUtproBlockPreviewToggleAppPlugins" BeforeTargets="BeforeBuild;Build;BeforePublish;Publish">
+    <ItemGroup>
+      <_UtproBlockPreviewToggleAppPlugins Include="$(MSBuildThisFileDirectory)..\..\Feature\uTPro.Feature.BlockPreviewToggle\App_Plugins\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UtproBlockPreviewToggleAppPlugins)" DestinationFiles="@(_UtproBlockPreviewToggleAppPlugins->'$(MSBuildThisFileDirectory)App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+  </Target>
+
 </Project>
