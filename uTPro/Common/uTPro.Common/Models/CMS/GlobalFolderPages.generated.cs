@@ -73,6 +73,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual string DefaultLayout => this.Value<string>(_publishedValueFallback, "defaultLayout");
 
 		///<summary>
+		/// Show In URL: When ON, this folder's segment is included in the URL of its child pages, and the folder itself redirects to its parent page. When OFF (default), the folder is transparent and child URLs skip it
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[ImplementPropertyType("showInUrl")]
+		public virtual bool ShowInUrl => this.Value<bool>(_publishedValueFallback, "showInUrl");
+
+		///<summary>
 		/// Sidebar Component: Shared sidebar shown beside every child page (when layout is left/right). Child pages can override.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]

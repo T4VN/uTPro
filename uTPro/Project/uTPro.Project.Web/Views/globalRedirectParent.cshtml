@@ -1,0 +1,17 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject Umbraco.Cms.Core.Routing.IPublishedUrlProvider PublishedUrlProvider
+@{
+    // "Pages" (and similar container nodes) are organisational folders, not real pages.
+    // When their segment is shown in the URL (showInUrl = ON) the container itself is
+    // reachable — send visitors to the parent page instead of rendering an empty shell.
+    Layout = null;
+
+    var parent = Model.Parent;
+    var target = parent is not null ? PublishedUrlProvider.GetUrl(parent.Key) : "/";
+    if (string.IsNullOrEmpty(target) || target == "#")
+    {
+        target = "/";
+    }
+
+    Context.Response.Redirect(target, permanent: false);
+}

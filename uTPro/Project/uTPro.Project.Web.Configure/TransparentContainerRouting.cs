@@ -59,23 +59,23 @@ namespace uTPro.Project.Web.Configure
             // The container itself has no URL — leave it to HiddenUrlProvider (which returns a
             // "no URL" message). Without this guard we'd fabricate a URL for the container, because
             // it also sits under the always-hidden root containers (globalFolderRoot / globalFolderSites).
-            if (_hidden.Contains(content.ContentType.Alias))
+            if (_hidden.IsTransparent(content))
             {
                 return null;
             }
 
-            // Only act when this node actually sits under a hidden container; otherwise let the
-            // default provider build the URL as usual.
-            if (!content.Ancestors().Any(a => _hidden.Contains(a.ContentType.Alias)))
+            // Only act when this node actually sits under a transparent container; otherwise let
+            // the default provider build the URL as usual.
+            if (!content.Ancestors().Any(a => _hidden.IsTransparent(a)))
             {
                 return null;
             }
 
-            // Nearest ancestor that is NOT a hidden container — its URL is our starting point.
+            // Nearest ancestor that is NOT a transparent container — its URL is our starting point.
             // Resolving that ancestor through the aggregate provider re-enters this provider for
             // that node, which returns null (it isn't under a container) so the default provider
             // builds it — no infinite recursion.
-            var basis = content.Ancestors().FirstOrDefault(a => !_hidden.Contains(a.ContentType.Alias));
+            var basis = content.Ancestors().FirstOrDefault(a => !_hidden.IsTransparent(a));
             if (basis is null)
             {
                 return null;
@@ -94,7 +94,7 @@ namespace uTPro.Project.Web.Configure
             // AncestorsOrSelf() yields self first then walks up; TakeWhile stops before `basis`.
             var tail = content.AncestorsOrSelf()
                 .TakeWhile(a => a.Key != basis.Key)
-                .Where(a => !_hidden.Contains(a.ContentType.Alias))
+                .Where(a => !_hidden.IsTransparent(a))
                 .Reverse()
                 .Select(a => GetSegment(a, culture))
                 .Where(s => !string.IsNullOrEmpty(s));
@@ -240,7 +240,7 @@ namespace uTPro.Project.Web.Configure
 
             foreach (var child in children)
             {
-                if (_hidden.Contains(child.ContentType.Alias))
+                if (_hidden.IsTransparent(child))
                 {
                     var inner = FindChild(child, segment, culture, ref skippedContainer);
                     if (inner is not null)

@@ -68,6 +68,46 @@ namespace uTPro.Project.Web.Configure
 
         /// <summary>True when the given document type alias is a hidden container.</summary>
         public bool Contains(string? alias) => alias is not null && Aliases.Contains(alias);
+
+        /// <summary>
+        /// The only container whose transparency is per-node (toggled by editors). All other
+        /// containers in <see cref="Aliases"/> are always transparent.
+        /// </summary>
+        public static readonly string TogglableContainerAlias = GlobalFolderPages.ModelTypeAlias;
+
+        /// <summary>Boolean property alias on the togglable container that, when ON, makes the
+        /// container's segment appear in child URLs (e.g. <c>/huong-dan/pages/...</c>).</summary>
+        public const string ShowInUrlPropertyAlias = "showInUrl";
+
+        private bool IsShown(string alias, bool showInUrl)
+            => alias.Equals(TogglableContainerAlias, StringComparison.OrdinalIgnoreCase) && showInUrl;
+
+        /// <summary>
+        /// True when the node should be treated as transparent (dropped from public URLs).
+        /// A container is transparent UNLESS it is the togglable container with
+        /// <see cref="ShowInUrlPropertyAlias"/> turned ON (in which case its segment is routed
+        /// normally and appears in the URL).
+        /// </summary>
+        public bool IsTransparent(IPublishedContent? node)
+        {
+            if (node is null || !Aliases.Contains(node.ContentType.Alias))
+            {
+                return false;
+            }
+
+            return !IsShown(node.ContentType.Alias, node.Value<bool>(ShowInUrlPropertyAlias));
+        }
+
+        /// <inheritdoc cref="IsTransparent(IPublishedContent?)"/>
+        public bool IsTransparent(Umbraco.Cms.Core.Models.IContent? node)
+        {
+            if (node is null || !Aliases.Contains(node.ContentType.Alias))
+            {
+                return false;
+            }
+
+            return !IsShown(node.ContentType.Alias, node.GetValue<bool>(ShowInUrlPropertyAlias));
+        }
     }
 
     /// <summary>
@@ -95,16 +135,16 @@ namespace uTPro.Project.Web.Configure
             => UrlInfo.AsMessage("This node is a container and has no URL.", Alias, culture);
 
         public UrlInfo? GetUrl(IPublishedContent content, UrlMode mode, string? culture, Uri current)
-            => _hidden.Contains(content.ContentType.Alias)
+            => _hidden.IsTransparent(content)
                 ? NoUrlMessage(culture)
                 : null;
 
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current) => [];
 
-        // No preview URL for container nodes; defer to the default provider for everything else.
+        // No preview URL for transparent container nodes; defer to the default provider otherwise.
         public Task<UrlInfo?> GetPreviewUrlAsync(Umbraco.Cms.Core.Models.IContent content, string? culture, string? segment)
             => Task.FromResult<UrlInfo?>(
-                _hidden.Contains(content.ContentType.Alias)
+                _hidden.IsTransparent(content)
                     ? NoUrlMessage(culture)
                     : null);
     }
@@ -144,8 +184,9 @@ namespace uTPro.Project.Web.Configure
 
         public async Task<ISet<UrlInfo>> GetAllAsync(Umbraco.Cms.Core.Models.IContent content)
         {
-            // The container itself has no URL — show a single message instead of any link.
-            if (_hidden.Contains(content.ContentType.Alias))
+            // A transparent container has no URL — show a single message instead of any link.
+            // (A "shown" togglable container falls through and gets its real URL below.)
+            if (_hidden.IsTransparent(content))
             {
                 return new HashSet<UrlInfo>
                 {
@@ -252,7 +293,9 @@ namespace uTPro.Project.Web.Configure
                 return segments;
             }
 
-            var containers = node.Ancestors().Where(a => _hidden.Contains(a.ContentType.Alias)).ToList();
+            // Only strip segments of TRANSPARENT container ancestors. A "shown" container keeps
+            // its segment in child URLs, so it must not be collected here.
+            var containers = node.Ancestors().Where(a => _hidden.IsTransparent(a)).ToList();
             if (containers.Count == 0)
             {
                 return segments;
