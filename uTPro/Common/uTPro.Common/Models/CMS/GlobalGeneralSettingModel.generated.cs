@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
 {
-	/// <summary>One Column Section - Setting</summary>
-	[PublishedModel("globalOneColumnSectionSetting")]
-	public partial class GlobalOneColumnSectionSetting : PublishedElementModel
+	/// <summary>Global General Setting Model</summary>
+	[PublishedModel("globalGeneralSettingModel")]
+	public partial class GlobalGeneralSettingModel : PublishedElementModel
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
-		public new const string ModelTypeAlias = "globalOneColumnSectionSetting";
+		public new const string ModelTypeAlias = "globalGeneralSettingModel";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
@@ -34,14 +34,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<GlobalOneColumnSectionSetting, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<GlobalGeneralSettingModel, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public GlobalOneColumnSectionSetting(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public GlobalGeneralSettingModel(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -72,5 +72,12 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("advancedCustomClasses")]
 		public virtual string AdvancedCustomClasses => this.Value<string>(_publishedValueFallback, "advancedCustomClasses");
+
+		///<summary>
+		/// Hidden
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[ImplementPropertyType("hidden")]
+		public virtual bool Hidden => this.Value<bool>(_publishedValueFallback, "hidden");
 	}
 }

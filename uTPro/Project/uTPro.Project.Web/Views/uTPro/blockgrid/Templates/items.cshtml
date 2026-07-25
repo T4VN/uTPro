@@ -2,9 +2,11 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IEnumerable<BlockGridItem>>
 @{
     if (Model?.Any() != true) { return; }
+    var itemsNotHidden = Model.Where(x => x.Settings?.Value<bool>("hidden") != true);
+    if (itemsNotHidden?.Any() != true) { return; }
 }
 <div class="umb-block-grid__layout-container">
-    @foreach (var item in Model)
+    @foreach (var item in itemsNotHidden)
     {
         <div class="umb-block-grid__layout-item @item.Content.ContentType.Alias"
              @* data-content-element-type-alias="@item.Content.ContentType.Alias"

@@ -1,9 +1,8 @@
 @using Umbraco.Cms.Core.Models.Blocks
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<GlobalOneColumnSectionContent, GlobalOneColumnSectionSetting>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<GlobalOneColumnSectionContent, GlobalGeneralSettingModel>>
 @{
     var content = Model.Content;
     var settings = Model.Settings;
-
     var bkg = string.Empty;
     var bkgImg = Model.Content?.BackgroundImage?.Url() ?? "";
     var bkgColor = Model.Content?.BackgroundColor?.Color ?? "";
