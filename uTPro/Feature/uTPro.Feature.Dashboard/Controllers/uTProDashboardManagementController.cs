@@ -287,7 +287,8 @@ public class uTProDashboardManagementController(
             .Select($@"{L("Datestamp")} AS Datestamp, {L("userId")} AS UserId,
                        {L("logHeader")} AS LogHeader, {L("logComment")} AS LogComment,
                        {L("entityType")} AS EntityType, {U("userName")} AS UserName,
-                       {nodeName} AS NodeName, {nodeKey} AS NodeKey")
+                       {nodeName} AS NodeName, {nodeKey} AS NodeKey,
+                       {N("nodeObjectType")} AS NodeObjectType")
             .From($"{syntax.GetQuotedTableName("umbracoLog")} l")
             .LeftJoin($"{syntax.GetQuotedTableName("umbracoUser")} u").On($"{U("id")} = {L("userId")}")
             .LeftJoin($"{syntax.GetQuotedTableName("umbracoNode")} n").On($"{N("id")} = {L("NodeId")}")
@@ -309,9 +310,33 @@ public class uTProDashboardManagementController(
             action = BuildAction(r),
             type = r.LogHeader ?? string.Empty,
             entityType = r.EntityType ?? string.Empty,
+            // Reliable link target resolved from umbracoNode.nodeObjectType (the raw log
+            // entityType is often empty), used by the dashboard to build the edit link.
+            linkEntityType = ResolveLinkEntityType(r.EntityType, r.NodeObjectType),
             node = r.NodeName ?? string.Empty,
             nodeKey = r.NodeKey,
         }).ToList();
+    }
+
+    // Maps an umbracoNode object type to the backoffice edit-link entity key (kebab-case).
+    // Prefers the reliable nodeObjectType GUID over the often-empty umbracoLog.entityType,
+    // falling back to the raw log entity type (e.g. DictionaryItem, which has no umbracoNode row).
+    private static string ResolveLinkEntityType(string? rawEntityType, Guid? nodeObjectType)
+    {
+        if (nodeObjectType.HasValue)
+        {
+            var ot = nodeObjectType.Value;
+            if (ot == Constants.ObjectTypes.Document) return "document";
+            if (ot == Constants.ObjectTypes.Media) return "media";
+            if (ot == Constants.ObjectTypes.Member) return "member";
+            if (ot == Constants.ObjectTypes.DocumentType) return "document-type";
+            if (ot == Constants.ObjectTypes.MediaType) return "media-type";
+            if (ot == Constants.ObjectTypes.MemberType) return "member-type";
+            if (ot == Constants.ObjectTypes.DataType) return "data-type";
+            if (ot == Constants.ObjectTypes.TemplateType) return "template";
+        }
+
+        return (rawEntityType ?? string.Empty).ToLowerInvariant();
     }
 
     // Prefer "{Action} {NodeName}" (e.g. "Save Home"); fall back to the log comment
@@ -477,6 +502,7 @@ public class uTProDashboardManagementController(
         public string? LogHeader { get; set; }
         public string? LogComment { get; set; }
         public string? EntityType { get; set; }
+        public Guid? NodeObjectType { get; set; }
         public string? UserName { get; set; }
         public string? NodeName { get; set; }
         public Guid? NodeKey { get; set; }

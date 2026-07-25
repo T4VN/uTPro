@@ -400,14 +400,25 @@ export class UtproDashboardElement extends UmbLitElement {
             </uui-box>`;
     }
 
-    // Backoffice edit URL for a content/media node (null for other entity types).
-    #nodeHref(entityType, nodeKey) {
+    // Backoffice edit route per normalised entity key (resolved server-side from
+    // umbracoNode.nodeObjectType). {key} = the entity GUID.
+    static #EDIT_ROUTES = {
+        'document':       'section/content/workspace/document/edit',
+        'media':          'section/media/workspace/media/edit',
+        'member':         'section/member-management/workspace/member/edit',
+        'dictionaryitem': 'section/translation/workspace/dictionary/edit',
+        'document-type':  'section/settings/workspace/document-type/edit',
+        'media-type':     'section/settings/workspace/media-type/edit',
+        'member-type':    'section/settings/workspace/member-type/edit',
+        'data-type':      'section/settings/workspace/data-type/edit',
+        'template':       'section/settings/workspace/template/edit',
+    };
+
+    // Backoffice edit URL for the entity (null when the type is not linkable).
+    #nodeHref(linkEntityType, nodeKey) {
         if (!nodeKey) return null;
-        const t = (entityType || '').toLowerCase();
-        if (t === 'document') return `/umbraco/section/content/workspace/document/edit/${nodeKey}`;
-        if (t === 'media') return `/umbraco/section/media/workspace/media/edit/${nodeKey}`;
-        if (t === 'dictionaryitem') return `/umbraco/section/translation/workspace/dictionary/edit/${nodeKey}`;
-        return null;
+        const route = UtproDashboardElement.#EDIT_ROUTES[(linkEntityType || '').toLowerCase()];
+        return route ? `/umbraco/${route}/${nodeKey}` : null;
     }
 
     // A "recent activity" card. items === null while loading; [] when empty.
@@ -419,7 +430,7 @@ export class UtproDashboardElement extends UmbLitElement {
                     : items.length === 0
                         ? html`<div class="muted">No activity yet.</div>`
                         : items.map((a) => {
-                            const href = this.#nodeHref(a.entityType, a.nodeKey);
+                            const href = this.#nodeHref(a.linkEntityType, a.nodeKey);
                             const b = actionInfo(a.type);
                             return html`
                             <div class="act">
