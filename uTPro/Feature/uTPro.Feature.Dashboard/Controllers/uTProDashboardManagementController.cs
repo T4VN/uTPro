@@ -240,7 +240,7 @@ public class uTProDashboardManagementController(
             if (name == null) continue;
             if (name.Name?.StartsWith("uTPro.Feature.") == true)
             {
-                apps.Add(new { Name = name.Name, Version = name.Version });
+                apps.Add(new { Name = name.Name, Version = name.Version.ToString(3) });
             }
         }
 
