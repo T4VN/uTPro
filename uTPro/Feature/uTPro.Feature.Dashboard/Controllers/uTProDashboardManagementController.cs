@@ -232,6 +232,18 @@ public class uTProDashboardManagementController(
         var membersApproved = memberService.GetCount(MemberCountType.Approved);
         var membersDisabled = Math.Max(0, membersTotal - membersApproved);
 
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        var apps = new List<object>();
+        foreach (var assembly in assemblies)
+        {
+            AssemblyName name = assembly.GetName();
+            if (name == null) continue;
+            if (name.Name?.StartsWith("uTPro.Feature.") == true)
+            {
+                apps.Add(new { Name = name.Name, Version = name.Version });
+            }
+        }
+
         return Ok(new
         {
             utproVersion = GetAppVersion(),
@@ -244,6 +256,7 @@ public class uTProDashboardManagementController(
             usersDisabled,
             membersTotal,
             membersDisabled,
+            apps
         });
     }
 

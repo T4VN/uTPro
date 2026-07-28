@@ -132,7 +132,6 @@ export class UtproDashboardElement extends UmbLitElement {
 
         this.observe(umbExtensionsRegistry.byType('section'), (exts) => {
             this._sectionExts = exts ?? [];
-            console.log(this._sectionExts)
         }, 'utpro-sections');
 
         this.observe(umbExtensionsRegistry.byType('menuItem'), (exts) => {
@@ -373,7 +372,7 @@ export class UtproDashboardElement extends UmbLitElement {
     // uTPro apps this user should see: auto-discovered from the registry AND permitted for this
     // user (admins pass every section). Sorted by their localized label.
     #visiblePackages() {
-        return discoverApps(this._sectionExts, this._menuExts, this._uTProType)
+        return discoverApps(this._sectionExts, this._menuExts)
             .filter((app) => canUsePackage(app, this._allowedSections))
             .map((app) => ({ ...app, label: this.#label(app.label) }))
             .sort((a, b) => a.label.localeCompare(b.label));
@@ -385,17 +384,22 @@ export class UtproDashboardElement extends UmbLitElement {
     #appsCard() {
         const items = this.#visiblePackages();
         if (items.length === 0) return nothing;
+        const s = this._stats;
         return html`
             <uui-box class="apps-box" headline="uTPro Apps">
                 <uui-icon slot="header-actions" name="icon-app"></uui-icon>
                 <div class="apps-grid">
                     ${items.map((app) => html`
+                    
                         <a class="app-tile" href=${app.href} title=${'Open ' + app.label}>
                             <div class="app-head">
                                 <uui-icon class="app-icon" name=${app.icon}></uui-icon>
                                 <span class="app-title">${app.label}</span>
                             </div>
-                            <span class="app-open">Open <uui-icon name="icon-arrow-right"></uui-icon></span>
+                            <div class="app-body">
+                                <span class="app-open">Open <uui-icon name="icon-arrow-right"></uui-icon></span>
+                                <span style="float:right">${s?.apps?.find((stat) => stat.name === app.packageid)?.version ?? ''}</span>
+                            </div>
                         </a>`)}
                 </div>
             </uui-box>`;
