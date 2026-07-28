@@ -1,7 +1,7 @@
 // Add stylesheet
 const styleLink = document.createElement('link');
 styleLink.rel = 'stylesheet';
-styleLink.href = '/App_Plugins/cms-screen/style.css';
+styleLink.href = '/App_Plugins/utpro-cms-screen/style.css';
 document.head.appendChild(styleLink);
 
 // Add icon

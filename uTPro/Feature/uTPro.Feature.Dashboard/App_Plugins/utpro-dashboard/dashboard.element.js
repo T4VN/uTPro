@@ -126,17 +126,18 @@ export class UtproDashboardElement extends UmbLitElement {
         // registry for the entry points they register (sections + Settings menu items). Cards
         // appear/disappear as packages are installed/removed — no hard-coded list, no server call.
         this._sectionExts = [];
+        this._uTProType = [];
         this._menuExts = [];
         this._allowedSections = null;
 
         this.observe(umbExtensionsRegistry.byType('section'), (exts) => {
             this._sectionExts = exts ?? [];
+            console.log(this._sectionExts)
         }, 'utpro-sections');
 
         this.observe(umbExtensionsRegistry.byType('menuItem'), (exts) => {
             this._menuExts = exts ?? [];
         }, 'utpro-menu-items');
-
         // The current user's allowed sections drive per-package permission (admins get all).
         this.consumeContext(UMB_CURRENT_USER_CONTEXT, (ctx) => {
             if (!ctx) return;
@@ -372,7 +373,7 @@ export class UtproDashboardElement extends UmbLitElement {
     // uTPro apps this user should see: auto-discovered from the registry AND permitted for this
     // user (admins pass every section). Sorted by their localized label.
     #visiblePackages() {
-        return discoverApps(this._sectionExts, this._menuExts)
+        return discoverApps(this._sectionExts, this._menuExts, this._uTProType)
             .filter((app) => canUsePackage(app, this._allowedSections))
             .map((app) => ({ ...app, label: this.#label(app.label) }))
             .sort((a, b) => a.label.localeCompare(b.label));

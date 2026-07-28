@@ -32,6 +32,7 @@ const fromSection = (m) => {
     if (!pathname) return null;
     return {
         key: m.alias,
+        pathname: m.pathname,
         label: m.meta?.label || m.name || m.alias,
         icon: m.meta?.icon || 'icon-app',
         href: `/umbraco/section/${pathname}`,
@@ -46,6 +47,7 @@ const fromMenuItem = (m) => {
     if (!entityType || !menus.includes(SETTINGS_MENU)) return null;
     return {
         key: m.alias,
+        pathname: m.pathname,
         label: m.meta?.label || m.name || m.alias,
         icon: m.meta?.icon || 'icon-app',
         href: `/umbraco/section/settings/workspace/${entityType}`,
@@ -55,9 +57,9 @@ const fromMenuItem = (m) => {
 
 // Builds the app list from the registry's current section + menuItem manifests.
 // De-duplicated by href and sorted by (localized) label happens in the element.
-export function discoverApps(sectionManifests, menuItemManifests) {
+export function discoverApps(sectionManifests, menuItemManifests, uTProType) {
     const apps = [];
-
+    console.log(uTProType)
     for (const m of sectionManifests || []) {
         if (!isUtpro(m)) continue;
         const app = fromSection(m);
@@ -68,7 +70,7 @@ export function discoverApps(sectionManifests, menuItemManifests) {
         const app = fromMenuItem(m);
         if (app) apps.push(app);
     }
-
+    console.log(apps);
     const seen = new Set();
     return apps.filter((a) => (seen.has(a.href) ? false : seen.add(a.href)));
 }

@@ -8,14 +8,14 @@
         "type": "appEntryPoint",
         "alias": "uTProCMSScreen",
         "name": "uTPro CMS Screen",
-        "js": "/App_Plugins/cms-screen/index.js",
+        "js": "/App_Plugins/utpro-cms-screen/index.js",
         "weight": 1000
       },
       {
         "type": "localization",
         "alias": "Login.Localize.EnUS",
         "name": "English",
-        "js": "/App_Plugins/cms-screen/lang/en-us.js",
+        "js": "/App_Plugins/utpro-cms-screen/lang/en-us.js",
         "weight": 1000,
         "meta": {
           "culture": "en-US"
