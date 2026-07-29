@@ -15,11 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="uTPro.Feature.AuditLog" Version="4.1.2" />
-    <PackageReference Include="uTPro.Feature.FileManager" Version="5.0.1" />
-    <PackageReference Include="uTPro.Feature.JobMonitor" Version="1.0.2" />
-    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="3.1.1" />
-    <PackageReference Include="uTPro.Feature.UrlViewer" Version="2.0.0" />
+    <PackageReference Include="uTPro.Feature.AuditLog" Version="5.0.0" />
+    <PackageReference Include="uTPro.Feature.FileManager" Version="6.0.0" />
+    <PackageReference Include="uTPro.Feature.JobMonitor" Version="2.0.0" />
+    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="4.0.0" />
+    <PackageReference Include="uTPro.Feature.UrlViewer" Version="3.0.0" />
     <PackageReference Include="uTPro.Feature.SEOAudit" Version="1.0.0" />
   </ItemGroup>
 
