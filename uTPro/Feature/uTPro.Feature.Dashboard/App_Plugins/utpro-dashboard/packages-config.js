@@ -46,7 +46,6 @@ const fromMenuItem = (m) => {
     const entityType = m.meta?.entityType;
     const menus = m.meta?.menus || [];
     if (!entityType || !menus.includes(SETTINGS_MENU)) return null;
-    console.log(m)
     return {
         key: m.alias,
         id: m.meta?.id,
@@ -72,7 +71,6 @@ export function discoverApps(sectionManifests, menuItemManifests) {
         const app = fromMenuItem(m);
         if (app) apps.push(app);
     }
-    console.log(apps);
     const seen = new Set();
     return apps.filter((a) => (seen.has(a.href) ? false : seen.add(a.href)));
 }
