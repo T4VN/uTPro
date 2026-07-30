@@ -46,6 +46,9 @@ namespace uTPro.Project.Web.Configure
             GlobalFolderNavigationLinkForSite.ModelTypeAlias,
             GlobalFolderSettings.ModelTypeAlias,
             GlobalFolderPages.ModelTypeAlias,
+            GlobalFolderCategories.ModelTypeAlias,
+            GlobalFolderCategoryGroup.ModelTypeAlias,
+            GlobalFolderCategoryItem.ModelTypeAlias,
         ];
 
         public HiddenContainerAliases(IOptions<HiddenUrlOptions> options)

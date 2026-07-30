@@ -6,6 +6,11 @@
 // override render() to show a compact card when the cluster's toggle is OFF, and we
 // inject the "Preview Mode" bar as the first row of the block layout container.
 //
+// When BlockPreview cannot find the .cshtml partial view for a block type, the server
+// returns the error page as valid HTML markup (HTTP 200). We detect this by inspecting
+// the _htmlMarkup content and fall back to the default Umbraco inline view
+// (uui-ref-node with icon + label), hiding the preview bar entirely for that block.
+//
 // (BlockPreview's own Grid/List views are unregistered in entry-point.js so only ours
 // competes for the slot — see the note there.)
 
@@ -105,6 +110,18 @@ const renderListCard = (el) => html`
         .label=${el.label} .icon=${el.icon} .unpublished=${el.unpublished}
         .config=${el.config} .content=${el.content} .settings=${el.settings}></umb-block-list-block>`;
 
+// Default Umbraco inline view (uui-ref-node with icon + label).
+// Used as fallback when BlockPreview cannot locate the .cshtml partial view.
+const renderDefaultView = (el) => {
+    // BlockPreview base class stores the edit path in _blockContext
+    const editPath = el._blockContext?.workspaceEditContentPath || el.config?.editContentPath || '';
+    return html`
+        <uui-ref-node standalone href=${editPath}>
+            <umb-icon slot="icon" .name=${el.icon || 'icon-document'}></umb-icon>
+            <umb-ufm-render slot="name" inline .markdown=${el.label} .value=${{ ...el.content, $settings: el.settings, $index: el.index }}></umb-ufm-render>
+        </uui-ref-node>`;
+};
+
 // Define a toggle custom view that subclasses BlockPreview's element.
 //   baseTag      - the BlockPreview element to subclass (e.g. 'block-grid-preview')
 //   tagName      - the tag to register our subclass under
@@ -116,12 +133,13 @@ function defineToggleView({ baseTag, tagName, entriesToken, rootOnly, renderCard
     if (!Base || customElements.get(tagName)) return;
 
     class UtproToggleView extends Base {
-        static properties = { _enabled: { state: true }, _isRoot: { state: true } };
+        static properties = { _enabled: { state: true }, _isRoot: { state: true }, _viewNotFound: { state: true } };
 
         constructor() {
             super();
             this._enabled = true;
             this._isRoot = !rootOnly; // list has no areas → always "root"
+            this._viewNotFound = false;
             this._key = '';
             this._toggleCtx = null;
             this._entries = null;
@@ -147,20 +165,44 @@ function defineToggleView({ baseTag, tagName, entriesToken, rootOnly, renderCard
         }
 
         #ensureBar() {
-            if (!this._isRoot) return;
+            if (!this._isRoot || this._viewNotFound) return;
             const container = this._entries?.getLayoutContainerElement?.();
             if (container) ensureBarIn(container);
         }
 
         updated(changed) {
             super.updated?.(changed);
+            if (this._viewNotFound) return;
+
+            // BlockPreview returns "view not found" error HTML as valid markup (HTTP 200).
+            // Detect by checking if _htmlMarkup contains the ASP.NET error message.
+            if (this._htmlMarkup && /could not be found/i.test(this._htmlMarkup)) {
+                this._viewNotFound = true;
+                return;
+            }
+            // Also handle explicit _error (other server-side failures).
+            if (this._error) {
+                this._viewNotFound = true;
+                return;
+            }
+
             this.#ensureBar();
         }
 
         render() {
-            // ON → BlockPreview markup (super.render()); OFF → compact card.
+            // View not found → show default Umbraco inline view (no preview bar).
+            if (this._viewNotFound) return renderDefaultView(this);
+
+            // ON → BlockPreview server-rendered markup; OFF → compact card.
             return this._enabled ? super.render() : renderCard(this);
         }
+
+        static styles = [
+            ...(Base.styles ? (Array.isArray(Base.styles) ? Base.styles : [Base.styles]) : []),
+            css`
+                :host { display: block; width: 100%; }
+            `,
+        ];
     }
 
     customElements.define(tagName, UtproToggleView);
