@@ -4,8 +4,6 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <!-- Serve wwwroot at the site root so App_Plugins/utpro-header resolves at
-         its declared absolute path (/App_Plugins/utpro-header/...). -->
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>
 
