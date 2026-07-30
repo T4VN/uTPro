@@ -95,6 +95,7 @@ export class UtproDashboardElement extends UmbLitElement {
         _showCreate: { state: true },
         _siteName: { state: true },
         _creating: { state: true },
+        _seoRuns: { state: true },
     };
 
     constructor() {
@@ -122,6 +123,9 @@ export class UtproDashboardElement extends UmbLitElement {
         // Live Frappe Chart instance for the trail card.
         this._chart = null;
 
+        // SEO Audit score trend: null = not loaded / not installed, [] = no runs.
+        this._seoRuns = null;
+
         // "uTPro Apps" card. We auto-discover sibling uTPro packages by watching the extension
         // registry for the entry points they register (sections + Settings menu items). Cards
         // appear/disappear as packages are installed/removed — no hard-coded list, no server call.
@@ -132,6 +136,8 @@ export class UtproDashboardElement extends UmbLitElement {
 
         this.observe(umbExtensionsRegistry.byType('section'), (exts) => {
             this._sectionExts = exts ?? [];
+            // Retry SEO Audit score loading when extensions appear (package may be detected late).
+            if (this._authContext && this._seoRuns === null) this.#loadSeoRuns();
         }, 'utpro-sections');
 
         this.observe(umbExtensionsRegistry.byType('menuItem'), (exts) => {
@@ -167,6 +173,7 @@ export class UtproDashboardElement extends UmbLitElement {
             this._myActivity = await fetchMyActivity(ctx);
             this._allActivity = await fetchRecentActivity(ctx);
             this.#loadTrail();
+            this.#loadSeoRuns();
         });
     }
 
@@ -353,6 +360,7 @@ export class UtproDashboardElement extends UmbLitElement {
                 </div>
             </uui-box>
             ${this.#appsCard()}
+            ${this.#seoScoreTrendCard()}
             ${this.#trailCard()}
             <div class="activity-grid">
                 ${this.#activityCard('myActivity', 'Your recent activity', this._myActivity, false)}
@@ -468,6 +476,74 @@ export class UtproDashboardElement extends UmbLitElement {
         ]);
         this._trailAll = all;
         this._trailMy = my;
+    }
+
+    // SEO Audit: fetches the latest audit runs (score trend) only when the package is installed.
+    // Detection is purely client-side: if the extension registry contains a section with
+    // alias "uTPro.SeoAudit.Section", the SEO Audit package is loaded. The API call is
+    // best-effort: if it 404s or errors (package API not present), _seoRuns stays null and the
+    // card is simply not shown.
+    async #loadSeoRuns() {
+        if (!this._authContext) return;
+        const hasSeoAudit = (this._sectionExts ?? []).some(
+            (ext) => ext.alias === 'uTPro.SeoAudit.Section');
+        if (!hasSeoAudit) { this._seoRuns = null; return; }
+        try {
+            const config = this._authContext?.getOpenApiConfiguration?.();
+            let token;
+            if (config?.token) token = await config.token();
+            if (!token) return;
+            const resp = await fetch('/umbraco/management/api/v1/utpro/url-scan/runs?limit=10', {
+                headers: { Accept: 'application/json', Authorization: 'Bearer ' + token },
+                credentials: config?.credentials || 'same-origin',
+            });
+            if (!resp.ok) { this._seoRuns = null; return; }
+            this._seoRuns = await resp.json();
+        } catch {
+            this._seoRuns = null;
+        }
+    }
+
+    // SEO Audit score trend card — only rendered when the package is installed and has runs.
+    #seoScoreTrendCard() {
+        if (!this._seoRuns || this._seoRuns.length < 2) return nothing;
+        const data = [...this._seoRuns].reverse().slice(-10);
+        const maxScore = 100;
+        const w = 300, h = 80, pad = 4;
+        const step = (w - pad * 2) / Math.max(data.length - 1, 1);
+
+        const points = data.map((r, i) =>
+            `${pad + i * step},${h - pad - ((r.healthScore ?? 0) / maxScore) * (h - pad * 2)}`).join(' ');
+
+        const latest = data[data.length - 1]?.healthScore ?? 0;
+        const oldest = data[0]?.healthScore ?? 0;
+        const scoreClass = (s) => s >= 90 ? 'health-a' : s >= 60 ? 'health-b' : 'health-c';
+
+        return html`
+            <uui-box class="seo-trend-box" headline="SEO Audit · Score trend">
+                <a slot="header-actions" href="/umbraco/section/seo-audit" title="Open SEO Audit"
+                   style="font-size:0.78rem;color:var(--uui-color-interactive,#3544b1);text-decoration:none;">
+                    Open →
+                </a>
+                <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+                    <svg width="${w}" height="${h}" style="flex:none;background:var(--uui-color-surface-alt,#f7f8fa);border-radius:8px;">
+                        <line x1="${pad}" y1="${h/2}" x2="${w-pad}" y2="${h/2}" stroke="#e7e7e9" stroke-dasharray="4"/>
+                        <polyline points="${points}" fill="none" stroke="#159a63" stroke-width="2" stroke-linejoin="round"/>
+                        ${data.map((r, i) => {
+                            const x = pad + i * step;
+                            const y = h - pad - ((r.healthScore ?? 0) / maxScore) * (h - pad * 2);
+                            return html`<circle cx="${x}" cy="${y}" r="3" fill="#159a63"/>`;
+                        })}
+                    </svg>
+                    <div style="font-size:0.78rem;color:var(--uui-color-text-alt,#68686e);">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <span style="width:12px;height:3px;background:#159a63;border-radius:2px;display:inline-block;"></span>
+                            Health score (last ${data.length} runs)
+                        </div>
+                        <div>Latest: <strong class="${scoreClass(latest)}">${latest}</strong> · Oldest: ${oldest}</div>
+                    </div>
+                </div>
+            </uui-box>`;
     }
 
     // Range <uui-select> change: remember the window, show loading and refetch both scopes.
