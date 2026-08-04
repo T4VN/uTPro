@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Page Standard</summary>
 	[PublishedModel("uTPro__PageStandard")]
-	public partial class UTpro__PageStandard : PublishedContentModel, IGlobalPageHeadMetaSetting, IGlobalPageHeadSocialMetaSetting, IGlobalPageScriptSetting, IGlobalPageSitemapSetting, IUTpro__ContentLayout
+	public partial class UTpro__PageStandard : PublishedContentModel, IGlobalPageHeadMetaSetting, IGlobalPageHeadSocialMetaSetting, IGlobalPagePageCategoriesSetting, IGlobalPageScriptSetting, IGlobalPageSitemapSetting, IUTpro__ContentLayout
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -56,14 +56,6 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("content")]
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel Content => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(_publishedValueFallback, "content");
-
-		///<summary>
-		/// Categories: Select one or more categories to classify this page.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("pageCategories")]
-		public virtual global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> PageCategories => this.Value<global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent>>(_publishedValueFallback, "pageCategories");
 
 		///<summary>
 		/// Keywords: Type to add tags (press ENTER after each tag)
@@ -176,6 +168,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("twitterTitle")]
 		public virtual string TwitterTitle => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPageHeadSocialMetaSetting.GetTwitterTitle(this, _publishedValueFallback);
+
+		///<summary>
+		/// Categories: Select one or more categories to classify this page.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("pageCategories")]
+		public virtual global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> PageCategories => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPagePageCategoriesSetting.GetPageCategories(this, _publishedValueFallback);
 
 		///<summary>
 		/// Body closing scripts: Anything you enter here will be placed before the closing {/body} tag on this page of your website.

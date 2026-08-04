@@ -18,14 +18,24 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
 {
-	/// <summary>Global - Category Group</summary>
-	[PublishedModel("globalFolderCategoryGroup")]
-	public partial class GlobalFolderCategoryGroup : PublishedContentModel
+	// Mixin Content Type with alias "globalPagePageCategoriesSetting"
+	/// <summary>Global - Page Categories Setting</summary>
+	public partial interface IGlobalPagePageCategoriesSetting : IPublishedElement
+	{
+		/// <summary>Categories</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> PageCategories { get; }
+	}
+
+	/// <summary>Global - Page Categories Setting</summary>
+	[PublishedModel("globalPagePageCategoriesSetting")]
+	public partial class GlobalPagePageCategoriesSetting : PublishedElementModel, IGlobalPagePageCategoriesSetting
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
-		public new const string ModelTypeAlias = "globalFolderCategoryGroup";
+		public new const string ModelTypeAlias = "globalPagePageCategoriesSetting";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
@@ -34,14 +44,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<GlobalFolderCategoryGroup, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<GlobalPagePageCategoriesSetting, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public GlobalFolderCategoryGroup(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
+		public GlobalPagePageCategoriesSetting(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,18 +60,16 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		// properties
 
 		///<summary>
-		/// Description: Optional description of this classification group.
+		/// Categories: Select one or more categories to classify this page.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("categoryGroupDescription")]
-		public virtual string CategoryGroupDescription => this.Value<string>(_publishedValueFallback, "categoryGroupDescription");
+		[ImplementPropertyType("pageCategories")]
+		public virtual global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> PageCategories => GetPageCategories(this, _publishedValueFallback);
 
-		///<summary>
-		/// Sort Order: Controls display order among groups. Lower numbers appear first.
-		///</summary>
+		/// <summary>Static getter for Categories</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
-		[ImplementPropertyType("categoryGroupSortOrder")]
-		public virtual int CategoryGroupSortOrder => this.Value<int>(_publishedValueFallback, "categoryGroupSortOrder");
+		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> GetPageCategories(IGlobalPagePageCategoriesSetting that, IPublishedValueFallback publishedValueFallback) => that.Value<global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent>>(publishedValueFallback, "pageCategories");
 	}
 }

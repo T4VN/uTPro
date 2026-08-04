@@ -54,14 +54,29 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("description")]
-		public virtual string Description => this.Value<string>(_publishedValueFallback, "description");
+		[ImplementPropertyType("categoryItemDescription")]
+		public virtual string CategoryItemDescription => this.Value<string>(_publishedValueFallback, "categoryItemDescription");
+
+		///<summary>
+		/// Show In URL: When ON, this category's URL segment is inserted into the URL of pages that reference it. For example: /huong-dan/co-ban/page-test/
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[ImplementPropertyType("categoryItemShowInUrl")]
+		public virtual bool CategoryItemShowInUrl => this.Value<bool>(_publishedValueFallback, "categoryItemShowInUrl");
 
 		///<summary>
 		/// Sort Order: Controls display order within the group. Lower numbers appear first.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
-		[ImplementPropertyType("sortOrder")]
-		public virtual int SortOrder => this.Value<int>(_publishedValueFallback, "sortOrder");
+		[ImplementPropertyType("categoryItemSortOrder")]
+		public virtual int CategoryItemSortOrder => this.Value<int>(_publishedValueFallback, "categoryItemSortOrder");
+
+		///<summary>
+		/// URL Segment: Custom URL-friendly slug for this category (e.g. "co-ban"). If empty, the node's default URL segment (based on name) is used.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("categoryItemUrlSegment")]
+		public virtual string CategoryItemUrlSegment => this.Value<string>(_publishedValueFallback, "categoryItemUrlSegment");
 	}
 }
