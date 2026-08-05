@@ -20,7 +20,7 @@ Your feedback — comments, reviews, or suggestions — is incredibly valuable. 
 | 1 | [Introduction](1.-Intro) | Overview, features, architecture, tech stack |
 | 2 | [Setup](2.-Setup) | Domain, project, and data setup |
 | 3 | [Project Structure](3.-Project-Structure) | Solution architecture, middleware pipeline, Program.cs |
-| 4 | [Configurations](4.-Configurations) | Language, backoffice, security, performance, SEO, load balancing, database |
+| 4 | [Configurations](4.-Configurations) | Language, backoffice, security, performance, SEO, load balancing, database, forwarded headers, category URLs, feature packages |
 | 5 | [Script Queue](5.-Script-Queue) | JS loading system for block components |
 | 6 | [Dashboard](6.-Dashboard) | Backoffice dashboard & header app |
 | 7 | [Content Editing](7.-Content-Editing) | Guide for content editors (pages, blocks, SEO, multilingual) |
