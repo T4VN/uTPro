@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual string CategoryItemDescription => this.Value<string>(_publishedValueFallback, "categoryItemDescription");
 
 		///<summary>
-		/// Show In URL: When ON, this category's URL segment is inserted into the URL of pages that reference it. For example: /huong-dan/co-ban/page-test/
+		/// Show In URL: When ON, this category's URL segment is inserted into the URL of pages that reference it. 
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[ImplementPropertyType("categoryItemShowInUrl")]
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual int CategoryItemSortOrder => this.Value<int>(_publishedValueFallback, "categoryItemSortOrder");
 
 		///<summary>
-		/// URL Segment: Custom URL-friendly slug for this category (e.g. "co-ban"). If empty, the node's default URL segment (based on name) is used.
+		/// URL Segment: Custom URL-friendly slug for this category. If empty, the node's default URL segment (based on name) is used.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
