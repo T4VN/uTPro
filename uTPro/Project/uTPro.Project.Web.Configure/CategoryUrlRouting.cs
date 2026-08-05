@@ -22,7 +22,7 @@ namespace uTPro.Project.Web.Configure
     {
         public static readonly string ShowInUrlAlias = PropertyAliasHelper.ToAlias(nameof(GlobalFolderCategoryItem.CategoryItemShowInUrl));
         public static readonly string UrlSegmentAlias = PropertyAliasHelper.ToAlias(nameof(GlobalFolderCategoryItem.CategoryItemUrlSegment));
-        public static readonly string PageCategoriesAlias = PropertyAliasHelper.ToAlias(nameof(GlobalPagePageCategoriesSetting.PageCategories));
+        public static readonly string PageCategoriesAlias = PropertyAliasHelper.ToAlias(nameof(GlobalPagePageCategoriesSetting.Categories));
     }
 
     /// <summary>

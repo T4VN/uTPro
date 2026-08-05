@@ -174,8 +174,16 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("pageCategories")]
-		public virtual global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> PageCategories => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPagePageCategoriesSetting.GetPageCategories(this, _publishedValueFallback);
+		[ImplementPropertyType("categories")]
+		public virtual global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> Categories => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPagePageCategoriesSetting.GetCategories(this, _publishedValueFallback);
+
+		///<summary>
+		/// Tags
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("tags")]
+		public virtual global::System.Collections.Generic.IEnumerable<string> Tags => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPagePageCategoriesSetting.GetTags(this, _publishedValueFallback);
 
 		///<summary>
 		/// Body closing scripts: Anything you enter here will be placed before the closing {/body} tag on this page of your website.
