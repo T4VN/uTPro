@@ -31,17 +31,20 @@ namespace uTPro.Project.Web.Configure
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IDocumentUrlService _documentUrlService;
+        private readonly CategoryUrlService _categoryUrlService;
 
         public TransparentContainerUrlProvider(
             HiddenContainerAliases hidden,
             IVariationContextAccessor variationContextAccessor,
             IPublishedUrlProvider publishedUrlProvider,
-            IDocumentUrlService documentUrlService)
+            IDocumentUrlService documentUrlService,
+            CategoryUrlService categoryUrlService)
         {
             _hidden = hidden;
             _variationContextAccessor = variationContextAccessor;
             _publishedUrlProvider = publishedUrlProvider;
             _documentUrlService = documentUrlService;
+            _categoryUrlService = categoryUrlService;
         }
 
         public string Alias => "uTProTransparentContainerUrlProvider";
@@ -60,6 +63,14 @@ namespace uTPro.Project.Web.Configure
             // "no URL" message). Without this guard we'd fabricate a URL for the container, because
             // it also sits under the always-hidden root containers (globalFolderRoot / globalFolderSites).
             if (_hidden.IsTransparent(content))
+            {
+                return null;
+            }
+
+            // If the page has visible categories with ShowInUrl enabled, yield to CategoryUrlProvider
+            // so the category segment is included in the generated URL.
+            if (content.HasProperty(CategoryUrlConstants.PageCategoriesAlias)
+                && _categoryUrlService.GetVisibleCategories(content).Count > 0)
             {
                 return null;
             }
@@ -275,6 +286,7 @@ namespace uTPro.Project.Web.Configure
         {
             // Shared alias set (also registered by HiddenUrlComposer — TryAdd keeps it a singleton).
             builder.Services.TryAddSingleton<HiddenContainerAliases>();
+            builder.Services.TryAddSingleton<CategoryUrlService>();
 
             builder.UrlProviders().Insert<TransparentContainerUrlProvider>();
             builder.ContentFinders().Append<TransparentContainerContentFinder>();
