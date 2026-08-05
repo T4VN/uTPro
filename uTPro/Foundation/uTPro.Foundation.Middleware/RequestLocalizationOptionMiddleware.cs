@@ -14,7 +14,7 @@ namespace uTPro.Foundation.Middleware
     internal class RequestLocalizationOptionMiddleware
     {
         private const string CookieCulture = ".uTPro.Culture";
-        private static readonly DateTimeOffset CookieExpiry = DateTimeOffset.UtcNow.AddDays(3);
+        private const int CookieExpiryDays = 3;
 
         private static readonly Lazy<HashSet<string>> _wwwRootEntries = new(() =>
         {
@@ -175,7 +175,7 @@ namespace uTPro.Foundation.Middleware
 
             httpContext.Response.Cookies.Append(CookieCulture, culture, new CookieOptions
             {
-                Expires = CookieExpiry,
+                Expires = DateTimeOffset.UtcNow.AddDays(CookieExpiryDays),
                 IsEssential = true,
                 HttpOnly = true,
                 Secure = httpContext.Request.IsHttps,
