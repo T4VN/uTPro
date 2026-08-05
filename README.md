@@ -77,12 +77,14 @@ uTPro follows a clean modular architecture with clear separation of concerns:
 
 | Component | Version |
 |-----------|---------|
-| Umbraco CMS | 16.5.1 |
-| .NET | 9.0 |
+| Umbraco CMS | 17.5.3 |
+| .NET | 10.0 |
 | Database | PostgreSQL (default) · SQL Server · SQLite |
-| uSync | 16.1.0 |
-| BlockPreview | 4.2.2 |
-| SeoVisualizer | 16.0.1 |
+| uSync | 17.3.6 |
+| BlockPreview | 5.4.3 |
+| SeoVisualizer | 17.0.0 |
+| WebOptimizer | 3.0.477 |
+| WebMarkupMin | 2.22.0 |
 
 ---
 
