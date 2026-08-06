@@ -1,0 +1,17 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__SidebarSearch>>
+@{
+
+}
+<section class="box">
+    @if (!string.IsNullOrEmpty(Model.Content.Header))
+    {
+        <header>
+            <h2>@Model.Content.Header</h2>
+        </header>
+    }
+    <form method="get" action="#">
+        <input class="col-12" type="text" name="search" placeholder="Tìm kiếm">
+        <br />
+        <button class="col-12 style1" type="submit">Search</button>
+    </form>
+</section>

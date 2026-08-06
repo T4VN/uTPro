@@ -16,7 +16,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Extensions;
+using Umbraco.Cms.Web.Common.PublishedModels;
 
 namespace uTPro.Feature.Dashboard.Controllers;
 
@@ -91,9 +91,11 @@ public class uTProDashboardManagementController(
     }
 
     // Document type aliases for the site skeleton created by "Create Site".
-    private const string RootDocTypeAlias = "globalRoot";
-    private const string SitesFolderDocTypeAlias = "globalFolderSites";
-    private const string NavigationLinkDocTypeAlias = "globalFolderNavigationLinkForSite";
+    // Use the generated model constants instead of hard-coded strings so a doc-type alias
+    // rename (e.g. globalRoot -> globalFolderRoot) is a compile-time change, not a silent break.
+    private const string RootDocTypeAlias = GlobalFolderRoot.ModelTypeAlias;
+    private const string SitesFolderDocTypeAlias = GlobalFolderSites.ModelTypeAlias;
+    private const string NavigationLinkDocTypeAlias = GlobalFolderNavigationLinkForSite.ModelTypeAlias;
 
     // Super-user id fallback (-1) for the int-based ContentService audit column. Defined locally
     // instead of Constants.Security.SuperUserId (obsolete, removed in Umbraco 18). These endpoints
@@ -102,17 +104,12 @@ public class uTProDashboardManagementController(
     private const int SuperUserIdFallback = -1;
 
     /// <summary>
-    /// Creates a new site skeleton in the Content tree:
-    /// <code>
-    /// {name}                (globalRoot)
-    ///   └─ Sites            (globalFolderSites)
-    ///        └─ Navigation Link (globalFolderNavigationLinkForSite)
-    /// </code>
     /// Nodes are saved as drafts (not published) so the editor can build pages under the
     /// structure and publish when ready. Requires Content section access.
     /// </summary>
     [HttpPost("create-site")]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
+    [IgnoreAntiforgeryToken]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateSite([FromBody] CreateSiteRequest request)
@@ -221,15 +218,32 @@ public class uTProDashboardManagementController(
         contentService.GetPagedContentInRecycleBin(0, 1, out var contentInBin);
         mediaService.GetPagedMediaInRecycleBin(0, 1, out var mediaInBin);
 
-        // Count via aggregate queries instead of materialising every user row (mirrors the
-        // member counts below): disabled = total − approved.
+        // Total users via an aggregate count (no need to materialise every row).
         var usersTotal = userService.GetCount(MemberCountType.All);
-        var usersApproved = userService.GetCount(MemberCountType.Approved);
-        var usersDisabled = Math.Max(0, usersTotal - usersApproved);
+
+        // Count disabled users by their actual state rather than deriving it from
+        // "total − approved": that heuristic wrongly flagged the built-in super-admin as
+        // disabled (GetCount(Approved) doesn't count it as expected) and also lumps in
+        // invited/pending users. GetAll returns the matching total via the out parameter,
+        // so we only fetch a single row.
+        userService.GetAll(0, 1, out var usersDisabled, "username", Direction.Ascending,
+            new[] { UserState.Disabled }, (string[]?)null, (string?)null);
 
         var membersTotal = memberService.GetCount(MemberCountType.All);
         var membersApproved = memberService.GetCount(MemberCountType.Approved);
         var membersDisabled = Math.Max(0, membersTotal - membersApproved);
+
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        var apps = new List<object>();
+        foreach (var assembly in assemblies)
+        {
+            AssemblyName name = assembly.GetName();
+            if (name == null) continue;
+            if (name.Name?.StartsWith("uTPro.Feature.") == true)
+            {
+                apps.Add(new { Name = name.Name, Version = name.Version?.ToString(3) });
+            }
+        }
 
         return Ok(new
         {
@@ -243,6 +257,7 @@ public class uTProDashboardManagementController(
             usersDisabled,
             membersTotal,
             membersDisabled,
+            apps
         });
     }
 
@@ -286,7 +301,8 @@ public class uTProDashboardManagementController(
             .Select($@"{L("Datestamp")} AS Datestamp, {L("userId")} AS UserId,
                        {L("logHeader")} AS LogHeader, {L("logComment")} AS LogComment,
                        {L("entityType")} AS EntityType, {U("userName")} AS UserName,
-                       {nodeName} AS NodeName, {nodeKey} AS NodeKey")
+                       {nodeName} AS NodeName, {nodeKey} AS NodeKey,
+                       {N("nodeObjectType")} AS NodeObjectType")
             .From($"{syntax.GetQuotedTableName("umbracoLog")} l")
             .LeftJoin($"{syntax.GetQuotedTableName("umbracoUser")} u").On($"{U("id")} = {L("userId")}")
             .LeftJoin($"{syntax.GetQuotedTableName("umbracoNode")} n").On($"{N("id")} = {L("NodeId")}")
@@ -308,9 +324,33 @@ public class uTProDashboardManagementController(
             action = BuildAction(r),
             type = r.LogHeader ?? string.Empty,
             entityType = r.EntityType ?? string.Empty,
+            // Reliable link target resolved from umbracoNode.nodeObjectType (the raw log
+            // entityType is often empty), used by the dashboard to build the edit link.
+            linkEntityType = ResolveLinkEntityType(r.EntityType, r.NodeObjectType),
             node = r.NodeName ?? string.Empty,
             nodeKey = r.NodeKey,
         }).ToList();
+    }
+
+    // Maps an umbracoNode object type to the backoffice edit-link entity key (kebab-case).
+    // Prefers the reliable nodeObjectType GUID over the often-empty umbracoLog.entityType,
+    // falling back to the raw log entity type (e.g. DictionaryItem, which has no umbracoNode row).
+    private static string ResolveLinkEntityType(string? rawEntityType, Guid? nodeObjectType)
+    {
+        if (nodeObjectType.HasValue)
+        {
+            var ot = nodeObjectType.Value;
+            if (ot == Constants.ObjectTypes.Document) return "document";
+            if (ot == Constants.ObjectTypes.Media) return "media";
+            if (ot == Constants.ObjectTypes.Member) return "member";
+            if (ot == Constants.ObjectTypes.DocumentType) return "document-type";
+            if (ot == Constants.ObjectTypes.MediaType) return "media-type";
+            if (ot == Constants.ObjectTypes.MemberType) return "member-type";
+            if (ot == Constants.ObjectTypes.DataType) return "data-type";
+            if (ot == Constants.ObjectTypes.TemplateType) return "template";
+        }
+
+        return (rawEntityType ?? string.Empty).ToLowerInvariant();
     }
 
     // Prefer "{Action} {NodeName}" (e.g. "Save Home"); fall back to the log comment
@@ -476,6 +516,7 @@ public class uTProDashboardManagementController(
         public string? LogHeader { get; set; }
         public string? LogComment { get; set; }
         public string? EntityType { get; set; }
+        public Guid? NodeObjectType { get; set; }
         public string? UserName { get; set; }
         public string? NodeName { get; set; }
         public Guid? NodeKey { get; set; }

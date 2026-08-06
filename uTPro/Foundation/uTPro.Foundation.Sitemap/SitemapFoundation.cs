@@ -3,7 +3,6 @@ using System.Text;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.PublishedModels;
-using uTPro.Common.Constants;
 using uTPro.Extension;
 using uTPro.Extension.CurrentSite;
 
@@ -11,7 +10,6 @@ namespace uTPro.Foundation.Sitemap
 {
     internal class SitemapFoundation : ISitemapFoundation
     {
-        private const string FileSitemapXSL = "sitemap.xsl";
         private const string CacheKeyPrefix = "uTPro:Sitemap:";
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
 
@@ -60,8 +58,14 @@ namespace uTPro.Foundation.Sitemap
                 var node = dataNode.Content;
                 if (node == null) continue;
 
+                // Skip nodes that have no routable URL (e.g. container/organisational nodes such as
+                // globalFolderPages). These sit inside the content tree below Home but resolve to "#"
+                // via the URL providers, so they must never appear in the sitemap.
+                var loc = _currentSite.GetUrlWithCulture(node, culture, mode: UrlMode.Absolute);
+                if (string.IsNullOrEmpty(loc) || loc.Contains('#')) continue;
+
                 XElement urlElement = new XElement(SchemaSitemap + "url");
-                AddLoc(node, culture, urlElement);
+                urlElement.Add(new XElement(SchemaSitemap + "loc", loc));
                 AddLastMod(node, urlElement);
                 AddChangeFrequency(node, culture, urlElement);
                 AddPriority(node, culture, urlElement);
@@ -69,22 +73,17 @@ namespace uTPro.Foundation.Sitemap
 
                 root.Add(urlElement);
             }
-
+            
             XDocument document = new XDocument(new XDeclaration("1.0", "UTF-8", null), root);
             return ConvertDocumentToString(document);
         }
 
-        private static void AddLoc(IPublishedContent node, string culture, XElement element)
-        {
-            element.Add(new XElement(SchemaSitemap + "loc", node.Url(culture, mode: UrlMode.Absolute)));
-        }
-
-        private static void AddLastMod(IPublishedContent node, XElement element)
+        private void AddLastMod(IPublishedContent node, XElement element)
         {
             element.Add(new XElement(SchemaSitemap + "lastmod", node.UpdateDate.ToString("yyyy-MM-dd")));
         }
 
-        private static void AddChangeFrequency(IPublishedContent node, string culture, XElement element)
+        private void AddChangeFrequency(IPublishedContent node, string culture, XElement element)
         {
             var changeFrequency = node.Value<string>(nameof(GlobalPageSitemapSetting.SitemapXmlChangeFrequency), culture);
             if (!string.IsNullOrWhiteSpace(changeFrequency))
@@ -93,7 +92,7 @@ namespace uTPro.Foundation.Sitemap
             }
         }
 
-        private static void AddPriority(IPublishedContent node, string culture, XElement element)
+        private void AddPriority(IPublishedContent node, string culture, XElement element)
         {
             var priority = node.Value<decimal>(nameof(GlobalPageSitemapSetting.SitemapXmlPriority), culture);
             if (priority > 0)
@@ -108,7 +107,7 @@ namespace uTPro.Foundation.Sitemap
             }
         }
 
-        private static void AddXhtmlLinks(IPublishedContent node, XElement element)
+        private void AddXhtmlLinks(IPublishedContent node, XElement element)
         {
             if (node.Cultures.Count <= 1) return;
 
@@ -117,15 +116,18 @@ namespace uTPro.Foundation.Sitemap
                 if (node.Value<bool>(nameof(GlobalPageSitemapSetting.SitemapHiddenSitemap), itemCul.Value.Culture))
                     continue;
 
+                var href = _currentSite.GetUrlWithCulture(node, itemCul.Value.Culture, mode: UrlMode.Absolute);
+                if (string.IsNullOrEmpty(href) || href.Contains('#')) continue;
+
                 var elementCul = new XElement(SchemaXhtml + "link",
                     new XAttribute("rel", "alternate"),
                     new XAttribute("hreflang", itemCul.Value.Culture),
-                    new XAttribute("href", node.Url(itemCul.Value.Culture, mode: UrlMode.Absolute)));
+                    new XAttribute("href", href));
                 element.Add(elementCul);
             }
         }
 
-        private static XElement InitElementRoot()
+        private XElement InitElementRoot()
         {
             return new XElement(SchemaSitemap + "urlset",
                 new XAttribute(XNamespace.Xmlns + "xhtml", SchemaXhtml),
@@ -137,10 +139,6 @@ namespace uTPro.Foundation.Sitemap
         {
             var sw = new Utf8StringWriter();
             sw.WriteLine(document.Declaration?.ToString());
-            if (System.IO.File.Exists(Path.Combine(PathFolder.DirectoryWWWRoot, FileSitemapXSL)))
-            {
-                sw.WriteLine("<?xml-stylesheet type=\"text/xsl\" href=\"/" + FileSitemapXSL + "\"?>");
-            }
             sw.WriteLine(document.ToString());
             return sw.ToString();
         }

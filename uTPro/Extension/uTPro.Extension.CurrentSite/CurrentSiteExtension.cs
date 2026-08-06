@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using static Umbraco.Cms.Core.Constants.Conventions;
+using Umbraco.Cms.Core;
 
 namespace uTPro.Extension.CurrentSite
 {
@@ -19,6 +20,7 @@ namespace uTPro.Extension.CurrentSite
     {
         private readonly ILogger<CurrentSiteExtension> _logger;
         private readonly ICultureDictionary _cultureDictionary;
+        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
@@ -33,12 +35,14 @@ namespace uTPro.Extension.CurrentSite
             IConfiguration configuration,
             IUmbracoContextFactory umbracoContextFactory,
             ICultureDictionary cultureDictionary,
+            IVariationContextAccessor variationContextAccessor,
             IServiceProvider serviceProvider)
         {
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _umbracoContextFactory = umbracoContextFactory;
             _cultureDictionary = cultureDictionary;
+            _variationContextAccessor = variationContextAccessor;
             _logger = logger;
 
             // Resolve lazily from the same scope (scoped service → same scope → same instance).
@@ -141,7 +145,11 @@ namespace uTPro.Extension.CurrentSite
             return domain ?? [];
         }
 
-        public void SetCurrentCulture(CultureInfo cul) => _currentCulture = cul;
+        public void SetCurrentCulture(CultureInfo cul)
+        {
+            _currentCulture = cul;
+            _variationContextAccessor.VariationContext = new VariationContext(cul.Name);
+        }
 
         public string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default)
         {
@@ -160,20 +168,38 @@ namespace uTPro.Extension.CurrentSite
                     : domain.Name;
 
                 var uri = new Uri(domainUrl, UriKind.RelativeOrAbsolute);
-                var segment = uri.AbsolutePath.Trim('/');
+                var segment = uri.IsAbsoluteUri ? uri.AbsolutePath.Trim('/') : domainUrl.Trim('/');
 
                 if (!string.IsNullOrWhiteSpace(segment))
                 {
+                    // Absolute URL (e.g. sitemap uses UrlMode.Absolute): insert the culture
+                    // segment right after the host when it is missing so the default culture
+                    // also gets its prefix, e.g.
+                    // https://utpro.local/gioi-thieu/ -> https://utpro.local/vi/gioi-thieu/
+                    if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                        || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (Uri.TryCreate(url, UriKind.Absolute, out var absoluteUrl))
+                        {
+                            var path = absoluteUrl.AbsolutePath.Trim('/');
+                            if (!path.Equals(segment, StringComparison.OrdinalIgnoreCase)
+                                && !path.StartsWith(segment + "/", StringComparison.OrdinalIgnoreCase))
+                            {
+                                var builder = new UriBuilder(absoluteUrl)
+                                {
+                                    Path = "/" + segment + absoluteUrl.AbsolutePath
+                                };
+                                return builder.Uri.ToString();
+                            }
+                        }
+                        return url;
+                    }
+
+                    // Relative URL
                     if (!url.StartsWith($"/{segment}", StringComparison.OrdinalIgnoreCase))
                     {
                         if (url == "/")
                             return $"/{segment}";
-                        else if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-                            || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-                            )
-                        {
-                            return url;
-                        }
                         return $"/{segment}{url}";
                     }
                 }

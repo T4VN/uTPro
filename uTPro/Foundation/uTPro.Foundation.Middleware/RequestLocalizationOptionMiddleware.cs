@@ -1,20 +1,18 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Globalization;
+using Umbraco.Cms.Core.Routing;
 using uTPro.Common.Constants;
 using uTPro.Extension;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Foundation.Middleware
 {
-    internal class RequestLocalizationOptionMiddleware
+    internal class RequestLocalizationOptionMiddleware(RequestDelegate next)
     {
         private const string CookieCulture = ".uTPro.Culture";
-        private static readonly DateTimeOffset CookieExpiry = DateTimeOffset.UtcNow.AddDays(3);
+        private const int CookieExpiryDays = 3;
 
         private static readonly Lazy<HashSet<string>> _wwwRootEntries = new(() =>
         {
@@ -41,16 +39,10 @@ namespace uTPro.Foundation.Middleware
             }
         });
 
-        // Cached exclude paths from config (built once per app lifetime).
-        private static HashSet<string>? _cachedExcludePaths;
-        private static readonly Lock _excludePathsLock = new();
+        // Per-site cached exclude paths keyed by (siteName + backofficeFlag).
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, HashSet<string>> _excludePathsCache = new(StringComparer.OrdinalIgnoreCase);
 
-        private readonly RequestDelegate _next;
-
-        public RequestLocalizationOptionMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
+        private readonly RequestDelegate _next = next;
 
         public async Task InvokeAsync(HttpContext context, ICurrentSiteExtension currentSite, ILogger<RequestLocalizationOptionMiddleware> logger)
         {
@@ -64,7 +56,7 @@ namespace uTPro.Foundation.Middleware
 
             try
             {
-                bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out bool isEnableCheckBackoffice);
+                _ = bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out bool isEnableCheckBackoffice);
 
                 string fullUrl = DetermineProviderCultureResult(context, currentSite, isEnableCheckBackoffice);
                 if (!string.IsNullOrEmpty(fullUrl) && IsLocalUrl(fullUrl))
@@ -125,14 +117,10 @@ namespace uTPro.Foundation.Middleware
 
         private static HashSet<string> GetExcludePaths(ICurrentSiteExtension currentSite, bool isEnableCheckBackoffice)
         {
-            if (_cachedExcludePaths != null)
-                return _cachedExcludePaths;
+            var siteKey = (currentSite.GetItem()?.Root?.Name ?? "_default") + "|" + (isEnableCheckBackoffice ? "1" : "0");
 
-            lock (_excludePathsLock)
+            return _excludePathsCache.GetOrAdd(siteKey, _ =>
             {
-                if (_cachedExcludePaths != null)
-                    return _cachedExcludePaths;
-
                 var result = new HashSet<string>(_wwwRootEntries.Value, StringComparer.OrdinalIgnoreCase);
 
                 if (!isEnableCheckBackoffice)
@@ -141,9 +129,8 @@ namespace uTPro.Foundation.Middleware
                     result.Add("app_plugins");
                 }
 
-                bool isEnabled = false;
                 var configSection = currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Enabled);
-                if (configSection != null && bool.TryParse(configSection.Value, out isEnabled) && isEnabled)
+                if (configSection != null && bool.TryParse(configSection.Value, out bool isEnabled) && isEnabled)
                 {
                     var pathsSection = currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Paths);
                     var lstPaths = pathsSection?.Get<string[]>();
@@ -157,9 +144,8 @@ namespace uTPro.Foundation.Middleware
                     }
                 }
 
-                _cachedExcludePaths = result;
-                return _cachedExcludePaths;
-            }
+                return result;
+            });
         }
 
         private static bool IsExcludePathUrl(string[] parts, ICurrentSiteExtension currentSite, bool isEnableCheckBackoffice)
@@ -175,7 +161,7 @@ namespace uTPro.Foundation.Middleware
 
             httpContext.Response.Cookies.Append(CookieCulture, culture, new CookieOptions
             {
-                Expires = CookieExpiry,
+                Expires = DateTimeOffset.UtcNow.AddDays(CookieExpiryDays),
                 IsEssential = true,
                 HttpOnly = true,
                 Secure = httpContext.Request.IsHttps,
@@ -193,8 +179,6 @@ namespace uTPro.Foundation.Middleware
             {
                 var cul = new CultureInfo(culture);
                 currentSite.SetCurrentCulture(cul);
-                CultureInfo.DefaultThreadCurrentCulture = cul;
-                CultureInfo.DefaultThreadCurrentUICulture = cul;
                 Thread.CurrentThread.CurrentCulture = cul;
                 Thread.CurrentThread.CurrentUICulture = cul;
                 StoreCookie(context, culture);
@@ -208,7 +192,7 @@ namespace uTPro.Foundation.Middleware
 
         private static string GetLanguageDefault(IReadOnlyList<Umbraco.Cms.Core.Routing.Domain> domains, ICurrentSiteExtension currentSite)
         {
-            var langDefault = domains.FirstOrDefault(x => x.Name.EndsWith("/"));
+            Domain? langDefault = domains.FirstOrDefault(x => x.Name.EndsWith('/'));
             if (langDefault != null && !string.IsNullOrEmpty(langDefault.Culture))
                 return langDefault.Culture;
 

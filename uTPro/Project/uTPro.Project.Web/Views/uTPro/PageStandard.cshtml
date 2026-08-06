@@ -1,11 +1,59 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+﻿@using Umbraco.Cms.Core.Models.Blocks;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     var currentPage = Umbraco.AssignedContentItem;
-    var top = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("topComponent");
-    var bottom = currentPage?.ValueInherited<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("bottomComponent");
-    var content = Model.Value<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>("content");
+    var rootName = CurrentSite.GetItem().Root.Name;
+
+    // Shared regions resolved as ordered chains. With the container's "Append To Inherited"
+    // toggle ON, the outer (e.g. site header) region is kept AND the container's region is added;
+    // OFF = the nearest one overrides (default).
+    var tops = currentPage?.GetInheritedRegion("topComponent", "appendToInherited")
+        ?? new List<BlockGridModel>();
+    var bottoms = currentPage?.GetInheritedRegion("bottomComponent", "appendToInherited")
+        ?? new List<BlockGridModel>();
+    var sidebars = currentPage?.GetInheritedRegion("sidebarComponent", "appendToInherited")
+        ?? new List<BlockGridModel>();
+
+    var content = Model.Value<BlockGridModel>("content");
+
+    // Effective layout: page's own `layout` -> Pages container `defaultLayout` -> "full".
+    var layout = Model.GetContentLayout();
 }
-@await Html.GetBlockGridHtmlAsync(top, CurrentSite.GetItem().Root.Name)
-@await Html.GetBlockGridHtmlAsync(content, CurrentSite.GetItem().Root.Name)
-@await Html.GetBlockGridHtmlAsync(bottom, CurrentSite.GetItem().Root.Name)
+@foreach (var region in tops)
+{
+    @await Html.GetBlockGridHtmlAsync(region, rootName)
+}
+
+@if (layout.HasSidebar())
+{
+    var rowLayout = layout == LayoutExtension.LayoutLeftSidebar ? "sidebar-left" : "sidebar-right";
+    <section class="wrapper style2">
+        <div class="container">
+            <div class="row gtr-150 @rowLayout">
+                <div class="col-8 col-12-medium content-col">
+                    <div class="content">
+                        @await Html.GetBlockGridHtmlAsync(content, rootName)
+                    </div>
+                </div>
+                <div class="col-4 col-12-medium sidebar-col">
+                    <div class="sidebar">
+                        @foreach (var region in sidebars)
+                        {
+                            @await Html.GetBlockGridHtmlAsync(region, rootName)
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    @* Full layout: render the content block grid as before (full-bleed sections). *@
+    @await Html.GetBlockGridHtmlAsync(content, rootName)
+}
+
+@foreach (var region in bottoms)
+{
+    @await Html.GetBlockGridHtmlAsync(region, rootName)
+}

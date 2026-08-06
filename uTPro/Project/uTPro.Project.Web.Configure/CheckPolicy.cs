@@ -12,7 +12,8 @@ namespace uTPro.Project.Web.Configure
             {
                 "localhost",
                 "*.local",
-                "*.t4vn.com"
+                "*.t4vn.com",
+                "*.utpro.dev"
             };
             internal static readonly DateTime exp_Date = DateTime.MaxValue;
         }
@@ -48,14 +49,17 @@ namespace uTPro.Project.Web.Configure
 
         private static Regex LikeExpressionToRegex(string likePattern)
         {
-            var replacementToken = "~~~";
+            // Escape all regex special characters first, then apply wildcard conversions.
+            string result = Regex.Escape(likePattern);
 
-            string result = likePattern.Replace("_", replacementToken)
-                .Replace("%", ".*");
-
-            result = Regex.Replace(result, @"\[.*" + replacementToken + @".*\]", "_");
-
-            result = result.Replace(replacementToken, ".");
+            // Convert SQL LIKE-style wildcards:
+            //   *  → .*  (zero or more characters, like shell glob)
+            //   %  → .*  (zero or more characters)
+            //   _  → .   (single character)
+            result = result
+                .Replace(@"\*", ".*")
+                .Replace(@"\%", ".*")
+                .Replace(@"\_", ".");
 
             return new Regex("^" + result + "$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }

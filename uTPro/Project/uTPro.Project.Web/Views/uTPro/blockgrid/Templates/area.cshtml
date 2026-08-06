@@ -1,11 +1,15 @@
 ﻿@using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridArea>
-
+@{
+    if (Model?.Any() != true) { return; }
+    var itemsNotHidden = Model.Where(x => x.Settings?.Value<bool>("hidden") != true);
+    if (itemsNotHidden?.Any() != true) { return; }
+}
 <div class="umb-block-grid__area @Model.Alias"
      data-area-col-span="@Model.ColumnSpan"
      data-area-row-span="@Model.RowSpan"
      data-area-alias="@Model.Alias"
      style="--umb-block-grid--grid-columns: @Model.ColumnSpan;--umb-block-grid--area-column-span: @Model.ColumnSpan; --umb-block-grid--area-row-span: @Model.RowSpan;">
     @* @await Html.GetBlockGridItemsHtmlAsync(Model) *@
-    @await Html.GetPreviewBlockGridItemsHtmlAsync(Model, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
+    @await Html.GetPreviewBlockGridItemsHtmlAsync(itemsNotHidden, $"{CurrentSite.GetItem().Root.Name}{Prefix.PrefixData}items")
 </div>
