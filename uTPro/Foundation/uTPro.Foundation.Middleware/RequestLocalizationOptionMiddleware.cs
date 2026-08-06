@@ -187,8 +187,6 @@ namespace uTPro.Foundation.Middleware
             {
                 var cul = new CultureInfo(culture);
                 currentSite.SetCurrentCulture(cul);
-                CultureInfo.DefaultThreadCurrentCulture = cul;
-                CultureInfo.DefaultThreadCurrentUICulture = cul;
                 Thread.CurrentThread.CurrentCulture = cul;
                 Thread.CurrentThread.CurrentUICulture = cul;
                 StoreCookie(context, culture);
