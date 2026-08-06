@@ -3,7 +3,6 @@
     public struct ConfigSettingUTPro
     {
         public const string Key = "uTPro";
-        public const string DefaultCulture = Key + ":DefaultCulture";
         public struct Backoffice
         {
             public const string Key = ConfigSettingUTPro.Key + ":Backoffice";

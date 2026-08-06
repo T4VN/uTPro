@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Page Standard</summary>
 	[PublishedModel("uTPro__PageStandard")]
-	public partial class UTpro__PageStandard : PublishedContentModel, IGlobalPageHeadMetaSetting, IGlobalPageHeadSocialMetaSetting, IGlobalPageScriptSetting, IGlobalPageSitemapSetting, IUTpro__ContentLayout
+	public partial class UTpro__PageStandard : PublishedContentModel, IGlobalPageHeadMetaSetting, IGlobalPageHeadSocialMetaSetting, IGlobalPagePageCategoriesSetting, IGlobalPageScriptSetting, IGlobalPageSitemapSetting, IUTpro__ContentLayout
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -170,6 +170,22 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual string TwitterTitle => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPageHeadSocialMetaSetting.GetTwitterTitle(this, _publishedValueFallback);
 
 		///<summary>
+		/// Categories: Select one or more categories to classify this page.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("categories")]
+		public virtual global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> Categories => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPagePageCategoriesSetting.GetCategories(this, _publishedValueFallback);
+
+		///<summary>
+		/// Tags
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("tags")]
+		public virtual global::System.Collections.Generic.IEnumerable<string> Tags => global::Umbraco.Cms.Web.Common.PublishedModels.GlobalPagePageCategoriesSetting.GetTags(this, _publishedValueFallback);
+
+		///<summary>
 		/// Body closing scripts: Anything you enter here will be placed before the closing {/body} tag on this page of your website.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
@@ -244,6 +260,22 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("bottomComponent")]
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel BottomComponent => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__ContentLayout.GetBottomComponent(this, _publishedValueFallback);
+
+		///<summary>
+		/// Layout: Page layout. Leave empty to inherit from the Pages container (default: full width).
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("layout")]
+		public virtual string Layout => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__ContentLayout.GetLayout(this, _publishedValueFallback);
+
+		///<summary>
+		/// Sidebar Component: Shown beside the content when Layout is left/right. Inherited from the Pages container when empty.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("sidebarComponent")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel SidebarComponent => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__ContentLayout.GetSidebarComponent(this, _publishedValueFallback);
 
 		///<summary>
 		/// Top Component

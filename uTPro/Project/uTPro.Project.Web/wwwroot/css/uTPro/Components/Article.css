@@ -33,6 +33,11 @@
     margin-left: 7em;
 }
 
+.box button {
+    font-size: revert !important;
+    padding: 0 !important;
+}
+
 @media screen and (max-width: 736px) {
     .box.post-excerpt .image.left {
         position: relative;

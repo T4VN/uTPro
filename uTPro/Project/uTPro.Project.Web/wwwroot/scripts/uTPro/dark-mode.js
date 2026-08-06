@@ -51,7 +51,12 @@
                 link.className = 'dark-mode-toggle';
                 link.title = 'Toggle Dark Mode';
                 link.setAttribute('aria-label', 'Toggle Dark Mode');
-                link.innerHTML = '<span class="dmt-slider"><span class="dmt-knob"></span></span>';
+                var slider = document.createElement('span');
+                slider.className = 'dmt-slider';
+                var knob = document.createElement('span');
+                knob.className = 'dmt-knob';
+                slider.appendChild(knob);
+                link.appendChild(slider);
                 navPanel.appendChild(link);
                 bindToggles();
             }

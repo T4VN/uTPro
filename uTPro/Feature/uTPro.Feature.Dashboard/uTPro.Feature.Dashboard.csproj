@@ -4,25 +4,27 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <!-- Serve wwwroot at the site root so App_Plugins/utpro-header resolves at
-         its declared absolute path (/App_Plugins/utpro-header/...). -->
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="App_Plugins\cms-screen\index.js" />
-    <Content Include="App_Plugins\cms-screen\lang\en-us.js" />
-    <Content Include="App_Plugins\cms-screen\style.css" />
-    <Content Include="App_Plugins\cms-screen\umbraco-package.json" />
-    <Content Include="App_Plugins\utpro-header\umbraco-package.json" />
-    <Content Include="App_Plugins\utpro-header\config.js" />
-    <Content Include="App_Plugins\utpro-header\dashboard.element.js" />
-    <Content Include="App_Plugins\utpro-header\header-app.element.js" />
-    <Content Include="App_Plugins\utpro-header\vendor\frappe-charts.min.esm.js" />
+    <Content Include="App_Plugins\utpro-cms-screen\style.css" />
+    <Content Include="App_Plugins\utpro-cms-screen\umbraco-package.json" />
+    <Content Include="App_Plugins\utpro-dashboard\umbraco-package.json" />
   </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="App_Plugins\utpro-cms-screen\index.js" />
+    <None Include="App_Plugins\utpro-cms-screen\lang\en-us.js" />
+    <None Include="App_Plugins\utpro-dashboard\config.js" />
+    <None Include="App_Plugins\utpro-dashboard\dashboard.element.js" />
+    <None Include="App_Plugins\utpro-dashboard\header-app.element.js" />
+    <None Include="App_Plugins\utpro-dashboard\packages-config.js" />
+    <None Include="App_Plugins\utpro-dashboard\vendor\frappe-charts.min.esm.js" />
   </ItemGroup>
 
   <ItemGroup>

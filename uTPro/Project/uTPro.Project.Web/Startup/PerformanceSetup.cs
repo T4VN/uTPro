@@ -28,16 +28,17 @@ public static class PerformanceSetup
             {
                 IgnoreAllErrors = true,
                 CommentMode = NUglify.Css.CssComment.None,
-            }, "css/**/*.css", "assets/**/*.css");
+            }, "css/**/*.css", "assets/**/*.css", "uTPro/**/*.css");
 
             pipeline.MinifyJsFiles(
                 new WebOptimizer.Processors.JsSettings(new NUglify.JavaScript.CodeSettings
                 {
                     IgnoreAllErrors = true,
                 }),
-                "js/**/*.js", "assets/**/*.js", "scripts/**/*.js"
+                "js/**/*.js", "assets/**/*.js", "scripts/**/*.js", "uTPro/**/*.js"
             );
         },
+
         // Force minification even in Development
         options =>
         {

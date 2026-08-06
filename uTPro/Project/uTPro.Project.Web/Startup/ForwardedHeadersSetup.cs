@@ -39,8 +39,7 @@ public static class ForwardedHeadersSetup
 
         services.Configure<ForwardedHeadersOptions>(options =>
         {
-            options.ForwardedHeaders =
-                ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
 
             // ASP.NET Core trusts only loopback out of the box. Clear the defaults so the
             // operator opts into exactly the proxies/networks the app sits behind.

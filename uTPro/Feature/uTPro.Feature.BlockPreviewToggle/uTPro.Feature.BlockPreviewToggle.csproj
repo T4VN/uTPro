@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Frontend-only feature (no C#). This project exists purely to organise the
+         backoffice assets in the solution and to be ready to split into a standalone
+         package later. The assets are served at runtime by uTPro.Project.Web via the
+         CopyUtproBlockPreviewToggleAppPlugins build target, so this project is NOT
+         referenced by the web app (avoids static-web-asset shadowing of the copy). -->
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <!-- App_Plugins files are auto-included by the SDK and shown in Solution Explorer;
+       no explicit <Content> items needed (that would duplicate the SDK defaults). -->
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>
