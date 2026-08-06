@@ -58,7 +58,8 @@ namespace uTPro.Project.Web.Configure
             }
 
             return categories
-                .Where(c => c.ContentType.Alias.Equals(GlobalFolderCategoryItem.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
+                .Where(c => c?.ContentType?.Alias is not null
+                    && c.ContentType.Alias.Equals(GlobalFolderCategoryItem.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
                 .Where(c => c.Value<bool>(CategoryUrlConstants.ShowInUrlAlias))
                 .ToList();
         }
@@ -67,8 +68,13 @@ namespace uTPro.Project.Web.Configure
         /// Gets the URL segment for a category item. Uses the custom <c>urlSegment</c> property
         /// if set; otherwise falls back to the node's default URL segment.
         /// </summary>
-        public string? GetCategorySegment(IPublishedContent categoryItem, string? culture)
+        public string? GetCategorySegment(IPublishedContent? categoryItem, string? culture)
         {
+            if (categoryItem is null || categoryItem.Key == Guid.Empty)
+            {
+                return null;
+            }
+
             // Prefer custom urlSegment property value.
             var customSegment = categoryItem.Value<string>(CategoryUrlConstants.UrlSegmentAlias);
             if (!string.IsNullOrWhiteSpace(customSegment))
@@ -153,9 +159,14 @@ namespace uTPro.Project.Web.Configure
 
         private void CollectCategoryItems(IPublishedContent node, string? culture, Dictionary<string, Guid> result)
         {
+            if (node?.ContentType?.Alias is null)
+            {
+                return;
+            }
+
             if (node.ContentType.Alias.Equals(GlobalFolderCategoryItem.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
             {
-                if (node.Value<bool>(CategoryUrlConstants.ShowInUrlAlias))
+                if (node.Key != Guid.Empty && node.Value<bool>(CategoryUrlConstants.ShowInUrlAlias))
                 {
                     var segment = GetCategorySegment(node, culture);
                     if (!string.IsNullOrEmpty(segment) && !result.ContainsKey(segment))
@@ -189,7 +200,7 @@ namespace uTPro.Project.Web.Configure
         public bool PageHasCategory(IPublishedContent page, Guid categoryKey)
         {
             var categories = page.Value<IEnumerable<IPublishedContent>>(CategoryUrlConstants.PageCategoriesAlias);
-            return categories?.Any(c => c.Key == categoryKey) == true;
+            return categories?.Any(c => c is not null && c.Key == categoryKey) == true;
         }
     }
 
