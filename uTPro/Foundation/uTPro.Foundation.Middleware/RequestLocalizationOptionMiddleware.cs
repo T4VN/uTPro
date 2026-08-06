@@ -1,17 +1,15 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Globalization;
+using Umbraco.Cms.Core.Routing;
 using uTPro.Common.Constants;
 using uTPro.Extension;
 using uTPro.Extension.CurrentSite;
 
 namespace uTPro.Foundation.Middleware
 {
-    internal class RequestLocalizationOptionMiddleware
+    internal class RequestLocalizationOptionMiddleware(RequestDelegate next)
     {
         private const string CookieCulture = ".uTPro.Culture";
         private const int CookieExpiryDays = 3;
@@ -44,12 +42,7 @@ namespace uTPro.Foundation.Middleware
         // Per-site cached exclude paths keyed by (siteName + backofficeFlag).
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, HashSet<string>> _excludePathsCache = new(StringComparer.OrdinalIgnoreCase);
 
-        private readonly RequestDelegate _next;
-
-        public RequestLocalizationOptionMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
+        private readonly RequestDelegate _next = next;
 
         public async Task InvokeAsync(HttpContext context, ICurrentSiteExtension currentSite, ILogger<RequestLocalizationOptionMiddleware> logger)
         {
@@ -63,7 +56,7 @@ namespace uTPro.Foundation.Middleware
 
             try
             {
-                bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out bool isEnableCheckBackoffice);
+                _ = bool.TryParse(currentSite.Configuration.GetSection(ConfigSettingUTPro.Backoffice.Enabled)?.Value, out bool isEnableCheckBackoffice);
 
                 string fullUrl = DetermineProviderCultureResult(context, currentSite, isEnableCheckBackoffice);
                 if (!string.IsNullOrEmpty(fullUrl) && IsLocalUrl(fullUrl))
@@ -136,9 +129,8 @@ namespace uTPro.Foundation.Middleware
                     result.Add("app_plugins");
                 }
 
-                bool isEnabled = false;
                 var configSection = currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Enabled);
-                if (configSection != null && bool.TryParse(configSection.Value, out isEnabled) && isEnabled)
+                if (configSection != null && bool.TryParse(configSection.Value, out bool isEnabled) && isEnabled)
                 {
                     var pathsSection = currentSite.Configuration.GetSection(ConfigSettingUTPro.ListRememberLanguage.ListExludeRequestLanguage.Paths);
                     var lstPaths = pathsSection?.Get<string[]>();
@@ -200,7 +192,7 @@ namespace uTPro.Foundation.Middleware
 
         private static string GetLanguageDefault(IReadOnlyList<Umbraco.Cms.Core.Routing.Domain> domains, ICurrentSiteExtension currentSite)
         {
-            var langDefault = domains.FirstOrDefault(x => x.Name.EndsWith("/"));
+            Domain? langDefault = domains.FirstOrDefault(x => x.Name.EndsWith('/'));
             if (langDefault != null && !string.IsNullOrEmpty(langDefault.Culture))
                 return langDefault.Culture;
 

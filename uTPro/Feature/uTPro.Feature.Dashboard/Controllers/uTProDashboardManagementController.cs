@@ -109,6 +109,7 @@ public class uTProDashboardManagementController(
     /// </summary>
     [HttpPost("create-site")]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
+    [IgnoreAntiforgeryToken]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateSite([FromBody] CreateSiteRequest request)
