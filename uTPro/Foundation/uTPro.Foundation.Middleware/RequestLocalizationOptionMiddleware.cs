@@ -41,9 +41,8 @@ namespace uTPro.Foundation.Middleware
             }
         });
 
-        // Cached exclude paths from config (built once per app lifetime).
-        private static HashSet<string>? _cachedExcludePaths;
-        private static readonly Lock _excludePathsLock = new();
+        // Per-site cached exclude paths keyed by (siteName + backofficeFlag).
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, HashSet<string>> _excludePathsCache = new(StringComparer.OrdinalIgnoreCase);
 
         private readonly RequestDelegate _next;
 
@@ -125,14 +124,10 @@ namespace uTPro.Foundation.Middleware
 
         private static HashSet<string> GetExcludePaths(ICurrentSiteExtension currentSite, bool isEnableCheckBackoffice)
         {
-            if (_cachedExcludePaths != null)
-                return _cachedExcludePaths;
+            var siteKey = (currentSite.GetItem()?.Root?.Name ?? "_default") + "|" + (isEnableCheckBackoffice ? "1" : "0");
 
-            lock (_excludePathsLock)
+            return _excludePathsCache.GetOrAdd(siteKey, _ =>
             {
-                if (_cachedExcludePaths != null)
-                    return _cachedExcludePaths;
-
                 var result = new HashSet<string>(_wwwRootEntries.Value, StringComparer.OrdinalIgnoreCase);
 
                 if (!isEnableCheckBackoffice)
@@ -157,9 +152,8 @@ namespace uTPro.Foundation.Middleware
                     }
                 }
 
-                _cachedExcludePaths = result;
-                return _cachedExcludePaths;
-            }
+                return result;
+            });
         }
 
         private static bool IsExcludePathUrl(string[] parts, ICurrentSiteExtension currentSite, bool isEnableCheckBackoffice)

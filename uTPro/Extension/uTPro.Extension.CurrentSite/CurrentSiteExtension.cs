@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using static Umbraco.Cms.Core.Constants.Conventions;
+using Umbraco.Cms.Core;
 
 namespace uTPro.Extension.CurrentSite
 {
@@ -19,6 +20,7 @@ namespace uTPro.Extension.CurrentSite
     {
         private readonly ILogger<CurrentSiteExtension> _logger;
         private readonly ICultureDictionary _cultureDictionary;
+        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
@@ -33,12 +35,14 @@ namespace uTPro.Extension.CurrentSite
             IConfiguration configuration,
             IUmbracoContextFactory umbracoContextFactory,
             ICultureDictionary cultureDictionary,
+            IVariationContextAccessor variationContextAccessor,
             IServiceProvider serviceProvider)
         {
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _umbracoContextFactory = umbracoContextFactory;
             _cultureDictionary = cultureDictionary;
+            _variationContextAccessor = variationContextAccessor;
             _logger = logger;
 
             // Resolve lazily from the same scope (scoped service → same scope → same instance).
@@ -141,7 +145,11 @@ namespace uTPro.Extension.CurrentSite
             return domain ?? [];
         }
 
-        public void SetCurrentCulture(CultureInfo cul) => _currentCulture = cul;
+        public void SetCurrentCulture(CultureInfo cul)
+        {
+            _currentCulture = cul;
+            _variationContextAccessor.VariationContext = new VariationContext(cul.Name);
+        }
 
         public string GetUrlWithCulture(IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default)
         {
