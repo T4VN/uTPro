@@ -1,6 +1,7 @@
 using Our.Umbraco.PostgreSql;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Community.BlockPreview.Extensions;
 
 namespace uTPro.Project.Web.Startup;
@@ -72,7 +73,7 @@ public static class UmbracoSetup
                 "Expected: SchedulingPublisher, Subscriber, Single, or Auto.");
         }
 
-        umbracoBuilder.Services.AddUnique<IServerRoleAccessor>(new ConfigurableServerRoleAccessor(role));
+        umbracoBuilder.SetServerRegistrar(new ConfigurableServerRoleAccessor(role));
 
         // On a shared database only the SchedulingPublisher owns schema changes and the
         // uSync import. Subscribers must skip both, otherwise concurrent boots race on
