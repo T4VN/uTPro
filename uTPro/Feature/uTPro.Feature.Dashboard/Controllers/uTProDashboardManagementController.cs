@@ -105,15 +105,21 @@ public class uTProDashboardManagementController(
 
     /// <summary>
     /// Nodes are saved as drafts (not published) so the editor can build pages under the
-    /// structure and publish when ready. Requires Content section access.
+    /// structure and publish when ready. Requires the user to be an administrator OR have
+    /// unrestricted content-root access (no content start-node configured).
     /// </summary>
     [HttpPost("create-site")]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
-    [IgnoreAntiforgeryToken]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateSite([FromBody] CreateSiteRequest request)
     {
+        if (!CanCreateSite())
+        {
+            return Forbid();
+        }
+
         var name = request?.Name?.Trim();
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -265,6 +271,23 @@ public class uTProDashboardManagementController(
     // (everyone's activity + IPs) must be restricted to admins.
     private bool IsAdmin() =>
         backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() == true;
+
+    // True when the user is allowed to create a new site skeleton at the content root.
+    // Permitted for admins OR users whose content start-node is the root (i.e. no
+    // restricted start-node configured — they can browse the entire content tree).
+    private bool CanCreateSite()
+    {
+        var user = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (user is null) return false;
+        if (user.IsAdmin()) return true;
+
+        // When a user has no content start-node restriction, StartContentIds is either
+        // empty or contains Constants.System.Root (-1), meaning they have root-level access.
+        var startIds = user.StartContentIds;
+        return startIds is null
+            || startIds.Length == 0
+            || startIds.Contains(Constants.System.Root);
+    }
 
     // Recent activity across ALL users (audit trail from umbracoLog) — admin only, since it
     // exposes other users' activity. Non-admins should use my-activity.
