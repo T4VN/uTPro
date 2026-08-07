@@ -68,25 +68,38 @@ jobs:
           fi
           echo "Found version: $VERSION"
           echo "version_tag=v$VERSION" >> $GITHUB_OUTPUT
-          
-      - name: Delete existing draft releases
+
+      # ✅ Kiểm tra tag đã tồn tại chưa, nếu rồi thì thêm suffix để không ghi đè release cũ
+      - name: Resolve unique tag
+        id: resolve_tag
         run: |
-          releases=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            https://api.github.com/repos/${{ github.repository }}/releases)
-          for id in $(echo "$releases" | jq '.[] | select(.draft==true) | .id'); do
-            echo "Deleting draft release id=$id"
-            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              https://api.github.com/repos/${{ github.repository }}/releases/$id
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+          TAG="${{ steps.version.outputs.version_tag }}"
+          # Kiểm tra tag đã tồn tại trên remote chưa
+          if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
+            # Tag đã tồn tại — thêm timestamp suffix
+            SUFFIX=$(date +%Y%m%d%H%M%S)
+            UNIQUE_TAG="${TAG}-build.${SUFFIX}"
+            echo "Tag '$TAG' already exists. Using unique tag: $UNIQUE_TAG"
+            echo "release_tag=$UNIQUE_TAG" >> $GITHUB_OUTPUT
+            echo "tag_existed=true" >> $GITHUB_OUTPUT
+          else
+            echo "Tag '$TAG' is new."
+            echo "release_tag=$TAG" >> $GITHUB_OUTPUT
+            echo "tag_existed=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ steps.version.outputs.version_tag }}
-          name: Release ${{ steps.branch.outputs.branch_name }}
-          body: "Auto-generated release from branch ${{ steps.branch.outputs.branch_name }}, build ${{ steps.version.outputs.version_tag }}"
+          tag_name: ${{ steps.resolve_tag.outputs.release_tag }}
+          name: Release ${{ steps.version.outputs.version_tag }}
+          body: |
+            Auto-generated release from branch `${{ steps.branch.outputs.branch_name }}`
+            - Version: `${{ steps.version.outputs.version_tag }}`
+            - Tag: `${{ steps.resolve_tag.outputs.release_tag }}`
+            - Tag existed: ${{ steps.resolve_tag.outputs.tag_existed }}
+            - Build time: ${{ github.event.head_commit.timestamp }}
+            - Commit: ${{ github.sha }}
           draft: true
           prerelease: true
           files: ${{ steps.rename.outputs.file_name }}
