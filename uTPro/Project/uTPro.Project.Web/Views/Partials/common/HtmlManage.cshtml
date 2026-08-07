@@ -1,9 +1,0 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<string>
-@{
-    var htmlManage = CurrentSite.GetItem().FolderSite;
-    if (htmlManage == null)
-    {
-        return;
-    }
-}
-@Html.Raw(htmlManage.ValueToString(Model))
