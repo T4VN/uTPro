@@ -56,5 +56,21 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("header")]
 		public virtual string Header => this.Value<string>(_publishedValueFallback, "header");
+
+		///<summary>
+		/// Param query: Default: q
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("paramQuery")]
+		public virtual string ParamQuery => this.Value<string>(_publishedValueFallback, "paramQuery");
+
+		///<summary>
+		/// Search result page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("searchResult")]
+		public virtual global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent SearchResult => this.Value<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent>(_publishedValueFallback, "searchResult");
 	}
 }

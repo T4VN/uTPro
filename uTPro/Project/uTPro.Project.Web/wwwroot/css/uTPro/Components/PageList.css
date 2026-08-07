@@ -1,0 +1,211 @@
+/* ── Page List Component ── */
+.page-list {
+    padding: 1rem 0;
+}
+
+/* ── List Layout ── */
+.page-list--list .page-list__items {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.page-list--list .page-list__item {
+    display: flex;
+    gap: 1.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--utp-border, #eee);
+}
+
+.page-list--list .page-list__thumbnail {
+    flex-shrink: 0;
+    width: 200px;
+    height: 140px;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.page-list--list .page-list__thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.page-list--list .page-list__thumbnail:hover img {
+    transform: scale(1.05);
+}
+
+/* ── Grid Layout ── */
+.page-list--grid .page-list__items {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.page-list--grid-2 .page-list__items {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.page-list--grid-3 .page-list__items {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.page-list--grid .page-list__item {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--utp-border, #eee);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.page-list--grid .page-list__item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.page-list--grid .page-list__thumbnail {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.page-list--grid .page-list__thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.page-list--grid .page-list__content {
+    padding: 1rem;
+}
+
+/* ── Content ── */
+.page-list__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+    line-height: 1.4;
+}
+
+.page-list__title a {
+    color: var(--utp-heading, #333);
+    text-decoration: none;
+}
+
+.page-list__title a:hover {
+    color: var(--utp-primary, #4a90d9);
+}
+
+.page-list__date {
+    display: inline-block;
+    font-size: 0.85rem;
+    color: var(--utp-muted, #888);
+    margin-bottom: 0.4rem;
+}
+
+.page-list__description {
+    font-size: 0.95rem;
+    color: var(--utp-text, #555);
+    line-height: 1.6;
+    margin: 0.25rem 0 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── Category Tags ── */
+.page-list__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.page-list__category-tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    background: var(--utp-tag-bg, #f0f0f0);
+    color: var(--utp-tag-text, #555);
+    border-radius: 3px;
+    text-transform: capitalize;
+}
+
+/* ── Empty State ── */
+.page-list__empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--utp-muted, #888);
+    font-style: italic;
+}
+
+/* ── Pagination ── */
+.page-list__pagination {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.page-list__pagination ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+.page-list__pagination li {
+    display: inline-block;
+}
+
+.page-list__pagination a,
+.page-list__pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.5rem;
+    border: 1px solid var(--utp-border, #ddd);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--utp-text, #333);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.page-list__pagination a:hover {
+    background: var(--utp-primary, #4a90d9);
+    color: #fff;
+    border-color: var(--utp-primary, #4a90d9);
+}
+
+.page-list__pagination li.active span {
+    background: var(--utp-primary, #4a90d9);
+    color: #fff;
+    border-color: var(--utp-primary, #4a90d9);
+    font-weight: 600;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .page-list--list .page-list__item {
+        flex-direction: column;
+    }
+
+    .page-list--list .page-list__thumbnail {
+        width: 100%;
+        height: 180px;
+        border-radius: 6px 6px 0 0;
+    }
+
+    .page-list--grid-2 .page-list__items,
+    .page-list--grid-3 .page-list__items {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+    .page-list--grid-3 .page-list__items {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
