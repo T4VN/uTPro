@@ -461,20 +461,9 @@ namespace uTPro.Project.Web.Configure
         /// </summary>
         private IPublishedContent? WalkTree(IPublishedContent root, string[] segments, string? culture)
         {
-            var current = root;
-
-            foreach (var segment in segments)
-            {
-                var match = FindChild(current, segment, culture);
-                if (match is null)
-                {
-                    return null;
-                }
-
-                current = match;
-            }
-
-            return current;
+            return segments.Aggregate(
+                (IPublishedContent?)root,
+                (current, segment) => current is null ? null : FindChild(current, segment, culture));
         }
 
         private IPublishedContent? FindChild(IPublishedContent parent, string segment, string? culture)
@@ -773,20 +762,9 @@ namespace uTPro.Project.Web.Configure
 
         private IPublishedContent? WalkTree(IPublishedContent root, string[] segments, string? culture)
         {
-            var current = root;
-
-            foreach (var segment in segments)
-            {
-                var match = FindChild(current, segment, culture);
-                if (match is null)
-                {
-                    return null;
-                }
-
-                current = match;
-            }
-
-            return current;
+            return segments.Aggregate(
+                (IPublishedContent?)root,
+                (current, segment) => current is null ? null : FindChild(current, segment, culture));
         }
 
         private IPublishedContent? FindChild(IPublishedContent parent, string segment, string? culture)
