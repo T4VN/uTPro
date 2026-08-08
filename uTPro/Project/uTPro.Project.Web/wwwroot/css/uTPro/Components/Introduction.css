@@ -11,14 +11,14 @@
 
     .intro .button,
     .intro a.button {
-        color: var(--utp-text-white);
-        background-color: var(--utp-text);
+        color: var(--utp-text-white, #fff);
+        background-color: var(--utp-text, #484d55);
     }
 
     .intro .button:hover,
     .intro a.button:hover {
-        background-color: var(--utp-primary-hover);
-        color: var(--utp-text-dark);
+        background-color: var(--utp-primary-hover, #FFCE40);
+        color: var(--utp-text-dark, #1a1a1a);
     }
 
     .intro .style-content2 {

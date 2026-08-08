@@ -10,8 +10,8 @@
 
     .navHeader > ul {
         display: inline-block;
-        border-radius: var(--utp-radius);
-        box-shadow: inset 0px 0px 1px 1px var(--utp-border-white-25);
+        border-radius: var(--utp-radius, 0.35em);
+        box-shadow: inset 0px 0px 1px 1px var(--utp-border-white-25, rgba(255, 255, 255, 0.25));
         padding: 0 1em 0 0;
         list-style: none
     }
@@ -30,7 +30,7 @@
             .navHeader > ul > li > a,
             .navHeader > ul > li > * {
                 display: block;
-                color: var(--utp-text-white-90);
+                color: var(--utp-text-white-90, rgba(255, 255, 255, 0.90));
                 text-transform: uppercase;
                 text-decoration: none;
                 font-size: 0.7em;
@@ -46,13 +46,13 @@
             }
 
                 .navHeader > ul > li > a:hover {
-                    color: var(--utp-text-white);
+                    color: var(--utp-text-white, #fff);
                 }
 
             #navPanel > nav > li.active > a,
             .navHeader > ul > li.active > a,
             .navHeader > ul > li.active > span {
-                color: var(--utp-primary-light);
+                color: var(--utp-primary-light, #ff9e40);
             }
 
     .navHeader .nav-logo {
@@ -73,11 +73,11 @@
         }
 
 .dropotron {
-    background: var(--utp-dark-overlay) url("/assets/img/overlay.png");
+    background: var(--utp-dark-overlay, #222835) url("/assets/img/overlay.png");
     background-color: rgba(44, 50, 63, 0.925);
     padding: 1.25em 1em 1.25em 1em;
-    border-radius: var(--utp-radius);
-    box-shadow: inset 0px 0px 1px 1px var(--utp-border-white-25);
+    border-radius: var(--utp-radius, 0.35em);
+    box-shadow: inset 0px 0px 1px 1px var(--utp-border-white-25, rgba(255, 255, 255, 0.25));
     min-width: 12em;
     text-align: left;
     margin-top: -1.25em;
@@ -99,12 +99,12 @@
         -ms-transition: all .25s ease-in-out;
         transition: all .25s ease-in-out;
         display: block;
-        color: var(--utp-text-white-90);
+        color: var(--utp-text-white-90, rgba(255, 255, 255, 0.90));
         text-transform: uppercase;
         text-decoration: none;
         font-size: 0.7em;
         letter-spacing: 0.25em;
-        border-top: solid 1px var(--utp-border-white-15);
+        border-top: solid 1px var(--utp-border-white-15, rgba(255, 255, 255, 0.15));
         line-height: 3em;
     }
 
@@ -119,7 +119,7 @@
 
         .dropotron li:hover > a,
         .dropotron li:hover > span {
-            color: var(--utp-text-white);
+            color: var(--utp-text-white, #fff);
         }
 @media screen and (max-width: 980px) {
     .navHeader,
