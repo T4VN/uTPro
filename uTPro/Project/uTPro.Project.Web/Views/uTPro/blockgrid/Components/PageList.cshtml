@@ -25,17 +25,9 @@
     if (!sourceNodes.Any()) { return; }
 
     // ── Get children from all source nodes (respecting depth), merged ──
-    IEnumerable<IPublishedContent> allItems;
-    if (maxDepth <= 1)
-    {
-        allItems = sourceNodes
-            .SelectMany(node => node.Children()?.Where(c => c.IsPublished()) ?? Enumerable.Empty<IPublishedContent>());
-    }
-    else
-    {
-        allItems = sourceNodes
-            .SelectMany(node => node.Descendants(maxDepth).Where(c => c.IsPublished() && c.Level > node.Level));
-    }
+    var allItems = maxDepth <= 1
+        ? sourceNodes.SelectMany(node => node.Children()?.Where(c => c.IsPublished()) ?? Enumerable.Empty<IPublishedContent>())
+        : sourceNodes.SelectMany(node => node.Descendants(maxDepth).Where(c => c.IsPublished() && c.Level > node.Level));
 
     // Deduplicate in case of overlapping trees
     allItems = allItems.DistinctBy(x => x.Id);
@@ -46,9 +38,9 @@
     var isCategoryFiltered = false;
     string? categoryFilterName = null;
     if ((filterCategory == null || !filterCategory.Any())
-        && Context.Items.ContainsKey(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey))
+        && Context.Items.TryGetValue(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem))
     {
-        var urlCategoryKey = (Guid)Context.Items[uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey]!;
+        var urlCategoryKey = (Guid)categoryLandingItem!;
         if (urlCategoryKey != Guid.Empty)
         {
             isCategoryFiltered = true;

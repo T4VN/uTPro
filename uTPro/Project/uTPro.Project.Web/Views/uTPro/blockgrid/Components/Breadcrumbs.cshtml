@@ -27,8 +27,8 @@
     // CategoryLandingContentFinder), inject the category as an extra crumb before the current page.
     string? categoryCrumbName = null;
     string? categoryCrumbUrl = null;
-    var isCategoryLanding = Context.Items.ContainsKey(
-        uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey);
+    var isCategoryLanding = Context.Items.TryGetValue(
+        uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingValue);
 
     if (!isCategoryLanding)
     {
@@ -56,7 +56,7 @@
     else
     {
         // Category landing page (e.g. /huong-dan/bat-dau/) — category IS the last crumb (current page)
-        var categoryKey = Context.Items[uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey] as Guid?;
+        var categoryKey = categoryLandingValue as Guid?;
         if (categoryKey.HasValue && categoryKey.Value != Guid.Empty)
         {
             var categoryNode = Umbraco.Content(categoryKey.Value);

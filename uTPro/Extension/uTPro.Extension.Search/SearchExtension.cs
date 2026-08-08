@@ -53,15 +53,9 @@ internal sealed class SearchExtension : ISearchExtension
         var examineQuery = searcher.CreateQuery("content");
 
         // ManagedQuery handles tokenization, fuzzy matching, and field boosting automatically
-        IBooleanOperation boolOp;
-        if (fields != null && fields.Length > 0)
-        {
-            boolOp = examineQuery.ManagedQuery(query.Trim(), fields);
-        }
-        else
-        {
-            boolOp = examineQuery.ManagedQuery(query.Trim());
-        }
+        var boolOp = fields != null && fields.Length > 0
+            ? examineQuery.ManagedQuery(query.Trim(), fields)
+            : examineQuery.ManagedQuery(query.Trim());
 
         // Apply ordering
         IOrdering ordered = ApplyOrdering(boolOp, orderBy);
@@ -90,31 +84,19 @@ internal sealed class SearchExtension : ISearchExtension
             {
                 var culture = _currentSite.CurrentCulture.Name;
                 var pathFilter = filterScopeId.HasValue ? $",{filterScopeId.Value}," : null;
-                var allMatched = new List<SearchResultItem>();
 
-                foreach (var searchResult in searchResults)
-                {
-                    if (!int.TryParse(searchResult.Id, out var nodeId))
-                        continue;
-
-                    var content = contentCache.GetById(nodeId);
-                    if (content == null || !content.IsPublished(culture))
-                        continue;
-
-                    // Path scope filter: check if content is a descendant of the scope node
-                    if (pathFilter != null)
+                var allMatched = searchResults
+                    .Where(sr => int.TryParse(sr.Id, out _))
+                    .Select(sr => new { SearchResult = sr, NodeId = int.Parse(sr.Id) })
+                    .Select(x => new { x.SearchResult, Content = contentCache.GetById(x.NodeId) })
+                    .Where(x => x.Content != null && x.Content.IsPublished(culture))
+                    .Where(x => pathFilter == null || ("," + x.Content!.Path + ",").Contains(pathFilter))
+                    .Select(x => new SearchResultItem
                     {
-                        var contentPath = "," + content.Path + ",";
-                        if (!contentPath.Contains(pathFilter))
-                            continue;
-                    }
-
-                    allMatched.Add(new SearchResultItem
-                    {
-                        Content = content,
-                        Score = searchResult.Score
-                    });
-                }
+                        Content = x.Content!,
+                        Score = x.SearchResult.Score
+                    })
+                    .ToList();
 
                 result.TotalResults = allMatched.Count;
                 result.TotalPages = (int)Math.Ceiling((double)allMatched.Count / pageSize);
