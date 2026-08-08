@@ -38,6 +38,16 @@
     padding: 0 !important;
 }
 
+/* SearchBox: ensure button fits within its grid column on all screen sizes */
+.box .search-box-btn {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* SearchBox outside sidebar: constrain width so it looks compact like the sidebar version */
 .sidebar section.box {
     max-width: 100%;
@@ -54,5 +64,11 @@
     .box.post-excerpt h3,
     .box.post-excerpt p {
         margin-left: 32.5%;
+    }
+
+    /* SearchBox button: override global mobile button (display:block; width:100%) */
+    .box .search-box-btn {
+        display: flex;
+        min-width: 0;
     }
 }

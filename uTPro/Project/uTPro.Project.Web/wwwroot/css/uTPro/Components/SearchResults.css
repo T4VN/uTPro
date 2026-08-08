@@ -6,10 +6,12 @@
 /* ── Search Form ── */
 .search-results__form {
     margin-bottom: 1.5rem;
+    width: 100%;
 }
 
 .search-results__input-wrap {
     display: flex;
+    width: 100%;
     border: 2px solid var(--utp-border-medium, #ddd);
     border-radius: 6px;
     overflow: hidden;
@@ -22,13 +24,18 @@
 
 .search-results__input {
     flex: 1;
+    min-width: 0;
+    width: 100%;
+    height: auto !important;
+    display: block;
     border: none;
-    border-radius: 0;
+    border-radius: 0 !important;
     padding: 0.75rem 1rem;
     font-size: 1rem;
     outline: none;
     background: transparent;
     color: var(--utp-text, #484d55);
+    box-shadow: none;
 }
 
 .search-results__input::placeholder {
@@ -71,4 +78,12 @@
     color: inherit;
     padding: 0.1em 0.2em;
     border-radius: 2px;
+}
+
+/* ── SearchBox component (row gtr-0 layout) ── */
+.box .search-box-btn {
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+    padding: 0 0.5em;
 }

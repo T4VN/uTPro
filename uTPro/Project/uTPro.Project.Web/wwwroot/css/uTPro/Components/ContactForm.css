@@ -1,4 +1,8 @@
-﻿
+﻿/* ── Mobile overflow fix ── */
+.contactform {
+    overflow-x: hidden;
+}
+
 .contactform form input[type="text"],
 .contactform form input[type="email"],
 .contactform form input[type="password"],
@@ -159,4 +163,27 @@
 /* ── Cloudflare Turnstile widget ── */
 .contactform .uTProForm-turnstile {
     margin: 0.5em 0 0 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* ── Mobile responsive fixes ── */
+@media screen and (max-width: 736px) {
+    .contactform .row {
+        margin-left: 0;
+    }
+
+    .contactform .row > * {
+        padding-left: 0;
+    }
+
+    .contactform .uTProForm .col-12 {
+        width: 100%;
+        padding-left: 0;
+    }
+
+    .contactform form input[type="file"] {
+        max-width: 100%;
+        overflow: hidden;
+    }
 }
