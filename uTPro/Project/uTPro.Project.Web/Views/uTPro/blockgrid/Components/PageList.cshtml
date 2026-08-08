@@ -41,7 +41,28 @@
     allItems = allItems.DistinctBy(x => x.Id);
 
     // ── Filter by category ──
-    if (filterCategory != null && filterCategory.Any())
+    // Auto-detect category from URL when CategoryLandingContentFinder matched.
+    // This allows /huong-dan/cau-hinh/ or /search/bat-dau/ to auto-filter PageList by the URL category.
+    var isCategoryFiltered = false;
+    string? categoryFilterName = null;
+    if ((filterCategory == null || !filterCategory.Any())
+        && Context.Items.ContainsKey(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey))
+    {
+        var urlCategoryKey = (Guid)Context.Items[uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey]!;
+        if (urlCategoryKey != Guid.Empty)
+        {
+            isCategoryFiltered = true;
+            var categoryNode = Umbraco.Content(urlCategoryKey);
+            categoryFilterName = categoryNode?.Name;
+
+            allItems = allItems.Where(item =>
+            {
+                var cats = item.Value<IEnumerable<IPublishedContent>>("categories");
+                return cats != null && cats.Any(c => c.Key == urlCategoryKey);
+            });
+        }
+    }
+    else if (filterCategory != null && filterCategory.Any())
     {
         var filterCategoryIds = filterCategory.Select(c => c.Id).ToHashSet();
         allItems = allItems.Where(item =>
@@ -103,6 +124,10 @@ else
 }
 
 <div class="container page-list @layoutClass">
+    @if (isCategoryFiltered && !string.IsNullOrEmpty(categoryFilterName))
+    {
+        <h2 class="page-list__category-heading">@categoryFilterName</h2>
+    }
     @if (!pagedItems.Any())
     {
         <p class="page-list__empty">@CurrentSite.GetDictionaryValue("uTPro.PageList.NoItems", "No items found.")</p>

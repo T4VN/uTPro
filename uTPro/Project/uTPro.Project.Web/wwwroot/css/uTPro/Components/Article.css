@@ -38,6 +38,11 @@
     padding: 0 !important;
 }
 
+/* SearchBox outside sidebar: constrain width so it looks compact like the sidebar version */
+.sidebar section.box {
+    max-width: 100%;
+}
+
 @media screen and (max-width: 736px) {
     .box.post-excerpt .image.left {
         position: relative;

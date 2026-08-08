@@ -12,6 +12,7 @@
     var showDate = Model.Content.PageListShowDate;
     var showCategories = Model.Content.PageListShowCategories;
     var layout = !string.IsNullOrWhiteSpace(Model.Content.PageListLayout) ? Model.Content.PageListLayout : "list";
+    var searchParamQuery = string.IsNullOrEmpty(Model.Content.SearchParameter) ? "q" : Model.Content.SearchParameter;
 
     // Search-specific settings
     var placeholder = !string.IsNullOrWhiteSpace(Model.Content.SearchPlaceholder)
@@ -25,7 +26,7 @@
     var searchScope = !string.IsNullOrWhiteSpace(Model.Content.SearchScope) ? Model.Content.SearchScope : "selectedSource";
 
     // ── Read query params ──
-    var queryString = Context.Request.Query["q"].FirstOrDefault() ?? "";
+    var queryString = Context.Request.Query[@searchParamQuery].FirstOrDefault() ?? "";
     var currentPage = 1;
     if (int.TryParse(Context.Request.Query["page"].FirstOrDefault(), out var qp) && qp > 0)
     {
@@ -104,6 +105,38 @@
 
     var hasSearched = !string.IsNullOrWhiteSpace(queryString) && queryString.Length >= minChars;
     var basePath = Context.Request.Path.ToString();
+
+    // ── Auto-filter search results by category from URL ──
+    var isCategoryFiltered = false;
+    string? categoryFilterName = null;
+    if (Context.Items.ContainsKey(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey))
+    {
+        var urlCategoryKey = (Guid)Context.Items[uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey]!;
+        if (urlCategoryKey != Guid.Empty && results.Items.Any())
+        {
+            isCategoryFiltered = true;
+            var categoryNode = Umbraco.Content(urlCategoryKey);
+            categoryFilterName = categoryNode?.Name;
+
+            var filtered = results.Items
+                .Where(r =>
+                {
+                    var cats = r.Content.Value<IEnumerable<IPublishedContent>>("categories");
+                    return cats != null && cats.Any(c => c.Key == urlCategoryKey);
+                })
+                .ToList();
+
+            results = new SearchResultSet
+            {
+                Query = results.Query,
+                Page = results.Page,
+                PageSize = results.PageSize,
+                TotalResults = filtered.Count,
+                TotalPages = (int)Math.Ceiling((double)filtered.Count / itemsPerPage),
+                Items = filtered
+            };
+        }
+    }
 }
 
 @if (Context.Request.IsBlockPreviewRequest())
@@ -121,11 +154,15 @@ else
 }
 
 <div class="container search-results">
+    @if (isCategoryFiltered && !string.IsNullOrEmpty(categoryFilterName))
+    {
+        <h2 class="page-list__category-heading">@categoryFilterName</h2>
+    }
     @* ── Search Form ── *@
     <form class="search-results__form" method="get" action="@basePath">
         <div class="search-results__input-wrap">
             <input type="text"
-                   name="q"
+                   name="@searchParamQuery"
                    value="@queryString"
                    placeholder="@placeholder"
                    minlength="@minChars"

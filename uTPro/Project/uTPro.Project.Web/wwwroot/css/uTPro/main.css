@@ -67,7 +67,6 @@ table, table.default {
 form label {
     display: block;
     font-weight: 700;
-    color: var(--utp-text, #484d55);
     margin: 0.25em 0 0.5em 0;
 }
 

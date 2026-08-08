@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__Breadcrumbs>>
+@using Umbraco.Cms.Core.Models.PublishedContent
 @{
     // Breadcrumb is built from the page currently being rendered (not from the block element),
     // so this component can be dropped into any region and always reflects the current page.
@@ -21,6 +22,51 @@
     {
         return;
     }
+
+    // Category breadcrumb: when the URL contains a category segment (from CategoryUrlProvider or
+    // CategoryLandingContentFinder), inject the category as an extra crumb before the current page.
+    string? categoryCrumbName = null;
+    string? categoryCrumbUrl = null;
+    var isCategoryLanding = Context.Items.ContainsKey(
+        uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey);
+
+    if (!isCategoryLanding)
+    {
+        // Page with category in URL (e.g. /huong-dan/bat-dau/gioi-thieu/)
+        // Check if the current page has visible categories via the CategoryUrlService.
+        var categoryUrlService = Context.RequestServices.GetService<uTPro.Project.Web.Configure.CategoryUrlService>();
+        if (categoryUrlService is not null)
+        {
+            var visibleCategories = categoryUrlService.GetVisibleCategories(current);
+            if (visibleCategories.Count > 0)
+            {
+                var firstCat = visibleCategories[0];
+                categoryCrumbName = firstCat.Name;
+                // Build category landing URL: current page's parent URL + category slug
+                var catSegment = categoryUrlService.GetCategorySegment(firstCat, null);
+                if (!string.IsNullOrEmpty(catSegment))
+                {
+                    var parentNode = crumbs.Count >= 2 ? crumbs[^2] : null;
+                    var parentUrl = parentNode?.Url()?.TrimEnd('/') ?? "";
+                    categoryCrumbUrl = $"{parentUrl}/{catSegment}/";
+                }
+            }
+        }
+    }
+    else
+    {
+        // Category landing page (e.g. /huong-dan/bat-dau/) — category IS the last crumb (current page)
+        var categoryKey = Context.Items[uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey] as Guid?;
+        if (categoryKey.HasValue && categoryKey.Value != Guid.Empty)
+        {
+            var categoryNode = Umbraco.Content(categoryKey.Value);
+            if (categoryNode is not null)
+            {
+                categoryCrumbName = categoryNode.Name;
+                // No URL needed — it's the "current" crumb (no link)
+            }
+        }
+    }
 }
 @if (Context.Request.IsBlockPreviewRequest())
 {
@@ -41,7 +87,25 @@ else
         {
             <span class="sep">/</span>
         }
-        if (i == crumbs.Count - 1)
+
+        @if (i == crumbs.Count - 1 && isCategoryLanding && !string.IsNullOrEmpty(categoryCrumbName))
+        {
+            // Category landing: show parent as link, then category as current
+            <a href="@node.Url()">@node.Name</a>
+            <span class="sep">/</span>
+            <span aria-current="page">@categoryCrumbName</span>
+        }
+        else if (i == crumbs.Count - 1 && !isCategoryLanding && !string.IsNullOrEmpty(categoryCrumbName))
+        {
+            // Page with category: insert category link before the current page
+            if (!string.IsNullOrEmpty(categoryCrumbUrl))
+            {
+                <a href="@categoryCrumbUrl">@categoryCrumbName</a>
+                <span class="sep">/</span>
+            }
+            <span aria-current="page">@node.Name</span>
+        }
+        else if (i == crumbs.Count - 1)
         {
             <span aria-current="page">@node.Name</span>
         }

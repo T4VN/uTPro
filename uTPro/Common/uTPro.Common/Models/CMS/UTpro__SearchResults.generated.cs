@@ -72,6 +72,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual string SearchNoResultsMessage => this.Value<string>(_publishedValueFallback, "searchNoResultsMessage");
 
 		///<summary>
+		/// Search parameter: Default: q
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("searchParameter")]
+		public virtual string SearchParameter => this.Value<string>(_publishedValueFallback, "searchParameter");
+
+		///<summary>
 		/// Placeholder: Placeholder text for the search input. Empty = uses dictionary key.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]

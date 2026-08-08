@@ -3,6 +3,14 @@
     padding: 1rem 0;
 }
 
+/* ── Category Filter Heading ── */
+.page-list__category-heading {
+    margin: 0 0 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--utp-primary, #f6821f);
+}
+
 /* ── List Layout ── */
 .page-list--list .page-list__items {
     display: flex;
