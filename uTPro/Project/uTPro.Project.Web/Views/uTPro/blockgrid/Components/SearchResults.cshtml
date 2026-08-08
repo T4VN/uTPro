@@ -109,9 +109,9 @@
     // ── Auto-filter search results by category from URL ──
     var isCategoryFiltered = false;
     string? categoryFilterName = null;
-    if (Context.Items.ContainsKey(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey))
+    if (Context.Items.TryGetValue(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem))
     {
-        var urlCategoryKey = (Guid)Context.Items[uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey]!;
+        var urlCategoryKey = (Guid)categoryLandingItem!;
         if (urlCategoryKey != Guid.Empty && results.Items.Any())
         {
             isCategoryFiltered = true;
