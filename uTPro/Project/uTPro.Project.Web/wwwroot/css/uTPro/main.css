@@ -44,7 +44,7 @@ table {
     }
 
         table.default tbody tr:nth-child(2n+2) {
-            background: var(--utp-bg-table-alt);
+            background: var(--utp-bg-table-alt, #f4f4f4);
         }
 
         table.default td {
@@ -58,12 +58,12 @@ table {
         }
 
         table.default thead {
-            background: var(--utp-text);
-            color: var(--utp-text-white);
+            background: var(--utp-text, #484d55);
+            color: var(--utp-text-white, #fff);
         }
 
         table.default tfoot {
-            background: var(--utp-bg-input);
+            background: var(--utp-bg-input, #eee);
         }
 
 /* Form */
@@ -71,7 +71,7 @@ table {
 form label {
     display: block;
     font-weight: 700;
-    color: var(--utp-text);
+    color: var(--utp-text, #484d55);
     margin: 0.25em 0 0.5em 0;
 }
 
@@ -87,9 +87,9 @@ form textarea {
     -webkit-appearance: none;
     display: block;
     border: 0;
-    background: var(--utp-bg-input);
-    box-shadow: inset 0px 0px 1px 0px var(--utp-border-input);
-    border-radius: var(--utp-radius);
+    background: var(--utp-bg-input, #eee);
+    box-shadow: inset 0px 0px 1px 0px var(--utp-border-input, #a0a1a7);
+    border-radius: var(--utp-radius, 0.35em);
     width: 100%;
     padding: 0.75em 1em 0.75em 1em;
 }
@@ -99,7 +99,7 @@ form textarea {
     form input[type="password"]:focus,
     form select:focus,
     form textarea:focus {
-        background: var(--utp-bg-input-focus);
+        background: var(--utp-bg-input-focus, #f8f8f8);
     }
 
     form input[type="text"],
@@ -121,23 +121,23 @@ form ul.actions {
 }
 
 form ::-webkit-input-placeholder {
-    color: var(--utp-text-placeholder) !important;
+    color: var(--utp-text-placeholder, #555) !important;
     font-style: italic;
     line-height: 1.35em;
 }
 
 form :-moz-placeholder {
-    color: var(--utp-text-placeholder) !important;
+    color: var(--utp-text-placeholder, #555) !important;
     font-style: italic;
 }
 
 form ::-moz-placeholder {
-    color: var(--utp-text-placeholder) !important;
+    color: var(--utp-text-placeholder, #555) !important;
     font-style: italic;
 }
 
 form :-ms-input-placeholder {
-    color: var(--utp-text-placeholder) !important;
+    color: var(--utp-text-placeholder, #555) !important;
     font-style: italic;
 }
 
@@ -194,13 +194,13 @@ button,
     -ms-transition: all .25s ease-in-out;
     transition: all .25s ease-in-out;
     display: inline-block;
-    background: var(--utp-dark-btn);
+    background: var(--utp-dark-btn, #444);
     text-align: center;
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.25em;
     text-decoration: none;
-    border-radius: var(--utp-radius);
+    border-radius: var(--utp-radius, 0.35em);
     border: 0;
     outline: 0;
     cursor: pointer;
@@ -216,7 +216,7 @@ button,
     input[type="reset"]:hover,
     button:hover,
     .button:hover {
-        background-color: var(--utp-primary-hover);
+        background-color: var(--utp-primary-hover, #FFCE40);
     }
 
     input[type="button"].large,
@@ -233,8 +233,8 @@ button,
     input[type="reset"].style1,
     button.style1,
     .button.style1 {
-        background-color: var(--utp-text);
-        color: var(--utp-text-white);
+        background-color: var(--utp-text, #484d55);
+        color: var(--utp-text-white, #fff);
     }
 
         input[type="button"].style1:hover,
@@ -242,7 +242,7 @@ button,
         input[type="reset"].style1:hover,
         button.style1:hover,
         .button.style1:hover {
-            background-color: var(--utp-primary-hover);
+            background-color: var(--utp-primary-hover, #FFCE40);
         }
 
         input[type="button"].style1:active,
@@ -250,7 +250,7 @@ button,
         input[type="reset"].style1:active,
         button.style1:active,
         .button.style1:active {
-            background-color: var(--utp-primary-active);
+            background-color: var(--utp-primary-active, #d96760);
         }
 
     input[type="button"].style2,
@@ -259,8 +259,8 @@ button,
     button.style2,
     .button.style2 {
         background: none;
-        color: var(--utp-text-light);
-        box-shadow: inset 0px 0px 2px 0px var(--utp-border-input);
+        color: var(--utp-text-light, #606167);
+        box-shadow: inset 0px 0px 2px 0px var(--utp-border-input, #a0a1a7);
     }
 
         input[type="button"].style2:hover,
@@ -268,7 +268,7 @@ button,
         input[type="reset"].style2:hover,
         button.style2:hover,
         .button.style2:hover {
-            box-shadow: inset 0px 0px 2px 0px var(--utp-text-light);
+            box-shadow: inset 0px 0px 2px 0px var(--utp-text-light, #606167);
         }
 
         input[type="button"].style2:active,
@@ -276,7 +276,7 @@ button,
         input[type="reset"].style2:active,
         button.style2:active,
         .button.style2:active {
-            box-shadow: inset 0px 0px 2px 0px var(--utp-dark-deep);
+            box-shadow: inset 0px 0px 2px 0px var(--utp-dark-deep, #1f232b);
         }
 
     input[type="button"].style3,
@@ -284,8 +284,8 @@ button,
     input[type="reset"].style3,
     button.style3,
     .button.style3 {
-        background: var(--utp-dark-medium) url("/assets/img/overlay.png");
-        color: var(--utp-text-white);
+        background: var(--utp-dark-medium, #2f333b) url("/assets/img/overlay.png");
+        color: var(--utp-text-white, #fff);
     }
 
         input[type="button"].style3:hover,
@@ -293,7 +293,7 @@ button,
         input[type="reset"].style3:hover,
         button.style3:hover,
         .button.style3:hover {
-            background-color: var(--utp-dark-soft);
+            background-color: var(--utp-dark-soft, #3f434b);
         }
 
         input[type="button"].style3:active,
@@ -301,7 +301,7 @@ button,
         input[type="reset"].style3:active,
         button.style3:active,
         .button.style3:active {
-            background-color: var(--utp-dark-deep);
+            background-color: var(--utp-dark-deep, #1f232b);
         }
 
 /* List */
@@ -321,7 +321,7 @@ ul {
     }
 
         ul.style2 li {
-            border-top: solid 1px var(--utp-border-light);
+            border-top: solid 1px var(--utp-border-light, #eee);
             padding: 1.5em 0 0 0;
             margin: 1.5em 0 0 0;
         }
@@ -338,7 +338,7 @@ ul {
     }
 
         ul.style3 li {
-            border-top: solid 1px var(--utp-border-light);
+            border-top: solid 1px var(--utp-border-light, #eee);
             padding: 0.5em 0 0 0;
             margin: 0.5em 0 0 0;
         }
@@ -397,8 +397,8 @@ ul.actions {
 /* Footer */
 
 #footer {
-    background: var(--utp-dark) url("/assets/img/overlay.png");
-    color: var(--utp-text-white-80);
+    background: var(--utp-dark, #282b34) url("/assets/img/overlay.png");
+    color: var(--utp-text-white-80, rgba(255, 255, 255, 0.80));
     padding-bottom: 6em;
 }
 
@@ -411,27 +411,27 @@ ul.actions {
     #footer strong,
     #footer b,
     #footer a {
-        color: var(--utp-text-white);
+        color: var(--utp-text-white, #fff);
     }
 
     #footer hr {
-        border-top-color: var(--utp-border-white-05);
+        border-top-color: var(--utp-border-white-05, rgba(255, 255, 255, 0.05));
     }
 
 
     #footer .title {
-        background: var(--utp-dark) url("/assets/img/overlay.png");
-        color: var(--utp-text-white-80);
+        background: var(--utp-dark, #282b34) url("/assets/img/overlay.png");
+        color: var(--utp-text-white-80, rgba(255, 255, 255, 0.80));
     }
 
     #footer header.style1 {
         padding-bottom: 6em;
         margin-bottom: 6em;
-        border-bottom: solid 1px var(--utp-border-white-05);
+        border-bottom: solid 1px var(--utp-border-white-05, rgba(255, 255, 255, 0.05));
     }
 
         #footer header.style1 h2 {
-            color: var(--utp-text-white);
+            color: var(--utp-text-white, #fff);
         }
 
         #footer header.style1 .p {
@@ -624,7 +624,7 @@ ul.actions {
         top: 0;
         width: 275px;
         z-index: 10002;
-        background: var(--utp-dark-alt) url("/assets/img/overlay.png");
+        background: var(--utp-dark-alt, #242730) url("/assets/img/overlay.png");
         box-shadow: inset -3px 0px 4px 0px rgba(0, 0, 0, 0.1);
     }
 
@@ -636,7 +636,7 @@ ul.actions {
 
         #navPanel .link {
             display: block;
-            color: var(--utp-text-white-90);
+            color: var(--utp-text-white-90, rgba(255, 255, 255, 0.90));
             text-transform: uppercase;
             text-decoration: none;
             font-size: 0.85em;
@@ -682,7 +682,7 @@ ul.actions {
         }
 
         #navPanel .depth-0 {
-            color: var(--utp-text-white);
+            color: var(--utp-text-white, #fff);
         }
 
     body.navPanel-visible #page-wrapper {

@@ -14,7 +14,7 @@
     display: flex;
     gap: 1.25rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--utp-border, #eee);
+    border-bottom: 1px solid var(--utp-border-light, #eee);
 }
 
 .page-list--list .page-list__thumbnail {
@@ -53,7 +53,7 @@
 .page-list--grid .page-list__item {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--utp-border, #eee);
+    border: 1px solid var(--utp-border-light, #eee);
     border-radius: 8px;
     overflow: hidden;
     transition: box-shadow 0.2s ease;
@@ -87,24 +87,24 @@
 }
 
 .page-list__title a {
-    color: var(--utp-heading, #333);
+    color: var(--utp-text-dark, #1a1a1a);
     text-decoration: none;
 }
 
 .page-list__title a:hover {
-    color: var(--utp-primary, #4a90d9);
+    color: var(--utp-primary, #f6821f);
 }
 
 .page-list__date {
     display: inline-block;
     font-size: 0.85rem;
-    color: var(--utp-muted, #888);
+    color: var(--utp-text-muted, #717479);
     margin-bottom: 0.4rem;
 }
 
 .page-list__description {
     font-size: 0.95rem;
-    color: var(--utp-text, #555);
+    color: var(--utp-text, #484d55);
     line-height: 1.6;
     margin: 0.25rem 0 0.5rem;
     display: -webkit-box;
@@ -125,8 +125,8 @@
     display: inline-block;
     padding: 0.2rem 0.6rem;
     font-size: 0.75rem;
-    background: var(--utp-tag-bg, #f0f0f0);
-    color: var(--utp-tag-text, #555);
+    background: var(--utp-bg-light, #f3f3f3);
+    color: var(--utp-text, #484d55);
     border-radius: 3px;
     text-transform: capitalize;
 }
@@ -135,7 +135,7 @@
 .page-list__empty {
     text-align: center;
     padding: 2rem;
-    color: var(--utp-muted, #888);
+    color: var(--utp-text-muted, #717479);
     font-style: italic;
 }
 
@@ -165,24 +165,24 @@
     min-width: 36px;
     height: 36px;
     padding: 0 0.5rem;
-    border: 1px solid var(--utp-border, #ddd);
+    border: 1px solid var(--utp-border-light, #eee);
     border-radius: 4px;
     text-decoration: none;
-    color: var(--utp-text, #333);
+    color: var(--utp-text, #484d55);
     font-size: 0.9rem;
     transition: all 0.2s ease;
 }
 
 .page-list__pagination a:hover {
-    background: var(--utp-primary, #4a90d9);
+    background: var(--utp-primary, #f6821f);
     color: #fff;
-    border-color: var(--utp-primary, #4a90d9);
+    border-color: var(--utp-primary, #f6821f);
 }
 
 .page-list__pagination li.active span {
-    background: var(--utp-primary, #4a90d9);
+    background: var(--utp-primary, #f6821f);
     color: #fff;
-    border-color: var(--utp-primary, #4a90d9);
+    border-color: var(--utp-primary, #f6821f);
     font-weight: 600;
 }
 
