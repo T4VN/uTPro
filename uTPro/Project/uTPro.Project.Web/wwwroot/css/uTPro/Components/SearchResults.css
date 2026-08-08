@@ -46,6 +46,8 @@
     color: #fff;
     cursor: pointer;
     transition: background 0.2s ease;
+    width: 70px;
+    min-width: 70px;
 }
 
 /* ── Summary ── */

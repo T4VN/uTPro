@@ -50,7 +50,7 @@
     else if (searchScope == "currentFolder")
     {
         var currentNode = Context.GetRouteValue("umbracoNode") as IPublishedContent;
-        scopeNodeId = currentNode?.Parent?.Id;
+        scopeNodeId = currentNode?.Parent()?.Id;
     }
     // "allSite" → no scope filter
 
@@ -133,7 +133,8 @@ else
                    aria-label="@placeholder" />
             <button type="submit" class="search-results__btn" aria-label="Search">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35" />
                 </svg>
             </button>
         </div>
@@ -180,7 +181,7 @@ else
                             @if (showThumbnail && thumbnail != null)
                             {
                                 <a href="@itemUrl" class="page-list__thumbnail">
-                                    <img src="@thumbnail.MediaUrl()" alt="@title" loading="lazy" decoding="async" />
+                                    @thumbnail.ResponsiveImg(title)
                                 </a>
                             }
                             <div class="page-list__content">
@@ -193,10 +194,6 @@ else
                                         @item.CreateDate.ToString("dd/MM/yyyy")
                                     </time>
                                 }
-                                @if (showDescription && !string.IsNullOrWhiteSpace(description))
-                                {
-                                    <p class="page-list__description">@Html.Raw(displayDesc)</p>
-                                }
                                 @if (showCategories && categories != null && categories.Any())
                                 {
                                     <div class="page-list__categories">
@@ -205,6 +202,10 @@ else
                                             <span class="page-list__category-tag">@cat.Name</span>
                                         }
                                     </div>
+                                }
+                                @if (showDescription && !string.IsNullOrWhiteSpace(description))
+                                {
+                                    <div class="page-list__description">@Html.Raw(displayDesc)</div>
                                 }
                             </div>
                         </article>

@@ -41,13 +41,13 @@
     allItems = allItems.DistinctBy(x => x.Id);
 
     // ── Filter by category ──
-    if (filterCategory != null)
+    if (filterCategory != null && filterCategory.Any())
     {
-        var filterCategoryId = filterCategory.Id;
+        var filterCategoryIds = filterCategory.Select(c => c.Id).ToHashSet();
         allItems = allItems.Where(item =>
         {
             var cats = item.Value<IEnumerable<IPublishedContent>>("categories");
-            return cats != null && cats.Any(c => c.Id == filterCategoryId);
+            return cats != null && cats.Any(c => filterCategoryIds.Contains(c.Id));
         });
     }
 
@@ -123,7 +123,7 @@ else
                     @if (showThumbnail && thumbnail != null)
                     {
                         <a href="@itemUrl" class="page-list__thumbnail">
-                            <img src="@thumbnail.MediaUrl()" alt="@title" loading="lazy" decoding="async" />
+                            @thumbnail.ResponsiveImg(title)
                         </a>
                     }
                     <div class="page-list__content">
@@ -136,10 +136,6 @@ else
                                 @item.CreateDate.ToString("dd/MM/yyyy")
                             </time>
                         }
-                        @if (showDescription && !string.IsNullOrWhiteSpace(description))
-                        {
-                            <p class="page-list__description">@description</p>
-                        }
                         @if (showCategories && categories != null && categories.Any())
                         {
                             <div class="page-list__categories">
@@ -148,6 +144,10 @@ else
                                     <span class="page-list__category-tag">@cat.Name</span>
                                 }
                             </div>
+                        }
+                        @if (showDescription && !string.IsNullOrWhiteSpace(description))
+                        {
+                            <div class="page-list__description">@description</div>
                         }
                     </div>
                 </article>

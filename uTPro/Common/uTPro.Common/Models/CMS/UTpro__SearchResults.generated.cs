@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("pageListFilterCategory")]
-		public virtual global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent PageListFilterCategory => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__PageListBase.GetPageListFilterCategory(this, _publishedValueFallback);
+		public virtual global::System.Collections.Generic.IEnumerable<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent> PageListFilterCategory => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__PageListBase.GetPageListFilterCategory(this, _publishedValueFallback);
 
 		///<summary>
 		/// Items Per Page: Number of items per page. Default: 10.

@@ -35,36 +35,32 @@ header.style1 {
 
 /* Table */
 
-table {
+table, table.default {
     width: 100%;
 }
 
-    table.default {
-        width: 100%;
+    table tbody tr:nth-child(2n+2) {
+        background: var(--utp-bg-table-alt, #f4f4f4);
     }
 
-        table.default tbody tr:nth-child(2n+2) {
-            background: var(--utp-bg-table-alt, #f4f4f4);
-        }
+    table td {
+        padding: 0.5em 1em 0.5em 1em;
+    }
 
-        table.default td {
-            padding: 0.5em 1em 0.5em 1em;
-        }
+    table th {
+        text-align: left;
+        font-weight: 400;
+        padding: 0.5em 1em 0.5em 1em;
+    }
 
-        table.default th {
-            text-align: left;
-            font-weight: 400;
-            padding: 0.5em 1em 0.5em 1em;
-        }
+    table thead {
+        background: var(--utp-text, #484d55);
+        color: var(--utp-text-white, #fff);
+    }
 
-        table.default thead {
-            background: var(--utp-text, #484d55);
-            color: var(--utp-text-white, #fff);
-        }
-
-        table.default tfoot {
-            background: var(--utp-bg-input, #eee);
-        }
+    table tfoot {
+        background: var(--utp-bg-input, #eee);
+    }
 
 /* Form */
 
@@ -102,11 +98,11 @@ form textarea {
         background: var(--utp-bg-input-focus, #f8f8f8);
     }
 
-    form input[type="text"],
-    form input[type="email"],
-    form input[type="password"] {
-        line-height: 1em;
-    }
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    line-height: 1em;
+}
 
 form select {
     line-height: 1em;
@@ -480,7 +476,6 @@ ul.actions {
             margin-bottom: 4em;
             border-bottom: solid 1px rgba(255, 255, 255, 0.05);
         }
-
 }
 
 /* Medium */
@@ -891,6 +886,6 @@ ul.actions {
     }
 }
 
-.paragraph.p0, .paragraph.p0 *{
+.paragraph.p0, .paragraph.p0 * {
     margin: 0;
 }
