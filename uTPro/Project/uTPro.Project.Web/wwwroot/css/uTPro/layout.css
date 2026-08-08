@@ -198,7 +198,7 @@ textarea,
 select {
 	font-family: 'Source Sans Pro', sans-serif;
 	font-weight: 400;
-	color: var(--utp-text);
+	color: var(--utp-text, #484d55);
 	font-size: 14pt;
 	line-height: 1.75em;
 	letter-spacing: 0.025em;
@@ -211,7 +211,7 @@ h4,
 h5,
 h6 {
 	font-weight: 700;
-	color: var(--utp-text);
+	color: var(--utp-text, #484d55);
 }
 
 h1 a,
@@ -230,7 +230,7 @@ a {
 	-ms-transition: color .25s ease-in-out;
 	transition: color .25s ease-in-out;
 	text-decoration: underline;
-	color: var(--utp-text-muted);
+	color: var(--utp-text-muted, #717479);
 }
 
 a:hover {
@@ -244,7 +244,7 @@ b {
 }
 
 blockquote {
-	border-left: solid 0.5em var(--utp-border-medium);
+	border-left: solid 0.5em var(--utp-border-medium, #ddd);
 	padding: 1em 0 1em 2em;
 	font-style: italic;
 }
@@ -256,7 +256,7 @@ i {
 
 hr {
 	border: 0;
-	border-top: solid 1px var(--utp-border-medium);
+	border-top: solid 1px var(--utp-border-medium, #ddd);
 	margin: 2em 0 2em 0;
 }
 

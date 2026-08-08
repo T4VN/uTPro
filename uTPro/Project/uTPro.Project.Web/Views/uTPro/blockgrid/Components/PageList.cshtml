@@ -1,0 +1,203 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__PageList>>
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using SeoVisualizer
+@{
+    // ── Configuration ──
+    var source = Model.Content.PageListSource;
+    var itemsPerPage = Model.Content.PageListItemsPerPage > 0 ? Model.Content.PageListItemsPerPage : 10;
+    var orderBy = !string.IsNullOrWhiteSpace(Model.Content.PageListOrderBy) ? Model.Content.PageListOrderBy : "sortOrder";
+    var orderDirection = !string.IsNullOrWhiteSpace(Model.Content.PageListOrderDirection) ? Model.Content.PageListOrderDirection : "asc";
+    var maxDepth = Model.Content.PageListMaxDepth > 0 ? Model.Content.PageListMaxDepth : 1;
+    var filterCategory = Model.Content.PageListFilterCategory;
+    var showThumbnail = Model.Content.PageListShowThumbnail;
+    var showDescription = Model.Content.PageListShowDescription;
+    var showDate = Model.Content.PageListShowDate;
+    var showCategories = Model.Content.PageListShowCategories;
+    var layout = !string.IsNullOrWhiteSpace(Model.Content.PageListLayout) ? Model.Content.PageListLayout : "list";
+
+    // ── Resolve source nodes (multiselect: merge children from all selected pages) ──
+    var sourceNodes = source?.ToList();
+    if (sourceNodes == null || !sourceNodes.Any())
+    {
+        var currentNode = Context.GetRouteValue("umbracoNode") as IPublishedContent;
+        sourceNodes = currentNode != null ? new List<IPublishedContent> { currentNode } : new List<IPublishedContent>();
+    }
+    if (!sourceNodes.Any()) { return; }
+
+    // ── Get children from all source nodes (respecting depth), merged ──
+    var allItems = maxDepth <= 1
+        ? sourceNodes.SelectMany(node => node.Children()?.Where(c => c.IsPublished()) ?? Enumerable.Empty<IPublishedContent>())
+        : sourceNodes.SelectMany(node => node.Descendants(maxDepth).Where(c => c.IsPublished() && c.Level > node.Level));
+
+    // Deduplicate in case of overlapping trees
+    allItems = allItems.DistinctBy(x => x.Id);
+
+    // ── Filter by category ──
+    // Auto-detect category from URL when CategoryLandingContentFinder matched.
+    // This allows /huong-dan/cau-hinh/ or /search/bat-dau/ to auto-filter PageList by the URL category.
+    var isCategoryFiltered = false;
+    string? categoryFilterName = null;
+    if ((filterCategory == null || !filterCategory.Any())
+        && Context.Items.TryGetValue(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem))
+    {
+        var urlCategoryKey = (Guid)categoryLandingItem!;
+        if (urlCategoryKey != Guid.Empty)
+        {
+            isCategoryFiltered = true;
+            var categoryNode = Umbraco.Content(urlCategoryKey);
+            categoryFilterName = categoryNode?.Name;
+
+            allItems = allItems.Where(item =>
+            {
+                var cats = item.Value<IEnumerable<IPublishedContent>>("categories");
+                return cats != null && cats.Any(c => c.Key == urlCategoryKey);
+            });
+        }
+    }
+    else if (filterCategory != null && filterCategory.Any())
+    {
+        var filterCategoryIds = filterCategory.Select(c => c.Id).ToHashSet();
+        allItems = allItems.Where(item =>
+        {
+            var cats = item.Value<IEnumerable<IPublishedContent>>("categories");
+            return cats != null && cats.Any(c => filterCategoryIds.Contains(c.Id));
+        });
+    }
+
+    // ── Order ──
+    allItems = orderBy.ToLowerInvariant() switch
+    {
+        "createdate" => orderDirection == "desc"
+            ? allItems.OrderByDescending(x => x.CreateDate)
+            : allItems.OrderBy(x => x.CreateDate),
+        "updatedate" => orderDirection == "desc"
+            ? allItems.OrderByDescending(x => x.UpdateDate)
+            : allItems.OrderBy(x => x.UpdateDate),
+        "name" => orderDirection == "desc"
+            ? allItems.OrderByDescending(x => x.Name)
+            : allItems.OrderBy(x => x.Name),
+        _ => orderDirection == "desc"
+            ? allItems.OrderByDescending(x => x.SortOrder)
+            : allItems.OrderBy(x => x.SortOrder)
+    };
+
+    // ── Pagination ──
+    var currentPage = 1;
+    if (int.TryParse(Context.Request.Query["page"].FirstOrDefault(), out var qp) && qp > 0)
+    {
+        currentPage = qp;
+    }
+
+    var totalItems = allItems.Count();
+    var totalPages = (int)Math.Ceiling((double)totalItems / itemsPerPage);
+    currentPage = Math.Min(currentPage, Math.Max(totalPages, 1));
+
+    var pagedItems = allItems.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+    // ── Layout CSS class ──
+    var layoutClass = layout switch
+    {
+        "grid-2col" => "page-list--grid page-list--grid-2",
+        "grid-3col" => "page-list--grid page-list--grid-3",
+        _ => "page-list--list"
+    };
+}
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/PageList.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString(), HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/PageList.css" />
+    }
+}
+
+<div class="container page-list @layoutClass">
+    @if (isCategoryFiltered && !string.IsNullOrEmpty(categoryFilterName))
+    {
+        <h2 class="page-list__category-heading">@categoryFilterName</h2>
+    }
+    @if (!pagedItems.Any())
+    {
+        <p class="page-list__empty">@CurrentSite.GetDictionaryValue("uTPro.PageList.NoItems", "No items found.")</p>
+    }
+    else
+    {
+        <div class="page-list__items">
+            @foreach (var item in pagedItems)
+            {
+                var seoValues = item.Value<SeoValues>("headTitleAndDescription");
+                var title = item.Name;
+                var description = seoValues?.Description ?? "";
+                var categories = item.Value<IEnumerable<IPublishedContent>>("categories");
+                var thumbnail = item.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("headSocialShareImage");
+                var itemUrl = item.Url();
+
+                <article class="page-list__item">
+                    @if (showThumbnail && thumbnail != null)
+                    {
+                        <a href="@itemUrl" class="page-list__thumbnail">
+                            @thumbnail.ResponsiveImg(title)
+                        </a>
+                    }
+                    <div class="page-list__content">
+                        <h3 class="page-list__title">
+                            <a href="@itemUrl">@title</a>
+                        </h3>
+                        @if (showDate)
+                        {
+                            <time class="page-list__date" datetime="@item.CreateDate.ToString("yyyy-MM-dd")">
+                                @item.CreateDate.ToString("dd/MM/yyyy")
+                            </time>
+                        }
+                        @if (showCategories && categories != null && categories.Any())
+                        {
+                            <div class="page-list__categories">
+                                @foreach (var cat in categories)
+                                {
+                                    <span class="page-list__category-tag">@cat.Name</span>
+                                }
+                            </div>
+                        }
+                        @if (showDescription && !string.IsNullOrWhiteSpace(description))
+                        {
+                            <div class="page-list__description">@description</div>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+
+        @* ── Pagination ── *@
+        @if (totalPages > 1)
+        {
+            var basePath = Context.Request.Path.ToString();
+            <nav class="page-list__pagination" aria-label="Pagination">
+                <ul>
+                    @if (currentPage > 1)
+                    {
+                        <li><a href="@basePath?page=@(currentPage - 1)" rel="prev">&laquo;</a></li>
+                    }
+                    @for (var i = 1; i <= totalPages; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <li class="active"><span>@i</span></li>
+                        }
+                        else
+                        {
+                            <li><a href="@basePath?page=@i">@i</a></li>
+                        }
+                    }
+                    @if (currentPage < totalPages)
+                    {
+                        <li><a href="@basePath?page=@(currentPage + 1)" rel="next">&raquo;</a></li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+</div>

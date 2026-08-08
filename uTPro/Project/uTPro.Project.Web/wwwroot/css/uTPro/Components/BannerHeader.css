@@ -39,13 +39,13 @@
         .banner-header .text h1 {
             font-weight: 900;
             text-transform: uppercase;
-            color: var(--utp-primary-light);
+            color: var(--utp-primary-light, #ff9e40);
             font-size: 2em;
             letter-spacing: 0.25em;
         }
 
         .banner-header .text p {
-            color: var(--utp-text-white-90);
+            color: var(--utp-text-white-90, rgba(255, 255, 255, 0.90));
             text-transform: uppercase;
             margin: 1.25em 0 0 0;
             display: block;

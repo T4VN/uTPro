@@ -5,7 +5,7 @@
 .contactform form select,
 .contactform form textarea {
     /*background: #ccc;*/
-    color: var(--utp-text);
+    color: var(--utp-text, #484d55);
     box-shadow: none;
 }
 
@@ -14,7 +14,7 @@
     .contactform form input[type="password"]:focus,
     .contactform form select:focus,
     .contactform form textarea:focus {
-        background: var(--utp-bg-input-active);
+        background: var(--utp-bg-input-active, #ccc);
     }
 
 .contactform input[type="button"],
@@ -22,7 +22,7 @@
 .contactform input[type="reset"],
 .contactform button,
 .contactform .button {
-    color: var(--utp-text-white);
+    color: var(--utp-text-white, #fff);
     box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.5);
 }
 
@@ -31,7 +31,7 @@
     .contactform input[type="reset"]:hover,
     .contactform button:hover,
     .contactform .button:hover {
-        color: var(--utp-text-white);
+        color: var(--utp-text-white, #fff);
         box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.65);
     }
 
@@ -60,7 +60,7 @@
 }
 
     .contactform .feature-list section {
-        border-top: solid 1px var(--utp-border-light);
+        border-top: solid 1px var(--utp-border-light, #eee);
         padding-top: 3em;
         padding-left: 5em;
         position: relative;
@@ -69,11 +69,11 @@
 
     .contactform .feature-list.small section {
         padding-left: 3.5em;
-        border-top-color: var(--utp-border-white-05);
+        border-top-color: var(--utp-border-white-05, rgba(255, 255, 255, 0.05));
     }
 
     .contactform .feature-list h3:before {
-        background: var(--utp-dark-contact) url("/assets/img/overlay.png");
+        background: var(--utp-dark-contact, #3d4249) url("/assets/img/overlay.png");
     }
 
 @media screen and (max-width: 980px) {
@@ -110,11 +110,11 @@
     display: block;
     width: 100%;
     padding: 0.65em 0.75em;
-    color: var(--utp-text);
-    background: var(--utp-bg-input);
+    color: var(--utp-text, #484d55);
+    background: var(--utp-bg-input, #eee);
     border: none;
-    border-radius: var(--utp-radius);
-    box-shadow: inset 0 0 0 1px var(--utp-border-input);
+    border-radius: var(--utp-radius, 0.35em);
+    box-shadow: inset 0 0 0 1px var(--utp-border-input, #a0a1a7);
     font-size: 0.95em;
     line-height: 1.5em;
     cursor: pointer;
@@ -123,17 +123,17 @@
 
     .contactform form input[type="file"]:focus {
         outline: none;
-        background: var(--utp-bg-input-active);
+        background: var(--utp-bg-input-active, #ccc);
     }
 
     /* "Choose File" button */
     .contactform form input[type="file"]::file-selector-button {
         margin-right: 1em;
         padding: 0.5em 1.25em;
-        color: var(--utp-text-white);
-        background: var(--utp-dark-btn);
+        color: var(--utp-text-white, #fff);
+        background: var(--utp-dark-btn, #444);
         border: none;
-        border-radius: var(--utp-radius);
+        border-radius: var(--utp-radius, 0.35em);
         box-shadow: inset 0 0 2px 0 rgba(255, 255, 255, 0.5);
         font-weight: 700;
         text-transform: uppercase;
@@ -143,7 +143,7 @@
     }
 
         .contactform form input[type="file"]::file-selector-button:hover {
-            background: var(--utp-text);
+            background: var(--utp-text, #484d55);
         }
 
 /* ── Field spacing: keep every field evenly separated ── */

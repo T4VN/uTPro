@@ -13,5 +13,5 @@ body.is-preload *, body.is-preload *:before, body.is-preload *:after { animation
 main { display: block; }
 img { max-width: 100%; height: auto; }
 .umb-block-grid__layout-container { display: grid; grid-template-columns: repeat(var(--umb-block-grid--grid-columns,1),minmax(0,1fr)); }
-.umb-block-grid__layout-item { grid-column-end: span min(var(--umb-block-grid--item-column-span,1),var(--umb-block-grid--grid-columns)); }
+.umb-block-grid__layout-item { grid-column-end: span min(var(--umb-block-grid--item-column-span,1),var(--umb-block-grid--grid-columns,1)); }
 @media(max-width:980px) { .navHeader { display: none !important; } }

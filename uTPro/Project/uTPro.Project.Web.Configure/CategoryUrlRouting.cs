@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core;
@@ -460,20 +461,9 @@ namespace uTPro.Project.Web.Configure
         /// </summary>
         private IPublishedContent? WalkTree(IPublishedContent root, string[] segments, string? culture)
         {
-            var current = root;
-
-            foreach (var segment in segments)
-            {
-                var match = FindChild(current, segment, culture);
-                if (match is null)
-                {
-                    return null;
-                }
-
-                current = match;
-            }
-
-            return current;
+            return segments.Aggregate(
+                (IPublishedContent?)root,
+                (current, segment) => current is null ? null : FindChild(current, segment, culture));
         }
 
         private IPublishedContent? FindChild(IPublishedContent parent, string segment, string? culture)
@@ -633,6 +623,184 @@ namespace uTPro.Project.Web.Configure
     }
 
     /// <summary>
+    /// Content finder for category "landing" URLs — e.g. <c>/huong-dan/cau-hinh/</c> where
+    /// <c>cau-hinh</c> is a category slug with no page segment following it.
+    ///
+    /// <para>When matched, the published content is set to the parent page (e.g. "Hướng dẫn") and
+    /// the category key is stored in <c>HttpContext.Items</c> so the render controller can force
+    /// the category-landing view (which shows a filtered page list).</para>
+    /// </summary>
+    public sealed class CategoryLandingContentFinder : IContentFinder
+    {
+        /// <summary>Key used in <see cref="HttpContext.Items"/> to signal a category landing request.</summary>
+        public const string CategoryLandingItemKey = "uTPro:CategoryLandingKey";
+
+        private readonly CategoryUrlService _categoryUrlService;
+        private readonly HiddenContainerAliases _hidden;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IDocumentNavigationQueryService _navigationQueryService;
+        private readonly IPublishedContentStatusFilteringService _publishedStatusFilteringService;
+        private readonly IDocumentUrlService _documentUrlService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public CategoryLandingContentFinder(
+            CategoryUrlService categoryUrlService,
+            HiddenContainerAliases hidden,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IVariationContextAccessor variationContextAccessor,
+            IDocumentNavigationQueryService navigationQueryService,
+            IPublishedContentStatusFilteringService publishedStatusFilteringService,
+            IDocumentUrlService documentUrlService,
+            IHttpContextAccessor httpContextAccessor)
+        {
+            _categoryUrlService = categoryUrlService;
+            _hidden = hidden;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _variationContextAccessor = variationContextAccessor;
+            _navigationQueryService = navigationQueryService;
+            _publishedStatusFilteringService = publishedStatusFilteringService;
+            _documentUrlService = documentUrlService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public Task<bool> TryFindContent(IPublishedRequestBuilder request)
+        {
+            if (request.PublishedContent is not null)
+            {
+                return Task.FromResult(false);
+            }
+
+            if (request.Domain is null)
+            {
+                return Task.FromResult(false);
+            }
+
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
+                || umbracoContext.Content is null)
+            {
+                return Task.FromResult(false);
+            }
+
+            var root = umbracoContext.Content.GetById(request.Domain.ContentId);
+            if (root is null)
+            {
+                return Task.FromResult(false);
+            }
+
+            // Path relative to the domain.
+            var decodedPath = Uri.UnescapeDataString(request.Uri.AbsolutePath).Trim('/');
+            var domainPath = request.Domain.Uri?.AbsolutePath.Trim('/') ?? string.Empty;
+            if (domainPath.Length > 0
+                && decodedPath.StartsWith(domainPath, StringComparison.OrdinalIgnoreCase))
+            {
+                decodedPath = decodedPath[domainPath.Length..].Trim('/');
+            }
+
+            if (decodedPath.Length == 0)
+            {
+                return Task.FromResult(false);
+            }
+
+            var segments = decodedPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length < 1)
+            {
+                return Task.FromResult(false);
+            }
+
+            var culture = request.Culture;
+            var categorySlugs = _categoryUrlService.GetAllVisibleCategorySlugs(culture, root.Key);
+
+            if (categorySlugs.Count == 0)
+            {
+                return Task.FromResult(false);
+            }
+
+            // The last segment might be a category slug. Check if all preceding segments
+            // resolve to a valid parent page (walking through transparent containers).
+            var lastSegment = segments[^1];
+            if (!categorySlugs.TryGetValue(lastSegment, out var categoryKey))
+            {
+                return Task.FromResult(false);
+            }
+
+            // Resolve the parent path (everything except the last segment).
+            IPublishedContent parentPage;
+            if (segments.Length == 1)
+            {
+                // Category slug is directly under domain root (e.g. /cau-hinh/).
+                parentPage = root;
+            }
+            else
+            {
+                var parentSegments = segments[..^1];
+                var resolved = WalkTree(root, parentSegments, culture);
+                if (resolved is null)
+                {
+                    return Task.FromResult(false);
+                }
+
+                parentPage = resolved;
+            }
+
+            // Only proceed if the parent page is a real page (not a hidden container).
+            if (_hidden.IsTransparent(parentPage))
+            {
+                return Task.FromResult(false);
+            }
+
+            // Store the category key for the render controller / view.
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext is not null)
+            {
+                httpContext.Items[CategoryLandingItemKey] = categoryKey;
+            }
+
+            request.SetPublishedContent(parentPage);
+            return Task.FromResult(true);
+        }
+
+        private IPublishedContent? WalkTree(IPublishedContent root, string[] segments, string? culture)
+        {
+            return segments.Aggregate(
+                (IPublishedContent?)root,
+                (current, segment) => current is null ? null : FindChild(current, segment, culture));
+        }
+
+        private IPublishedContent? FindChild(IPublishedContent parent, string segment, string? culture)
+        {
+            var children = parent.Children(_navigationQueryService, _publishedStatusFilteringService)
+                ?? Enumerable.Empty<IPublishedContent>();
+
+            foreach (var child in children)
+            {
+                if (_hidden.IsTransparent(child))
+                {
+                    var inner = FindChild(child, segment, culture);
+                    if (inner is not null)
+                    {
+                        return inner;
+                    }
+
+                    continue;
+                }
+
+                var childSegment = _documentUrlService.GetUrlSegment(
+                    child.Key,
+                    culture ?? _variationContextAccessor.VariationContext?.Culture ?? string.Empty,
+                    false);
+
+                if (string.Equals(childSegment, segment, StringComparison.OrdinalIgnoreCase))
+                {
+                    return child;
+                }
+            }
+
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Registers the category URL provider and content finder.
     /// </summary>
     public sealed class CategoryUrlComposer : IComposer
@@ -647,6 +815,10 @@ namespace uTPro.Project.Web.Configure
 
             // Append the category content finder AFTER the transparent-container finder.
             builder.ContentFinders().Append<CategoryUrlContentFinder>();
+
+            // Append the category landing finder AFTER the category content finder so it only
+            // activates when no page-level match was found.
+            builder.ContentFinders().Append<CategoryLandingContentFinder>();
         }
     }
 }

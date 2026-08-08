@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.7.11903.348 stable
+VisualStudioVersion = 18.7.11903.348
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Project.Web", "Project\uTPro.Project.Web\uTPro.Project.Web.csproj", "{879135C7-F935-4DD9-B0D9-0DA4473434FD}"
 EndProject
@@ -38,6 +38,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Feature.Dashboard", "Feature\uTPro.Feature.Dashboard\uTPro.Feature.Dashboard.csproj", "{DD42FB44-90BB-458C-8D01-DCA99B5AE9A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Feature.BlockPreviewToggle", "Feature\uTPro.Feature.BlockPreviewToggle\uTPro.Feature.BlockPreviewToggle.csproj", "{7F3E9A21-4C8B-4D6E-9F1A-2B3C4D5E6F70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uTPro.Extension.Search", "Extension\uTPro.Extension.Search\uTPro.Extension.Search.csproj", "{3FA3AF41-53DA-7306-F305-256D756CCCB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,10 @@ Global
 		{7F3E9A21-4C8B-4D6E-9F1A-2B3C4D5E6F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F3E9A21-4C8B-4D6E-9F1A-2B3C4D5E6F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F3E9A21-4C8B-4D6E-9F1A-2B3C4D5E6F70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FA3AF41-53DA-7306-F305-256D756CCCB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FA3AF41-53DA-7306-F305-256D756CCCB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FA3AF41-53DA-7306-F305-256D756CCCB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FA3AF41-53DA-7306-F305-256D756CCCB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +121,7 @@ Global
 		{E606C629-3B37-458C-9C80-D555A762E28E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{DD42FB44-90BB-458C-8D01-DCA99B5AE9A5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{7F3E9A21-4C8B-4D6E-9F1A-2B3C4D5E6F70} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3FA3AF41-53DA-7306-F305-256D756CCCB5} = {FA4082ED-8008-43AA-85E0-503BDA5B28C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EEF559D3-C416-4C76-A0BD-CD923A2994F8}

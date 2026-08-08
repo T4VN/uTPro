@@ -1,0 +1,316 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__SearchResults>>
+@using SeoVisualizer
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using uTPro.Extension.Search
+@inject ISearchExtension SearchService
+@{
+    // ── Configuration (from composition: PageListBase + SearchResults fields) ──
+    var source = Model.Content.PageListSource;
+    var itemsPerPage = Model.Content.PageListItemsPerPage > 0 ? Model.Content.PageListItemsPerPage : 10;
+    var showThumbnail = Model.Content.PageListShowThumbnail;
+    var showDescription = Model.Content.PageListShowDescription;
+    var showDate = Model.Content.PageListShowDate;
+    var showCategories = Model.Content.PageListShowCategories;
+    var layout = !string.IsNullOrWhiteSpace(Model.Content.PageListLayout) ? Model.Content.PageListLayout : "list";
+    var searchParamQuery = string.IsNullOrEmpty(Model.Content.SearchParameter) ? "q" : Model.Content.SearchParameter;
+
+    // Search-specific settings
+    var placeholder = !string.IsNullOrWhiteSpace(Model.Content.SearchPlaceholder)
+        ? Model.Content.SearchPlaceholder
+        : CurrentSite.GetDictionaryValue("uTPro.Search.Placeholder", "Search...");
+    var minChars = Model.Content.SearchMinChars > 0 ? Model.Content.SearchMinChars : 3;
+    var noResultsMessage = !string.IsNullOrWhiteSpace(Model.Content.SearchNoResultsMessage)
+        ? Model.Content.SearchNoResultsMessage
+        : CurrentSite.GetDictionaryValue("uTPro.Search.NoResults", "No results found.");
+    var highlightKeywords = Model.Content.SearchHighlightKeywords;
+    var searchScope = !string.IsNullOrWhiteSpace(Model.Content.SearchScope) ? Model.Content.SearchScope : "selectedSource";
+
+    // ── Read query params ──
+    var queryString = Context.Request.Query[@searchParamQuery].FirstOrDefault() ?? "";
+    var currentPage = 1;
+    if (int.TryParse(Context.Request.Query["page"].FirstOrDefault(), out var qp) && qp > 0)
+    {
+        currentPage = qp;
+    }
+
+    // ── Determine scope node IDs (multiselect support) ──
+    int? scopeNodeId = null;
+    int[]? scopeNodeIds = null;
+    if (searchScope == "selectedSource" && source != null && source.Any())
+    {
+        var sourceList = source.ToList();
+        if (sourceList.Count == 1)
+        {
+            scopeNodeId = sourceList[0].Id;
+        }
+        else
+        {
+            scopeNodeIds = sourceList.Select(s => s.Id).ToArray();
+        }
+    }
+    else if (searchScope == "currentFolder")
+    {
+        var currentNode = Context.GetRouteValue("umbracoNode") as IPublishedContent;
+        scopeNodeId = currentNode?.Parent()?.Id;
+    }
+    // "allSite" → no scope filter
+
+    // ── Execute search ──
+    SearchResultSet results;
+    if (!string.IsNullOrWhiteSpace(queryString) && queryString.Length >= minChars)
+    {
+        if (scopeNodeIds != null && scopeNodeIds.Length > 1)
+        {
+            // Multiple sources: search each scope and merge results
+            var mergedItems = new List<SearchResultItem>();
+            long totalResults = 0;
+            foreach (var nodeId in scopeNodeIds)
+            {
+                var partial = SearchService.Search(queryString, searchScope, nodeId, 1, int.MaxValue);
+                mergedItems.AddRange(partial.Items);
+                totalResults += partial.TotalResults;
+            }
+            // Deduplicate, sort by score descending, then paginate
+            mergedItems = mergedItems.DistinctBy(x => x.Content.Id).OrderByDescending(x => x.Score).ToList();
+            totalResults = mergedItems.Count;
+            var totalPages = (int)Math.Ceiling((double)totalResults / itemsPerPage);
+            var pagedMerged = mergedItems.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+            results = new SearchResultSet
+            {
+                Query = queryString,
+                Page = currentPage,
+                PageSize = itemsPerPage,
+                TotalResults = totalResults,
+                TotalPages = totalPages,
+                Items = pagedMerged
+            };
+        }
+        else
+        {
+            results = SearchService.Search(queryString, searchScope, scopeNodeId, currentPage, itemsPerPage);
+        }
+    }
+    else
+    {
+        results = new SearchResultSet { Query = queryString, Page = currentPage, PageSize = itemsPerPage };
+    }
+
+    // ── Layout CSS class ──
+    var layoutClass = layout switch
+    {
+        "grid-2col" => "page-list--grid page-list--grid-2",
+        "grid-3col" => "page-list--grid page-list--grid-3",
+        _ => "page-list--list"
+    };
+
+    var hasSearched = !string.IsNullOrWhiteSpace(queryString) && queryString.Length >= minChars;
+    var basePath = Context.Request.Path.ToString();
+
+    // ── Auto-filter search results by category from URL ──
+    var isCategoryFiltered = false;
+    string? categoryFilterName = null;
+    if (Context.Items.TryGetValue(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem))
+    {
+        var urlCategoryKey = (Guid)categoryLandingItem!;
+        if (urlCategoryKey != Guid.Empty && results.Items.Any())
+        {
+            isCategoryFiltered = true;
+            var categoryNode = Umbraco.Content(urlCategoryKey);
+            categoryFilterName = categoryNode?.Name;
+
+            var filtered = results.Items
+                .Where(r =>
+                {
+                    var cats = r.Content.Value<IEnumerable<IPublishedContent>>("categories");
+                    return cats != null && cats.Any(c => c.Key == urlCategoryKey);
+                })
+                .ToList();
+
+            results = new SearchResultSet
+            {
+                Query = results.Query,
+                Page = results.Page,
+                PageSize = results.PageSize,
+                TotalResults = filtered.Count,
+                TotalPages = (int)Math.Ceiling((double)filtered.Count / itemsPerPage),
+                Items = filtered
+            };
+        }
+    }
+}
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/PageList.css" />
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/SearchResults.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString(), HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/PageList.css" />
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/SearchResults.css" />
+    }
+}
+
+<div class="container search-results">
+    @if (isCategoryFiltered && !string.IsNullOrEmpty(categoryFilterName))
+    {
+        <h2 class="page-list__category-heading">@categoryFilterName</h2>
+    }
+    @* ── Search Form ── *@
+    <form class="search-results__form" method="get" action="@basePath">
+        <div class="search-results__input-wrap">
+            <input type="text"
+                   name="@searchParamQuery"
+                   value="@queryString"
+                   placeholder="@placeholder"
+                   minlength="@minChars"
+                   class="search-results__input"
+                   aria-label="@placeholder" />
+            <button type="submit" class="search-results__btn" aria-label="Search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35" />
+                </svg>
+            </button>
+        </div>
+    </form>
+
+    @if (hasSearched)
+    {
+        <div class="search-results__summary">
+            <p>
+                @if (results.TotalResults > 0)
+                {
+                    <span>@CurrentSite.GetDictionaryValue("uTPro.Search.ResultsFound", "Results found")</span>
+                    <strong>@results.TotalResults</strong>
+                    <span>@CurrentSite.GetDictionaryValue("uTPro.Search.ForQuery", "for")</span>
+                    <em>"@queryString"</em>
+                }
+                else
+                {
+                    <span>@noResultsMessage</span>
+                    <em>"@queryString"</em>
+                }
+            </p>
+        </div>
+
+        @if (results.Items.Any())
+        {
+            <div class="page-list @layoutClass">
+                <div class="page-list__items">
+                    @foreach (var resultItem in results.Items)
+                    {
+                        var item = resultItem.Content;
+                        var seoValues = item.Value<SeoValues>("headTitleAndDescription");
+                        var title = item.Name;
+                        var description = seoValues?.Description ?? "";
+                        var categories = item.Value<IEnumerable<IPublishedContent>>("categories");
+                        var thumbnail = item.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("headSocialShareImage");
+                        var itemUrl = item.Url();
+
+                        // Highlight keywords in title and description
+                        var displayTitle = highlightKeywords ? HighlightText(title, queryString) : title;
+                        var displayDesc = highlightKeywords ? HighlightText(description, queryString) : description;
+
+                        <article class="page-list__item">
+                            @if (showThumbnail && thumbnail != null)
+                            {
+                                <a href="@itemUrl" class="page-list__thumbnail">
+                                    @thumbnail.ResponsiveImg(title)
+                                </a>
+                            }
+                            <div class="page-list__content">
+                                <h3 class="page-list__title">
+                                    <a href="@itemUrl">@Html.Raw(displayTitle)</a>
+                                </h3>
+                                @if (showDate)
+                                {
+                                    <time class="page-list__date" datetime="@item.CreateDate.ToString("yyyy-MM-dd")">
+                                        @item.CreateDate.ToString("dd/MM/yyyy")
+                                    </time>
+                                }
+                                @if (showCategories && categories != null && categories.Any())
+                                {
+                                    <div class="page-list__categories">
+                                        @foreach (var cat in categories)
+                                        {
+                                            <span class="page-list__category-tag">@cat.Name</span>
+                                        }
+                                    </div>
+                                }
+                                @if (showDescription && !string.IsNullOrWhiteSpace(description))
+                                {
+                                    <div class="page-list__description">@Html.Raw(displayDesc)</div>
+                                }
+                            </div>
+                        </article>
+                    }
+                </div>
+
+                @* ── Pagination ── *@
+                @if (results.TotalPages > 1)
+                {
+                    <nav class="page-list__pagination" aria-label="Pagination">
+                        <ul>
+                            @if (currentPage > 1)
+                            {
+                                <li><a href="@basePath?q=@Uri.EscapeDataString(queryString)&page=@(currentPage - 1)" rel="prev">&laquo;</a></li>
+                            }
+                            @for (var i = 1; i <= results.TotalPages; i++)
+                            {
+                                if (i == currentPage)
+                                {
+                                    <li class="active"><span>@i</span></li>
+                                }
+                                else
+                                {
+                                    <li><a href="@basePath?q=@Uri.EscapeDataString(queryString)&page=@i">@i</a></li>
+                                }
+                            }
+                            @if (currentPage < results.TotalPages)
+                            {
+                                <li><a href="@basePath?q=@Uri.EscapeDataString(queryString)&page=@(currentPage + 1)" rel="next">&raquo;</a></li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            </div>
+        }
+    }
+</div>
+
+@functions {
+    /// <summary>
+    /// Highlights occurrences of the search term in text by wrapping them in <mark> tags.
+    /// HTML-encodes the text first to prevent XSS, then injects the mark tags.
+    /// </summary>
+    private static string HighlightText(string text, string keyword)
+    {
+        if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(keyword))
+            return System.Net.WebUtility.HtmlEncode(text);
+
+        var encoded = System.Net.WebUtility.HtmlEncode(text);
+        var encodedKeyword = System.Net.WebUtility.HtmlEncode(keyword);
+
+        // Case-insensitive replacement
+        var index = encoded.IndexOf(encodedKeyword, StringComparison.OrdinalIgnoreCase);
+        if (index < 0)
+            return encoded;
+
+        var result = new System.Text.StringBuilder();
+        var lastIndex = 0;
+        while (index >= 0)
+        {
+            result.Append(encoded, lastIndex, index - lastIndex);
+            result.Append("<mark>");
+            result.Append(encoded, index, encodedKeyword.Length);
+            result.Append("</mark>");
+            lastIndex = index + encodedKeyword.Length;
+            index = encoded.IndexOf(encodedKeyword, lastIndex, StringComparison.OrdinalIgnoreCase);
+        }
+        result.Append(encoded, lastIndex, encoded.Length - lastIndex);
+        return result.ToString();
+    }
+}

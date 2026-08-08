@@ -7,8 +7,8 @@
     left: 0;
     right: 0;
     z-index: 99999;
-    background: var(--utp-dark);
-    color: var(--utp-text-white-90);
+    background: var(--utp-dark, #282b34);
+    color: var(--utp-text-white-90, rgba(255, 255, 255, 0.90));
     padding: 0.7em 1.5em;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
     display: flex;
@@ -45,12 +45,12 @@
 }
 
     .consent-banner__message a {
-        color: var(--utp-primary-light);
+        color: var(--utp-primary-light, #ff9e40);
         text-decoration: underline;
     }
 
         .consent-banner__message a:hover {
-            color: var(--utp-primary-hover);
+            color: var(--utp-primary-hover, #FFCE40);
         }
 
     .consent-banner__message p {
@@ -69,7 +69,7 @@
     justify-content: center;
     padding: 0.45em 1.2em;
     border: none;
-    border-radius: var(--utp-radius);
+    border-radius: var(--utp-radius, 0.35em);
     font-size: 0.8em;
     font-weight: 700;
     text-transform: uppercase;
@@ -83,24 +83,24 @@
 }
 
 .consent-banner__btn--accept {
-    background: var(--utp-primary);
-    color: var(--utp-text-white);
+    background: var(--utp-primary, #f6821f);
+    color: var(--utp-text-white, #fff);
 }
 
     .consent-banner__btn--accept:hover {
-        background: var(--utp-primary-hover);
-        color: var(--utp-text-dark);
+        background: var(--utp-primary-hover, #FFCE40);
+        color: var(--utp-text-dark, #1a1a1a);
     }
 
 .consent-banner__btn--reject {
     background: transparent;
-    color: var(--utp-text-white-80);
-    border: 1px solid var(--utp-border-white-25);
+    color: var(--utp-text-white-80, rgba(255, 255, 255, 0.80));
+    border: 1px solid var(--utp-border-white-25, rgba(255, 255, 255, 0.25));
 }
 
     .consent-banner__btn--reject:hover {
-        background: var(--utp-dark-soft);
-        color: var(--utp-text-white);
+        background: var(--utp-dark-soft, #3f434b);
+        color: var(--utp-text-white, #fff);
     }
 
 /* ── Responsive ── */
