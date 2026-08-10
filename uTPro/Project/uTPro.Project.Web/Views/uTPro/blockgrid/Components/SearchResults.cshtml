@@ -26,6 +26,7 @@
     var searchScope = !string.IsNullOrWhiteSpace(Model.Content.SearchScope) ? Model.Content.SearchScope : "selectedSource";
 
     // ── Read query params ──
+    var maxItems = Model.Content.PageListMaxItems;
     var queryString = Context.Request.Query[@searchParamQuery].FirstOrDefault() ?? "";
     var currentPage = 1;
     if (int.TryParse(Context.Request.Query["page"].FirstOrDefault(), out var qp) && qp > 0)
@@ -70,8 +71,12 @@
                 mergedItems.AddRange(partial.Items);
                 totalResults += partial.TotalResults;
             }
-            // Deduplicate, sort by score descending, then paginate
+            // Deduplicate, sort by score descending, then apply maxItems limit
             mergedItems = mergedItems.DistinctBy(x => x.Content.Id).OrderByDescending(x => x.Score).ToList();
+            if (maxItems > 0)
+            {
+                mergedItems = mergedItems.Take(maxItems).ToList();
+            }
             totalResults = mergedItems.Count;
             var totalPages = (int)Math.Ceiling((double)totalResults / itemsPerPage);
             var pagedMerged = mergedItems.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
@@ -87,7 +92,27 @@
         }
         else
         {
-            results = SearchService.Search(queryString, searchScope, scopeNodeId, currentPage, itemsPerPage);
+            // When maxItems is set, fetch all results and limit client-side
+            if (maxItems > 0)
+            {
+                var fullResults = SearchService.Search(queryString, searchScope, scopeNodeId, 1, maxItems);
+                var limitedTotal = fullResults.Items.Count();
+                var limitedTotalPages = (int)Math.Ceiling((double)limitedTotal / itemsPerPage);
+                var limitedPaged = fullResults.Items.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+                results = new SearchResultSet
+                {
+                    Query = queryString,
+                    Page = currentPage,
+                    PageSize = itemsPerPage,
+                    TotalResults = limitedTotal,
+                    TotalPages = limitedTotalPages,
+                    Items = limitedPaged
+                };
+            }
+            else
+            {
+                results = SearchService.Search(queryString, searchScope, scopeNodeId, currentPage, itemsPerPage);
+            }
         }
     }
     else
@@ -249,7 +274,7 @@ else
                     }
                 </div>
 
-                @* ── Pagination ── *@
+                @* ── Pagination (auto-hidden when totalPages <= 1) ── *@
                 @if (results.TotalPages > 1)
                 {
                     <nav class="page-list__pagination" aria-label="Pagination">

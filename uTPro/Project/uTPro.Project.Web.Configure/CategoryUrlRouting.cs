@@ -50,7 +50,7 @@ namespace uTPro.Project.Web.Configure
         /// Gets all category items assigned to the given page that have <c>showInUrl</c> enabled.
         /// Returns them in picker order.
         /// </summary>
-        public IReadOnlyList<IPublishedContent> GetVisibleCategories(IPublishedContent page)
+        public static IReadOnlyList<IPublishedContent> GetVisibleCategories(IPublishedContent page)
         {
             var categories = page.Value<IEnumerable<IPublishedContent>>(CategoryUrlConstants.PageCategoriesAlias);
             if (categories is null)
@@ -58,11 +58,10 @@ namespace uTPro.Project.Web.Configure
                 return [];
             }
 
-            return categories
+            return [.. categories
                 .Where(c => c?.ContentType?.Alias is not null
                     && c.ContentType.Alias.Equals(GlobalFolderCategoryItem.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
-                .Where(c => c.Value<bool>(CategoryUrlConstants.ShowInUrlAlias))
-                .ToList();
+                .Where(c => c.Value<bool>(CategoryUrlConstants.ShowInUrlAlias))];
         }
 
         /// <summary>
@@ -188,7 +187,7 @@ namespace uTPro.Project.Web.Configure
                 || node.Parent() is null
                 || node.Parent()?.ContentType?.Alias?.Equals(GlobalFolderSites.ModelTypeAlias, StringComparison.OrdinalIgnoreCase) == true)
             {
-                foreach (var child in node.Children() ?? Enumerable.Empty<IPublishedContent>())
+                foreach (var child in node.Children() ?? [])
                 {
                     CollectCategoryItems(child, culture, result);
                 }
@@ -196,9 +195,74 @@ namespace uTPro.Project.Web.Configure
         }
 
         /// <summary>
+        /// Gets the category landing URL and category name for a given page.
+        /// <para>
+        /// If <paramref name="currentCat"/> is provided, builds the URL for that specific category.
+        /// Otherwise, uses the first visible category assigned to the page.
+        /// </para>
+        /// <para>
+        /// Base URL logic: if <paramref name="currentNode"/> is a container (has children),
+        /// its own URL is used. If it's a leaf page, the parent's URL is used instead.
+        /// </para>
+        /// </summary>
+        /// <param name="currentNode">The page currently being rendered.</param>
+        /// <param name="currentCat">Optional specific category item to build the URL for. If null, the first visible category is used.</param>
+        /// <returns>A tuple of (categoryUrl, categoryName). Both are empty strings if no valid category is found.</returns>
+        public (string, string) GetUrlNameCategory(IPublishedContent currentNode, IPublishedContent? currentCat = null)
+        {
+            if (currentNode?.ContentType?.Alias is null)
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            var crumbs = currentNode.AncestorsOrSelf()
+                .Where(n =>
+                {
+                    var u = n.Url(mode: UrlMode.Relative);
+                    return !string.IsNullOrEmpty(u) && u != "#";
+                })
+                .Reverse()
+                .ToList();
+
+            if (crumbs.Count == 0)
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            // Determine the target category
+            IPublishedContent? targetCat = currentCat;
+            if (targetCat is null)
+            {
+                var visibleCategories = GetVisibleCategories(currentNode);
+                targetCat = visibleCategories.Count > 0 ? visibleCategories[0] : null;
+            }
+
+            if (targetCat is null)
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            var categoryCrumbName = targetCat.Name ?? string.Empty;
+            var catSegment = this.GetCategorySegment(targetCat, null);
+            if (string.IsNullOrEmpty(catSegment))
+            {
+                return (string.Empty, categoryCrumbName);
+            }
+
+            // Base URL: if currentNode is a container (has children), use its own URL.
+            // If currentNode is a leaf page, use parent (crumbs[^2]) URL.
+            var hasChildren = currentNode.Children()?.Any() == true;
+            var basePage = hasChildren ? currentNode : (crumbs.Count >= 2 ? crumbs[^2] : null);
+            var baseUrl = basePage?.Url()?.TrimEnd('/') ?? "";
+
+            var categoryCrumbUrl = $"{baseUrl}/{catSegment}/";
+            return (categoryCrumbUrl, categoryCrumbName);
+        }
+
+        /// <summary>
         /// Checks if a page references a category with the given key in its <c>pageCategories</c> picker.
         /// </summary>
-        public bool PageHasCategory(IPublishedContent page, Guid categoryKey)
+        public static bool PageHasCategory(IPublishedContent page, Guid categoryKey)
         {
             var categories = page.Value<IEnumerable<IPublishedContent>>(CategoryUrlConstants.PageCategoriesAlias);
             return categories?.Any(c => c is not null && c.Key == categoryKey) == true;
@@ -254,7 +318,7 @@ namespace uTPro.Project.Web.Configure
                 return null;
             }
 
-            var visibleCategories = _categoryUrlService.GetVisibleCategories(content);
+            var visibleCategories = CategoryUrlService.GetVisibleCategories(content);
             if (visibleCategories.Count == 0)
             {
                 return null;
@@ -443,7 +507,7 @@ namespace uTPro.Project.Web.Configure
                 }
 
                 // Verify the resolved page actually references this category.
-                if (!_categoryUrlService.PageHasCategory(resolved, categoryKey))
+                if (!CategoryUrlService.PageHasCategory(resolved, categoryKey))
                 {
                     continue;
                 }
@@ -469,7 +533,7 @@ namespace uTPro.Project.Web.Configure
         private IPublishedContent? FindChild(IPublishedContent parent, string segment, string? culture)
         {
             var children = parent.Children(_navigationQueryService, _publishedStatusFilteringService)
-                ?? Enumerable.Empty<IPublishedContent>();
+                ?? [];
 
             foreach (var child in children)
             {
@@ -516,7 +580,7 @@ namespace uTPro.Project.Web.Configure
             string? culture = null,
             Guid? categoryKey = null)
         {
-            var visibleCategories = categoryUrlService.GetVisibleCategories(page);
+            var visibleCategories = CategoryUrlService.GetVisibleCategories(page);
             if (visibleCategories.Count == 0)
             {
                 return null;
@@ -565,7 +629,7 @@ namespace uTPro.Project.Web.Configure
             IPublishedUrlProvider urlProvider,
             string? culture = null)
         {
-            var visibleCategories = categoryUrlService.GetVisibleCategories(page);
+            var visibleCategories = CategoryUrlService.GetVisibleCategories(page);
             if (visibleCategories.Count == 0)
             {
                 return [];
@@ -751,10 +815,7 @@ namespace uTPro.Project.Web.Configure
 
             // Store the category key for the render controller / view.
             var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext is not null)
-            {
-                httpContext.Items[CategoryLandingItemKey] = categoryKey;
-            }
+            httpContext?.Items[CategoryLandingItemKey] = categoryKey;
 
             request.SetPublishedContent(parentPage);
             return Task.FromResult(true);
@@ -770,7 +831,7 @@ namespace uTPro.Project.Web.Configure
         private IPublishedContent? FindChild(IPublishedContent parent, string segment, string? culture)
         {
             var children = parent.Children(_navigationQueryService, _publishedStatusFilteringService)
-                ?? Enumerable.Empty<IPublishedContent>();
+                ?? [];
 
             foreach (var child in children)
             {
