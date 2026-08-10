@@ -80,6 +80,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual int PageListMaxDepth => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__PageListBase.GetPageListMaxDepth(this, _publishedValueFallback);
 
 		///<summary>
+		/// Max Items: Maximum total items to display. 0 = no limit (show all).
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[ImplementPropertyType("pageListMaxItems")]
+		public virtual int PageListMaxItems => global::Umbraco.Cms.Web.Common.PublishedModels.UTpro__PageListBase.GetPageListMaxItems(this, _publishedValueFallback);
+
+		///<summary>
 		/// Order By: Sort field: sortOrder, createDate, updateDate, or name. Default: sortOrder.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]

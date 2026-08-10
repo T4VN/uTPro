@@ -53,7 +53,7 @@ else
     @await Html.GetBlockGridHtmlAsync(content, rootName)
 }
 
-@foreach (var region in bottoms)
+@foreach (var region in bottoms.Reverse())
 {
     @await Html.GetBlockGridHtmlAsync(region, rootName)
 }

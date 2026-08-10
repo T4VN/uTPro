@@ -40,6 +40,10 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		int PageListMaxDepth { get; }
 
+		/// <summary>Max Items</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		int PageListMaxItems { get; }
+
 		/// <summary>Order By</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
@@ -150,6 +154,17 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		/// <summary>Static getter for Max Depth</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
 		public static int GetPageListMaxDepth(IUTpro__PageListBase that, IPublishedValueFallback publishedValueFallback) => that.Value<int>(publishedValueFallback, "pageListMaxDepth");
+
+		///<summary>
+		/// Max Items: Maximum total items to display. 0 = no limit (show all).
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		[ImplementPropertyType("pageListMaxItems")]
+		public virtual int PageListMaxItems => GetPageListMaxItems(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Max Items</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.5.3+a9649da")]
+		public static int GetPageListMaxItems(IUTpro__PageListBase that, IPublishedValueFallback publishedValueFallback) => that.Value<int>(publishedValueFallback, "pageListMaxItems");
 
 		///<summary>
 		/// Order By: Sort field: sortOrder, createDate, updateDate, or name. Default: sortOrder.

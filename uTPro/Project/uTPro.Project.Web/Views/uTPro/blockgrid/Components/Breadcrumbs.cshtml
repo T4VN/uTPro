@@ -30,27 +30,16 @@
     var isCategoryLanding = Context.Items.TryGetValue(
         uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingValue);
 
+    var categoryUrlService = Context.RequestServices.GetService<uTPro.Project.Web.Configure.CategoryUrlService>();
+
     if (!isCategoryLanding)
     {
         // Page with category in URL (e.g. /huong-dan/bat-dau/gioi-thieu/)
-        // Check if the current page has visible categories via the CategoryUrlService.
-        var categoryUrlService = Context.RequestServices.GetService<uTPro.Project.Web.Configure.CategoryUrlService>();
         if (categoryUrlService is not null)
         {
-            var visibleCategories = categoryUrlService.GetVisibleCategories(current);
-            if (visibleCategories.Count > 0)
-            {
-                var firstCat = visibleCategories[0];
-                categoryCrumbName = firstCat.Name;
-                // Build category landing URL: current page's parent URL + category slug
-                var catSegment = categoryUrlService.GetCategorySegment(firstCat, null);
-                if (!string.IsNullOrEmpty(catSegment))
-                {
-                    var parentNode = crumbs.Count >= 2 ? crumbs[^2] : null;
-                    var parentUrl = parentNode?.Url()?.TrimEnd('/') ?? "";
-                    categoryCrumbUrl = $"{parentUrl}/{catSegment}/";
-                }
-            }
+            var (url, name) = categoryUrlService.GetUrlNameCategory(current);
+            categoryCrumbUrl = !string.IsNullOrEmpty(url) ? url : null;
+            categoryCrumbName = !string.IsNullOrEmpty(name) ? name : null;
         }
     }
     else

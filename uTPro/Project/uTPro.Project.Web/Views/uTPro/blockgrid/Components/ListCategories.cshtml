@@ -1,0 +1,33 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__ListCategories>>
+@{
+    var categoryUrlService = Context.RequestServices.GetService<uTPro.Project.Web.Configure.CategoryUrlService>();
+    var currentPage = Umbraco.AssignedContentItem;
+}
+
+<section class="container box">
+    @if (!string.IsNullOrEmpty(Model.Content.Header))
+    {
+        <header>
+            <h2>@Model.Content.Header</h2>
+        </header>
+    }
+    @if (Model.Content.FilterByCategory?.Any() == true)
+    {
+        <ul class="style3">
+            @foreach (var item in Model.Content.FilterByCategory)
+            {
+                var showInUrl = item.Value<bool>("categoryItemShowInUrl");
+                var href = "#";
+                if (showInUrl && categoryUrlService is not null)
+                {
+                    var (url, name) = categoryUrlService.GetUrlNameCategory(currentPage, item);
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        href = url;
+                    }
+                }
+                <li><a href="@href">@item.Name</a></li>
+            }
+        </ul>
+    }
+</section>

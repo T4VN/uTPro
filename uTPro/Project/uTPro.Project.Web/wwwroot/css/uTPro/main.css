@@ -101,6 +101,7 @@ form input[type="text"],
 form input[type="email"],
 form input[type="password"] {
     line-height: 1em;
+    height: 100%
 }
 
 form select {

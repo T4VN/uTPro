@@ -81,6 +81,13 @@
             : allItems.OrderBy(x => x.SortOrder)
     };
 
+    // ── Max Items limit (0 = no limit, show all) ──
+    var maxItems = Model.Content.PageListMaxItems;
+    if (maxItems > 0)
+    {
+        allItems = allItems.Take(maxItems);
+    }
+
     // ── Pagination ──
     var currentPage = 1;
     if (int.TryParse(Context.Request.Query["page"].FirstOrDefault(), out var qp) && qp > 0)
@@ -171,7 +178,7 @@ else
             }
         </div>
 
-        @* ── Pagination ── *@
+        @* ── Pagination (auto-hidden when totalPages <= 1) ── *@
         @if (totalPages > 1)
         {
             var basePath = Context.Request.Path.ToString();
