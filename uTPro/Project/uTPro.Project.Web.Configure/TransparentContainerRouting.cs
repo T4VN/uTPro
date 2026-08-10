@@ -70,7 +70,7 @@ namespace uTPro.Project.Web.Configure
             // If the page has visible categories with ShowInUrl enabled, yield to CategoryUrlProvider
             // so the category segment is included in the generated URL.
             if (content.HasProperty(CategoryUrlConstants.PageCategoriesAlias)
-                && _categoryUrlService.GetVisibleCategories(content).Count > 0)
+                && CategoryUrlService.GetVisibleCategories(content).Count > 0)
             {
                 return null;
             }
