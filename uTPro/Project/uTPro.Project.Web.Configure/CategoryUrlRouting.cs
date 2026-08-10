@@ -196,6 +196,71 @@ namespace uTPro.Project.Web.Configure
         }
 
         /// <summary>
+        /// Gets the category landing URL and category name for a given page.
+        /// <para>
+        /// If <paramref name="currentCat"/> is provided, builds the URL for that specific category.
+        /// Otherwise, uses the first visible category assigned to the page.
+        /// </para>
+        /// <para>
+        /// Base URL logic: if <paramref name="currentNode"/> is a container (has children),
+        /// its own URL is used. If it's a leaf page, the parent's URL is used instead.
+        /// </para>
+        /// </summary>
+        /// <param name="currentNode">The page currently being rendered.</param>
+        /// <param name="currentCat">Optional specific category item to build the URL for. If null, the first visible category is used.</param>
+        /// <returns>A tuple of (categoryUrl, categoryName). Both are empty strings if no valid category is found.</returns>
+        public (string, string) GetUrlNameCategory(IPublishedContent currentNode, IPublishedContent? currentCat = null)
+        {
+            if (currentNode?.ContentType?.Alias is null)
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            var crumbs = currentNode.AncestorsOrSelf()
+                .Where(n =>
+                {
+                    var u = n.Url(mode: UrlMode.Relative);
+                    return !string.IsNullOrEmpty(u) && u != "#";
+                })
+                .Reverse()
+                .ToList();
+
+            if (crumbs.Count == 0)
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            // Determine the target category
+            IPublishedContent? targetCat = currentCat;
+            if (targetCat is null)
+            {
+                var visibleCategories = this.GetVisibleCategories(currentNode);
+                targetCat = visibleCategories.Count > 0 ? visibleCategories[0] : null;
+            }
+
+            if (targetCat is null)
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            var categoryCrumbName = targetCat.Name ?? string.Empty;
+            var catSegment = this.GetCategorySegment(targetCat, null);
+            if (string.IsNullOrEmpty(catSegment))
+            {
+                return (string.Empty, categoryCrumbName);
+            }
+
+            // Base URL: if currentNode is a container (has children), use its own URL.
+            // If currentNode is a leaf page, use parent (crumbs[^2]) URL.
+            var hasChildren = currentNode.Children()?.Any() == true;
+            var basePage = hasChildren ? currentNode : (crumbs.Count >= 2 ? crumbs[^2] : null);
+            var baseUrl = basePage?.Url()?.TrimEnd('/') ?? "";
+
+            var categoryCrumbUrl = $"{baseUrl}/{catSegment}/";
+            return (categoryCrumbUrl, categoryCrumbName);
+        }
+
+        /// <summary>
         /// Checks if a page references a category with the given key in its <c>pageCategories</c> picker.
         /// </summary>
         public bool PageHasCategory(IPublishedContent page, Guid categoryKey)

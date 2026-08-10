@@ -51,6 +51,7 @@
 /* SearchBox outside sidebar: constrain width so it looks compact like the sidebar version */
 .sidebar section.box {
     max-width: 100%;
+    margin: 0 0 2em 0
 }
 
 @media screen and (max-width: 736px) {
