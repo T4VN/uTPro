@@ -50,9 +50,6 @@
     }
     <main class="page-wrapper">
         @RenderBody()
-        @{
-            await Html.RenderPartialAsync("Copyright.cshtml");
-        }
     </main>
     <script>window.lstRenderScriptQueue = [@Html.RenderScriptQueue()];</script>
     <script src="/scripts/uTPro/init.js" defer></script>
