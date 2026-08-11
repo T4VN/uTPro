@@ -5,18 +5,23 @@ namespace uTPro.Extension
         private const string PlaceholderHost = "invalid.utpro.local";
         public static string AddScheme(string urlRedirect, string schemeDefault = "https")
         {
-            if (urlRedirect.StartsWith("/"))
+            if (string.IsNullOrWhiteSpace(urlRedirect))
             {
-                return schemeDefault + $"://{PlaceholderHost}" + urlRedirect;
+                return string.Empty;
             }
-            if (urlRedirect.StartsWith("http://") || urlRedirect.StartsWith("https://"))
+
+            if (urlRedirect.StartsWith('/'))
+            {
+                return $"{schemeDefault}://{PlaceholderHost}{urlRedirect}";
+            }
+
+            if (urlRedirect.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                || urlRedirect.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             {
                 return urlRedirect;
             }
-            else
-            {
-                return schemeDefault + "://" + urlRedirect;
-            }
+
+            return $"{schemeDefault}://{urlRedirect}";
         }
     }
 }
