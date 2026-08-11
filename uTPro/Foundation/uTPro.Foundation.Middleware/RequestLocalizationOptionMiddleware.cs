@@ -203,13 +203,13 @@ namespace uTPro.Foundation.Middleware
         {
             if (!isRedirect) return string.Empty;
 
-            string _prefixUrl = SchemeUrlExtensions.AddScheme(prefixUrl);
+            string _prefixUrl = SchemeUrlHelper.AddScheme(prefixUrl);
 
             if (!string.IsNullOrEmpty(_prefixUrl) && Uri.TryCreate(_prefixUrl, UriKind.RelativeOrAbsolute, out var redirectUri))
             {
                 foreach (var item in domains)
                 {
-                    if (Uri.TryCreate(SchemeUrlExtensions.AddScheme(item.Name), UriKind.RelativeOrAbsolute, out var domainHost))
+                    if (Uri.TryCreate(SchemeUrlHelper.AddScheme(item.Name), UriKind.RelativeOrAbsolute, out var domainHost))
                     {
                         if (string.Equals(domainHost.Host, redirectUri.Host, StringComparison.OrdinalIgnoreCase))
                         {
@@ -345,7 +345,7 @@ namespace uTPro.Foundation.Middleware
 
         private static string GetDomainHost(Umbraco.Cms.Core.Routing.Domain domain)
         {
-            if (Uri.TryCreate(SchemeUrlExtensions.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)
+            if (Uri.TryCreate(SchemeUrlHelper.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)
                 && uri.IsAbsoluteUri)
                 return uri.Host;
             return string.Empty;
@@ -353,7 +353,7 @@ namespace uTPro.Foundation.Middleware
 
         private static bool HasPathSegment(Umbraco.Cms.Core.Routing.Domain domain)
         {
-            if (Uri.TryCreate(SchemeUrlExtensions.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)
+            if (Uri.TryCreate(SchemeUrlHelper.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)
                 && uri.IsAbsoluteUri)
                 return !string.IsNullOrEmpty(uri.AbsolutePath.Trim('/'));
 

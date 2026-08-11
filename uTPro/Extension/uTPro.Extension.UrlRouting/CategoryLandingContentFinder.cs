@@ -1,0 +1,107 @@
+using Microsoft.AspNetCore.Http;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
+
+namespace uTPro.Extension.UrlRouting;
+
+/// <summary>
+/// Content finder for category "landing" URLs — e.g. <c>/huong-dan/cau-hinh/</c> where
+/// <c>cau-hinh</c> is a category slug with no page segment following it.
+/// </summary>
+public sealed class CategoryLandingContentFinder(
+    CategoryUrlService categoryUrlService,
+    ContentTreeWalker treeWalker,
+    HiddenContainerAliases hidden,
+    IUmbracoContextAccessor umbracoContextAccessor,
+    IHttpContextAccessor httpContextAccessor) : IContentFinder
+{
+    /// <summary>Key used in <see cref="HttpContext.Items"/> to signal a category landing request.</summary>
+    public const string CategoryLandingItemKey = "uTPro:CategoryLandingKey";
+
+    public Task<bool> TryFindContent(IPublishedRequestBuilder request)
+    {
+        if (request.PublishedContent is not null)
+        {
+            return Task.FromResult(false);
+        }
+
+        if (request.Domain is null)
+        {
+            return Task.FromResult(false);
+        }
+
+        if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
+            || umbracoContext.Content is null)
+        {
+            return Task.FromResult(false);
+        }
+
+        var root = umbracoContext.Content.GetById(request.Domain.ContentId);
+        if (root is null)
+        {
+            return Task.FromResult(false);
+        }
+
+        var decodedPath = Uri.UnescapeDataString(request.Uri.AbsolutePath).Trim('/');
+        var domainPath = request.Domain.Uri?.AbsolutePath.Trim('/') ?? string.Empty;
+        if (domainPath.Length > 0
+            && decodedPath.StartsWith(domainPath, StringComparison.OrdinalIgnoreCase))
+        {
+            decodedPath = decodedPath[domainPath.Length..].Trim('/');
+        }
+
+        if (decodedPath.Length == 0)
+        {
+            return Task.FromResult(false);
+        }
+
+        var segments = decodedPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length < 1)
+        {
+            return Task.FromResult(false);
+        }
+
+        var culture = request.Culture;
+        var categorySlugs = categoryUrlService.GetAllVisibleCategorySlugs(culture, root.Key);
+
+        if (categorySlugs.Count == 0)
+        {
+            return Task.FromResult(false);
+        }
+
+        var lastSegment = segments[^1];
+        if (!categorySlugs.TryGetValue(lastSegment, out var categoryKey))
+        {
+            return Task.FromResult(false);
+        }
+
+        IPublishedContent parentPage;
+        if (segments.Length == 1)
+        {
+            parentPage = root;
+        }
+        else
+        {
+            var parentSegments = segments[..^1];
+            var resolved = treeWalker.WalkTree(root, parentSegments, culture);
+            if (resolved is null)
+            {
+                return Task.FromResult(false);
+            }
+
+            parentPage = resolved;
+        }
+
+        if (hidden.IsTransparent(parentPage))
+        {
+            return Task.FromResult(false);
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
+        httpContext?.Items[CategoryLandingItemKey] = categoryKey;
+
+        request.SetPublishedContent(parentPage);
+        return Task.FromResult(true);
+    }
+}
