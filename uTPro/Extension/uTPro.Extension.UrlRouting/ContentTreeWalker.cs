@@ -19,7 +19,13 @@ public sealed class ContentTreeWalker(
     /// <summary>
     /// Walks the content tree from <paramref name="root"/> through the given segments,
     /// stepping through transparent containers.
+    /// <summary>
+    /// Traverses the content tree using the specified URL segments.
     /// </summary>
+    /// <param name="root">The content item at which traversal begins.</param>
+    /// <param name="segments">The URL segments to resolve in order.</param>
+    /// <param name="culture">The culture used to resolve URL segments, or null for the current culture.</param>
+    /// <returns>The content item resolved by all segments, or null if any segment cannot be resolved.</returns>
     public IPublishedContent? WalkTree(IPublishedContent root, string[] segments, string? culture)
     {
         return segments.Aggregate(
@@ -29,7 +35,13 @@ public sealed class ContentTreeWalker(
 
     /// <summary>
     /// Finds a direct child matching the given URL segment, stepping through transparent containers.
+    /// <summary>
+    /// Finds a published descendant matching the specified URL segment, traversing transparent containers.
     /// </summary>
+    /// <param name="parent">The content item whose descendants are searched.</param>
+    /// <param name="segment">The URL segment to match.</param>
+    /// <param name="culture">The culture used to generate URL segments, or the current variation culture when omitted.</param>
+    /// <returns>The matching content item, or <c>null</c> when no descendant matches.</returns>
     public IPublishedContent? FindChild(IPublishedContent parent, string segment, string? culture)
     {
         var children = parent.Children(navigationQueryService, publishedStatusFilteringService)

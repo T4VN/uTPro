@@ -12,6 +12,11 @@ public sealed class CategoryUrlContentFinder(
     ContentTreeWalker treeWalker,
     IUmbracoContextAccessor umbracoContextAccessor) : IContentFinder
 {
+    /// <summary>
+    /// Resolves a published page from a URL containing a visible category segment.
+    /// </summary>
+    /// <param name="request">The published request to resolve.</param>
+    /// <returns><c>true</c> if a matching page is found; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {
         if (request.PublishedContent is not null)

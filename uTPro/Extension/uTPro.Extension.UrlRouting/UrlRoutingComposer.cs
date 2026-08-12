@@ -14,6 +14,10 @@ namespace uTPro.Extension.UrlRouting;
 /// </summary>
 public sealed class UrlRoutingComposer : IComposer
 {
+    /// <summary>
+    /// Registers URL-routing configuration, services, URL providers, and content finders with Umbraco.
+    /// </summary>
+    /// <param name="builder">The Umbraco builder used to configure the application.</param>
     public void Compose(IUmbracoBuilder builder)
     {
         // Configuration

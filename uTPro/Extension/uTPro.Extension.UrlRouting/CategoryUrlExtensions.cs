@@ -10,7 +10,12 @@ public static class CategoryUrlExtensions
 {
     /// <summary>
     /// Gets the category-based URL for a page using the first visible category.
+    /// <summary>
+    /// Builds a URL for the page using a visible category segment.
     /// </summary>
+    /// <param name="culture">The culture used to resolve the category segment and page URL.</param>
+    /// <param name="categoryKey">The key of the category to use; when omitted, the first visible category is selected.</param>
+    /// <returns>The category URL, or <see langword="null"/> when no suitable category or page URL is available.</returns>
     public static string? GetCategoryUrl(
         this IPublishedContent page,
         CategoryUrlService categoryUrlService,
@@ -56,7 +61,13 @@ public static class CategoryUrlExtensions
 
     /// <summary>
     /// Gets all category-based URLs for a page (one per visible category).
+    /// <summary>
+    /// Generates URLs for all visible categories associated with a page.
     /// </summary>
+    /// <param name="culture">The culture used to resolve the page URL and category segments.</param>
+    /// <returns>
+    /// The category keys and corresponding URLs for categories with valid segments, or an empty list when no valid URLs can be generated.
+    /// </returns>
     public static IReadOnlyList<(Guid CategoryKey, string Url)> GetAllCategoryUrls(
         this IPublishedContent page,
         CategoryUrlService categoryUrlService,
@@ -95,6 +106,12 @@ public static class CategoryUrlExtensions
         return result;
     }
 
+    /// <summary>
+    /// Inserts a category segment before the page segment in a URL.
+    /// </summary>
+    /// <param name="url">The URL containing the page segment.</param>
+    /// <param name="categorySegment">The category segment to insert.</param>
+    /// <returns>The URL with the category segment inserted, or <see langword="null"/> if the URL has no slash.</returns>
     private static string? InsertCategorySegment(string url, string categorySegment)
     {
         var trailingSlash = url.EndsWith('/');

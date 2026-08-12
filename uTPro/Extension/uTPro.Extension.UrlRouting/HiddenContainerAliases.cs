@@ -38,6 +38,10 @@ public sealed class HiddenContainerAliases
         GlobalFolderCategoryItem.ModelTypeAlias,
     ];
 
+    /// <summary>
+    /// Initializes the configured hidden container aliases.
+    /// </summary>
+    /// <param name="options">The options containing additional document type aliases.</param>
     public HiddenContainerAliases(IOptions<HiddenUrlOptions> options)
     {
         var set = new HashSet<string>(DefaultDocumentTypeAliases, StringComparer.OrdinalIgnoreCase);
@@ -56,7 +60,11 @@ public sealed class HiddenContainerAliases
     /// <summary>The resolved, case-insensitive set of hidden container aliases.</summary>
     public IReadOnlySet<string> Aliases { get; }
 
-    /// <summary>True when the given document type alias is a hidden container.</summary>
+    /// <summary>
+/// Determines whether a document type alias identifies a hidden container.
+/// </summary>
+/// <param name="alias">The document type alias to check.</param>
+/// <returns><c>true</c> if the alias identifies a hidden container; otherwise, <c>false</c>.</returns>
     public bool Contains(string? alias) => alias is not null && Aliases.Contains(alias);
 
     /// <summary>
@@ -68,12 +76,22 @@ public sealed class HiddenContainerAliases
     /// container's segment appear in child URLs.</summary>
     public const string ShowInUrlPropertyAlias = "showInUrl";
 
-    private bool IsShown(string alias, bool showInUrl)
+    /// <summary>
+        /// Determines whether the container should be shown in the URL.
+        /// </summary>
+        /// <param name="alias">The container alias.</param>
+        /// <param name="showInUrl">Whether the container is configured to appear in the URL.</param>
+        /// <returns><c>true</c> if the alias identifies the togglable container and it is enabled for URL display; otherwise, <c>false</c>.</returns>
+        private bool IsShown(string alias, bool showInUrl)
         => alias.Equals(TogglableContainerAlias, StringComparison.OrdinalIgnoreCase) && showInUrl;
 
     /// <summary>
     /// True when the node should be treated as transparent (dropped from public URLs).
+    /// <summary>
+    /// Determines whether a published content node should have a transparent URL.
     /// </summary>
+    /// <param name="node">The published content node to evaluate.</param>
+    /// <returns><c>true</c> if the node is configured as a hidden container and should be transparent; otherwise, <c>false</c>.</returns>
     public bool IsTransparent(IPublishedContent? node)
     {
         if (node is null || !Aliases.Contains(node.ContentType.Alias))
