@@ -23,6 +23,9 @@ public sealed class CategoryLandingContentFinder(
     /// Resolves a category landing URL to its parent published content.
     /// </summary>
     /// <param name="request">The published request to resolve.</param>
+    /// <summary>
+    /// Resolves a category landing URL to its parent page.
+    /// </summary>
     /// <returns><c>true</c> if the request matches a visible category landing URL; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {
@@ -48,20 +51,20 @@ public sealed class CategoryLandingContentFinder(
             return Task.FromResult(false);
         }
 
-        var decodedPath = Uri.UnescapeDataString(request.Uri.AbsolutePath).Trim('/');
+        // Split path first, then decode each segment individually.
+        // This prevents encoded slashes (%2F) from being decoded into '/' and creating extra segments.
+        var rawPath = request.Uri.AbsolutePath.Trim('/');
         var domainPath = request.Domain.Uri?.AbsolutePath.Trim('/') ?? string.Empty;
-        if (domainPath.Length > 0
-            && decodedPath.StartsWith(domainPath, StringComparison.OrdinalIgnoreCase))
-        {
-            decodedPath = decodedPath[domainPath.Length..].Trim('/');
-        }
+        rawPath = RequestPathHelper.StripDomainPrefix(rawPath, domainPath);
 
-        if (decodedPath.Length == 0)
+        if (rawPath.Length == 0)
         {
             return Task.FromResult(false);
         }
 
-        var segments = decodedPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var segments = rawPath.Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Select(Uri.UnescapeDataString)
+            .ToArray();
         if (segments.Length < 1)
         {
             return Task.FromResult(false);

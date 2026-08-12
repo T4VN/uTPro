@@ -103,6 +103,12 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
     /// <param name="content">The content whose URL information is retrieved.</param>
     /// <returns>
     /// URL information for the content, including a no-URL message for transparent containers and cleaned URLs for descendants of transparent containers.
+    /// <summary>
+    /// Retrieves URLs for content while removing URL segments belonging to transparent ancestor containers.
+    /// </summary>
+    /// <param name="content">The content whose URLs are retrieved.</param>
+    /// <returns>
+    /// The content URLs with transparent ancestor segments removed, or a no-URL message for transparent content.
     /// </returns>
     public async Task<ISet<UrlInfo>> GetAllAsync(Umbraco.Cms.Core.Models.IContent content)
     {
@@ -116,10 +122,24 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
 
         var urls = await _inner.GetAllAsync(content);
 
-        var containerSegments = GetAncestorContainerSegments(content, urls);
-        if (containerSegments.Count == 0)
+        var ancestorContainers = GetAncestorContainers(content);
+        if (ancestorContainers is null)
         {
             return urls;
+        }
+
+        // Cache ancestor segments per culture to avoid redundant GetUrlSegment calls
+        var segmentsByCulture = new Dictionary<string, IReadOnlyList<string?>>(StringComparer.OrdinalIgnoreCase);
+
+        IReadOnlyList<string?> GetSegmentsForCulture(string? culture)
+        {
+            var key = culture ?? string.Empty;
+            if (!segmentsByCulture.TryGetValue(key, out var segments))
+            {
+                segments = BuildAncestorSegments(ancestorContainers, key);
+                segmentsByCulture[key] = segments;
+            }
+            return segments;
         }
 
         var result = new HashSet<UrlInfo>();
@@ -133,7 +153,8 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
                 continue;
             }
 
-            if (!PathContainsSegment(info.Url, containerSegments))
+            var ancestorSegments = GetSegmentsForCulture(info.Culture);
+            if (!PathContainsSegment(info.Url, ancestorSegments))
             {
                 result.Add(info);
                 seenPaths.Add(PathKey(info.Culture, PathOf(info.Url)));
@@ -142,12 +163,18 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
 
         foreach (var info in urls)
         {
-            if (info.Url is null || !PathContainsSegment(info.Url, containerSegments))
+            if (info.Url is null)
             {
                 continue;
             }
 
-            var cleanedPath = StripSegmentsFromPath(PathOf(info.Url), containerSegments);
+            var ancestorSegments = GetSegmentsForCulture(info.Culture);
+            if (!PathContainsSegment(info.Url, ancestorSegments))
+            {
+                continue;
+            }
+
+            var cleanedPath = StripSegmentsFromPath(PathOf(info.Url), ancestorSegments);
             if (!seenPaths.Add(PathKey(info.Culture, cleanedPath)))
             {
                 continue;
@@ -174,17 +201,34 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
 private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
 
     /// <summary>
-    /// Removes the specified segments from a URL path while preserving its leading slash and applicable trailing slash.
+    /// Strips container segments from the path. Uses the ordered ancestor list to determine
+    /// which segments to remove, accounting for domain-root offset (the URL may not contain
+    /// segments for ancestors above the domain root).
     /// </summary>
-    /// <param name="path">The URL path to clean.</param>
-    /// <param name="segments">The path segments to remove.</param>
-    /// <returns>The path with matching segments removed.</returns>
-    private static string StripSegmentsFromPath(string path, HashSet<string> segments)
+    private static string StripSegmentsFromPath(string path, IReadOnlyList<string?> ancestorSegments)
     {
-        var kept = path.Split('/', StringSplitOptions.RemoveEmptyEntries)
-            .Where(p => !segments.Contains(p));
+        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        var result = "/" + string.Join("/", kept);
+        // Find the offset where ancestor segments start appearing in the path.
+        // Ancestors above the domain root won't appear in the URL, so we need to
+        // find where the first non-null ancestor segment actually matches in the path.
+        var offset = FindAncestorOffset(parts, ancestorSegments);
+
+        // Walk backwards to avoid index shift issues when removing.
+        for (var i = Math.Min(ancestorSegments.Count, parts.Count + offset) - 1; i >= offset; i--)
+        {
+            if (ancestorSegments[i] is { } s)
+            {
+                var pathIndex = i - offset;
+                if (pathIndex >= 0 && pathIndex < parts.Count
+                    && string.Equals(parts[pathIndex], s, StringComparison.OrdinalIgnoreCase))
+                {
+                    parts.RemoveAt(pathIndex);
+                }
+            }
+        }
+
+        var result = "/" + string.Join("/", parts);
 
         if (path.EndsWith('/') && result.Length > 1)
         {
@@ -195,68 +239,129 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     }
 
     /// <summary>
-    /// Gets URL path segments for transparent ancestor containers represented by the supplied URLs.
+    /// Determines the offset in <paramref name="ancestorSegments"/> where the path begins.
+    /// Ancestors above the domain root don't appear in the URL, so we scan for the first
+    /// non-null ancestor segment that matches a path part at a consistent offset.
     /// </summary>
-    /// <param name="content">The content whose transparent ancestors are examined.</param>
-    /// <param name="urls">The existing URLs used to determine the relevant cultures.</param>
-    /// <returns>The case-insensitive set of transparent ancestor URL segments.</returns>
-    private HashSet<string> GetAncestorContainerSegments(
-        Umbraco.Cms.Core.Models.IContent content, ISet<UrlInfo> urls)
+    private static int FindAncestorOffset(List<string> parts, IReadOnlyList<string?> ancestorSegments)
     {
-        var segments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        // Try each possible offset: how many ancestor entries are "above" the URL
+        for (var offset = 0; offset < ancestorSegments.Count; offset++)
+        {
+            var match = true;
+            var foundAny = false;
 
+            for (var i = offset; i < ancestorSegments.Count; i++)
+            {
+                var pathIndex = i - offset;
+                if (pathIndex >= parts.Count) break;
+
+                if (ancestorSegments[i] is null)
+                {
+                    // Non-container ancestor — its segment should be in the URL
+                    continue;
+                }
+
+                foundAny = true;
+                if (!string.Equals(parts[pathIndex], ancestorSegments[i], StringComparison.OrdinalIgnoreCase))
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match && foundAny)
+            {
+                return offset;
+            }
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Builds an ordered list (root→leaf) of ancestor URL segments. Entries are null for
+    /// non-container ancestors, and non-null for transparent containers. This preserves
+    /// positional information needed by <see cref="StripSegmentsFromPath"/>.
+    /// <summary>
+    /// Builds the ordered URL segment list for the specified ancestors.
+    /// </summary>
+    /// <param name="ancestors">The ancestors and whether each one is a transparent container.</param>
+    /// <param name="culture">The culture used to resolve transparent ancestor URL segments.</param>
+    /// <returns>A positional list containing URL segments for transparent ancestors and null entries for other ancestors.</returns>
+    private IReadOnlyList<string?> BuildAncestorSegments(
+        IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)> ancestors, string culture)
+    {
+        var result = new List<string?>(ancestors.Count);
+        foreach (var (ancestor, isTransparent) in ancestors)
+        {
+            if (isTransparent)
+            {
+                var segment = _documentUrlService.GetUrlSegment(ancestor.Key, culture, false);
+                result.Add(segment);
+            }
+            else
+            {
+                result.Add(null);
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the ordered ancestor list with transparency flags. Returns null if no transparent
+    /// containers exist in the ancestry (indicating no work to do).
+    /// <summary>
+    /// Gets the content's ancestors in root-to-leaf order with their transparency status.
+    /// </summary>
+    /// <param name="content">The content whose ancestors are resolved.</param>
+    /// <returns>
+    /// The ordered ancestors and their transparency status, or <c>null</c> if the content cannot be resolved
+    /// or has no transparent ancestors.
+    /// </returns>
+    private IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)>? GetAncestorContainers(
+        Umbraco.Cms.Core.Models.IContent content)
+    {
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
             || umbracoContext.Content is null)
         {
-            return segments;
+            return null;
         }
 
         var node = umbracoContext.Content.GetById(content.Key);
         if (node is null)
         {
-            return segments;
+            return null;
         }
 
-        var containers = node.Ancestors().Where(a => _hidden.IsTransparent(a)).ToList();
-        if (containers.Count == 0)
+        // Ancestors() returns parent→root order; reverse to get root→leaf.
+        var ancestors = node.Ancestors().Reverse().ToList();
+        if (!ancestors.Any(a => _hidden.IsTransparent(a)))
         {
-            return segments;
+            return null;
         }
 
-        var cultures = urls.Select(u => u.Culture).Distinct().ToList();
-        if (cultures.Count == 0)
-        {
-            cultures.Add(null);
-        }
-
-        foreach (var container in containers)
-        {
-            foreach (var culture in cultures)
-            {
-                var segment = _documentUrlService.GetUrlSegment(container.Key, culture ?? string.Empty, false);
-                if (!string.IsNullOrEmpty(segment))
-                {
-                    segments.Add(segment);
-                }
-            }
-        }
-
-        return segments;
+        return ancestors.Select(a => (a, _hidden.IsTransparent(a))).ToList();
     }
 
     /// <summary>
-    /// Determines whether a URL path contains any of the specified segments.
+    /// Determines whether a URL path contains a transparent ancestor segment at its expected position,
+    /// accounting for domain-root offset.
     /// </summary>
-    /// <param name="url">The URL whose path is checked.</param>
-    /// <param name="segments">The path segments to find.</param>
-    /// <returns><c>true</c> if the URL path contains a specified segment; <c>false</c> otherwise.</returns>
-    private static bool PathContainsSegment(Uri url, HashSet<string> segments)
+    private static bool PathContainsSegment(Uri url, IReadOnlyList<string?> ancestorSegments)
     {
         var path = url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
+        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        foreach (var part in path.Split('/', StringSplitOptions.RemoveEmptyEntries))
+        var offset = FindAncestorOffset(parts, ancestorSegments);
+
+        for (var i = offset; i < ancestorSegments.Count; i++)
         {
-            if (segments.Contains(part))
+            var pathIndex = i - offset;
+            if (pathIndex >= parts.Count) break;
+
+            if (ancestorSegments[i] is { } s
+                && string.Equals(parts[pathIndex], s, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }

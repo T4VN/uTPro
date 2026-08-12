@@ -16,7 +16,10 @@ public sealed class CategoryUrlContentFinder(
     /// Resolves a published page from a URL containing a visible category segment.
     /// </summary>
     /// <param name="request">The published request to resolve.</param>
-    /// <returns><c>true</c> if a matching page is found; <c>false</c> otherwise.</returns>
+    /// <summary>
+    /// Resolves a published page from a URL containing a visible category segment.
+    /// </summary>
+    /// <returns><c>true</c> if a matching page is found and assigned to the category; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {
         if (request.PublishedContent is not null)
@@ -41,20 +44,20 @@ public sealed class CategoryUrlContentFinder(
             return Task.FromResult(false);
         }
 
-        var decodedPath = Uri.UnescapeDataString(request.Uri.AbsolutePath).Trim('/');
+        // Split path first, then decode each segment individually.
+        // This prevents encoded slashes (%2F) from being decoded into '/' and creating extra segments.
+        var rawPath = request.Uri.AbsolutePath.Trim('/');
         var domainPath = request.Domain.Uri?.AbsolutePath.Trim('/') ?? string.Empty;
-        if (domainPath.Length > 0
-            && decodedPath.StartsWith(domainPath, StringComparison.OrdinalIgnoreCase))
-        {
-            decodedPath = decodedPath[domainPath.Length..].Trim('/');
-        }
+        rawPath = RequestPathHelper.StripDomainPrefix(rawPath, domainPath);
 
-        if (decodedPath.Length == 0)
+        if (rawPath.Length == 0)
         {
             return Task.FromResult(false);
         }
 
-        var segments = decodedPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var segments = rawPath.Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Select(Uri.UnescapeDataString)
+            .ToArray();
         if (segments.Length < 2)
         {
             return Task.FromResult(false);
@@ -68,30 +71,29 @@ public sealed class CategoryUrlContentFinder(
             return Task.FromResult(false);
         }
 
-        for (int i = 0; i < segments.Length; i++)
+        // CategoryUrlProvider always places the category segment immediately before
+        // the page segment (penultimate position). Only accept that canonical position
+        // to avoid multiple URLs resolving to the same content (duplicate content issue).
+        var categoryIndex = segments.Length - 2;
+        if (!categorySlugs.TryGetValue(segments[categoryIndex], out var categoryKey))
         {
-            if (!categorySlugs.TryGetValue(segments[i], out var categoryKey))
-            {
-                continue;
-            }
-
-            var withoutCategory = segments.Where((_, idx) => idx != i).ToArray();
-
-            var resolved = treeWalker.WalkTree(root, withoutCategory, culture);
-            if (resolved is null)
-            {
-                continue;
-            }
-
-            if (!CategoryUrlService.PageHasCategory(resolved, categoryKey))
-            {
-                continue;
-            }
-
-            request.SetPublishedContent(resolved);
-            return Task.FromResult(true);
+            return Task.FromResult(false);
         }
 
-        return Task.FromResult(false);
+        var withoutCategory = segments.Where((_, idx) => idx != categoryIndex).ToArray();
+
+        var resolved = treeWalker.WalkTree(root, withoutCategory, culture);
+        if (resolved is null)
+        {
+            return Task.FromResult(false);
+        }
+
+        if (!CategoryUrlService.PageHasCategory(resolved, categoryKey))
+        {
+            return Task.FromResult(false);
+        }
+
+        request.SetPublishedContent(resolved);
+        return Task.FromResult(true);
     }
 }
