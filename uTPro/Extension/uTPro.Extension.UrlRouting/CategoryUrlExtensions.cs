@@ -9,16 +9,14 @@ namespace uTPro.Extension.UrlRouting;
 public static class CategoryUrlExtensions
 {
     /// <summary>
-    /// Gets the category-based URL for a page using the first visible category.
-    /// <summary>
-    /// Builds a URL for the page using a visible category segment.
+    /// Gets the category-based URL for a page using a visible category.
     /// </summary>
     /// <remarks>
     /// Delegates to <see cref="IPublishedUrlProvider.GetUrl"/> which routes through
     /// <see cref="CategoryUrlProvider"/>, ensuring consistent URL generation that
     /// correctly handles transparent containers.
     /// When a specific <paramref name="categoryKey"/> is provided and doesn't match
-    /// the first visible category, falls back to path manipulation on the resolved URL.
+    /// the first visible category, falls back to segment swapping on the resolved URL.
     /// </remarks>
     public static string? GetCategoryUrl(
         this IPublishedContent page,
@@ -75,13 +73,7 @@ public static class CategoryUrlExtensions
 
     /// <summary>
     /// Gets all category-based URLs for a page (one per visible category).
-    /// <summary>
-    /// Generates URLs for all visible categories associated with a page.
     /// </summary>
-    /// <param name="culture">The culture used to resolve the page URL and category segments.</param>
-    /// <returns>
-    /// The category keys and corresponding URLs for categories with valid segments, or an empty list when no valid URLs can be generated.
-    /// </returns>
     public static IReadOnlyList<(Guid CategoryKey, string Url)> GetAllCategoryUrls(
         this IPublishedContent page,
         CategoryUrlService categoryUrlService,
@@ -134,7 +126,28 @@ public static class CategoryUrlExtensions
         return result;
     }
 
-    private static string? InsertCategorySegment(string url, string categorySegment)
+    /// <summary>
+    /// Replaces a category segment within a URL (handles both relative and absolute URLs safely).
+    /// </summary>
+    private static string? ReplaceCategorySegment(string url, string oldSegment, string newSegment)
+    {
+        // Extract just the path portion, handling both absolute and relative URLs
+        if (Uri.TryCreate(url, UriKind.Absolute, out var absoluteUri))
+        {
+            var path = absoluteUri.AbsolutePath;
+            var newPath = ReplaceSegmentInPath(path, oldSegment, newSegment);
+            if (newPath is null) return null;
+            return absoluteUri.GetLeftPart(UriPartial.Authority) + newPath;
+        }
+
+        // Relative URL — operate on the string directly as a path
+        return ReplaceSegmentInPath(url, oldSegment, newSegment);
+    }
+
+    /// <summary>
+    /// Replaces the penultimate segment (category position) in a path string.
+    /// </summary>
+    private static string? ReplaceSegmentInPath(string path, string oldSegment, string newSegment)
     {
         var trailingSlash = path.EndsWith('/');
         var trimmed = path.TrimEnd('/');

@@ -92,7 +92,5 @@ public sealed class CategoryUrlContentFinder(
 
         request.SetPublishedContent(resolved);
         return Task.FromResult(true);
-
-        return Task.FromResult(false);
     }
 }
