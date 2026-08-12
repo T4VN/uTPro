@@ -17,6 +17,11 @@ public sealed class CategoryUrlProvider(
 {
     public string Alias => "uTProCategoryUrlProvider";
 
+    /// <summary>
+    /// Builds a URL that includes the content's first visible category.
+    /// </summary>
+    /// <param name="culture">The culture used to resolve the category and content URL segments.</param>
+    /// <returns>The category-prefixed URL, or <c>null</c> when the content cannot produce one.</returns>
     public UrlInfo? GetUrl(IPublishedContent content, UrlMode mode, string? culture, Uri current)
     {
         if (hidden.IsTransparent(content))
@@ -45,11 +50,29 @@ public sealed class CategoryUrlProvider(
         return BuildCategoryUrl(content, categorySegment, mode, culture);
     }
 
-    public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current) => [];
+    /// <summary>
+/// Gets alternate URLs for the specified content.
+/// </summary>
+/// <param name="id">The content identifier.</param>
+/// <param name="current">The current request URI.</param>
+/// <returns>An empty collection.</returns>
+public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current) => [];
 
-    public Task<UrlInfo?> GetPreviewUrlAsync(Umbraco.Cms.Core.Models.IContent content, string? culture, string? segment)
+    /// <summary>
+        /// Provides no preview URL for the specified content.
+        /// </summary>
+        /// <param name="content">The content for which to provide a preview URL.</param>
+        /// <param name="culture">The requested culture.</param>
+        /// <param name="segment">The requested URL segment.</param>
+        /// <returns><c>null</c>.</returns>
+        public Task<UrlInfo?> GetPreviewUrlAsync(Umbraco.Cms.Core.Models.IContent content, string? culture, string? segment)
         => Task.FromResult<UrlInfo?>(null);
 
+    /// <summary>
+    /// Builds a category-based URL for the specified content.
+    /// </summary>
+    /// <param name="categorySegment">The URL segment for the content's category.</param>
+    /// <returns>The constructed category URL, or null when a valid URL cannot be resolved.</returns>
     private UrlInfo? BuildCategoryUrl(IPublishedContent content, string categorySegment, UrlMode mode, string? culture)
     {
         var resolvedCulture = culture ?? variationContextAccessor.VariationContext?.Culture ?? string.Empty;

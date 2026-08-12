@@ -19,6 +19,10 @@ public sealed class TransparentContainerContentFinder : IContentFinder
     private readonly IPublishedContentStatusFilteringService _publishedStatusFilteringService;
     private readonly IDocumentUrlService _documentUrlService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TransparentContainerContentFinder"/> class.
+    /// </summary>
+    /// <param name="hidden">The configured transparent container aliases.</param>
     public TransparentContainerContentFinder(
         HiddenContainerAliases hidden,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -35,12 +39,23 @@ public sealed class TransparentContainerContentFinder : IContentFinder
         _documentUrlService = documentUrlService;
     }
 
-    private string? GetSegment(IPublishedContent node, string? culture)
+    /// <summary>
+            /// Gets the URL segment for a content node in the specified culture.
+            /// </summary>
+            /// <param name="node">The content node whose URL segment is retrieved.</param>
+            /// <param name="culture">The requested culture, or the current variation culture when omitted.</param>
+            /// <returns>The node's URL segment, or <c>null</c> when no segment is available.</returns>
+            private string? GetSegment(IPublishedContent node, string? culture)
         => _documentUrlService.GetUrlSegment(
             node.Key,
             culture ?? _variationContextAccessor.VariationContext?.Culture ?? string.Empty,
             false);
 
+    /// <summary>
+    /// Resolves a clean URL to published content by bypassing configured transparent containers.
+    /// </summary>
+    /// <param name="request">The published request to resolve.</param>
+    /// <returns><c>true</c> if content is resolved after bypassing a transparent container; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {
         if (request.PublishedContent is not null)
@@ -105,6 +120,14 @@ public sealed class TransparentContainerContentFinder : IContentFinder
         return Task.FromResult(true);
     }
 
+    /// <summary>
+    /// Finds a child matching the specified URL segment, traversing transparent containers when necessary.
+    /// </summary>
+    /// <param name="parent">The content node whose descendants are searched.</param>
+    /// <param name="segment">The URL segment to match.</param>
+    /// <param name="culture">The culture used to resolve URL segments.</param>
+    /// <param name="skippedContainer">Indicates whether a transparent container was bypassed.</param>
+    /// <returns>The matching content node, or null when no match is found.</returns>
     private IPublishedContent? FindChild(
         IPublishedContent parent, string segment, string? culture, ref bool skippedContainer)
     {

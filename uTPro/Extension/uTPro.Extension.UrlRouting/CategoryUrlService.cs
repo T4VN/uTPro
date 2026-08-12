@@ -19,7 +19,11 @@ public sealed class CategoryUrlService(
     /// <summary>
     /// Gets all category items assigned to the given page that have <c>showInUrl</c> enabled.
     /// Returns them in picker order.
+    /// <summary>
+    /// Gets the categories configured to appear in the page URL.
     /// </summary>
+    /// <param name="page">The page whose category selections are evaluated.</param>
+    /// <returns>The visible categories in picker order.</returns>
     public static IReadOnlyList<IPublishedContent> GetVisibleCategories(IPublishedContent page)
     {
         var categories = page.Value<IEnumerable<IPublishedContent>>(CategoryUrlConstants.PageCategoriesAlias);
@@ -36,7 +40,12 @@ public sealed class CategoryUrlService(
 
     /// <summary>
     /// Gets the URL segment for a category item.
+    /// <summary>
+    /// Resolves the URL segment for a category item.
     /// </summary>
+    /// <param name="categoryItem">The category item whose URL segment is resolved.</param>
+    /// <param name="culture">The culture used to resolve the URL segment, or the current variation culture when omitted.</param>
+    /// <returns>The normalized custom or generated URL segment, or <c>null</c> when the category item is unavailable or invalid.</returns>
     public string? GetCategorySegment(IPublishedContent? categoryItem, string? culture)
     {
         if (categoryItem is null || categoryItem.Key == Guid.Empty)
@@ -58,7 +67,14 @@ public sealed class CategoryUrlService(
 
     /// <summary>
     /// Gets all visible category slugs under a given site root.
+    /// <summary>
+    /// Collects visible category URL segments beneath a site root.
     /// </summary>
+    /// <param name="culture">The culture used to resolve category URL segments.</param>
+    /// <param name="siteRoot">The root content node from which to collect categories.</param>
+    /// <returns>
+    /// A case-insensitive mapping of category URL segments to category keys.
+    /// </returns>
     public Dictionary<string, Guid> GetAllVisibleCategorySlugs(string? culture, IPublishedContent? siteRoot = null)
     {
         if (!umbracoContextAccessor.TryGetUmbracoContext(out var ctx) || ctx.Content is null)
@@ -78,7 +94,12 @@ public sealed class CategoryUrlService(
 
     /// <summary>
     /// Overload that accepts a domain root key.
+    /// <summary>
+    /// Collects visible category URL slugs from the domain root or its nearest ancestor containing categories.
     /// </summary>
+    /// <param name="culture">The culture used to resolve category URL segments.</param>
+    /// <param name="domainRootKey">The key of the domain root content item.</param>
+    /// <returns>A case-insensitive mapping of category URL slugs to category keys.</returns>
     public Dictionary<string, Guid> GetAllVisibleCategorySlugs(string? culture, Guid domainRootKey)
     {
         if (!umbracoContextAccessor.TryGetUmbracoContext(out var ctx) || ctx.Content is null)
@@ -111,7 +132,12 @@ public sealed class CategoryUrlService(
 
     /// <summary>
     /// Gets the category landing URL and category name for a given page.
+    /// <summary>
+    /// Builds the category landing URL and display name for a content page.
     /// </summary>
+    /// <param name="currentNode">The content page for which to build the category URL.</param>
+    /// <param name="currentCat">The category to use, or the page's first visible category when omitted.</param>
+    /// <returns>A tuple containing the category URL and display name, or empty values when the required content is unavailable.</returns>
     public (string Url, string Name) GetUrlNameCategory(IPublishedContent currentNode, IPublishedContent? currentCat = null)
     {
         if (currentNode?.ContentType?.Alias is null)
@@ -162,13 +188,23 @@ public sealed class CategoryUrlService(
 
     /// <summary>
     /// Checks if a page references a category with the given key.
+    /// <summary>
+    /// Determines whether a page contains a category with the specified key.
     /// </summary>
+    /// <param name="categoryKey">The key of the category to find.</param>
+    /// <returns><c>true</c> if the page contains the specified category; otherwise, <c>false</c>.</returns>
     public static bool PageHasCategory(IPublishedContent page, Guid categoryKey)
     {
         var categories = page.Value<IEnumerable<IPublishedContent>>(CategoryUrlConstants.PageCategoriesAlias);
         return categories?.Any(c => c is not null && c.Key == categoryKey) == true;
     }
 
+    /// <summary>
+    /// Collects visible category items beneath eligible content nodes and adds their URL segments and keys to the result.
+    /// </summary>
+    /// <param name="node">The content node from which to begin traversal.</param>
+    /// <param name="culture">The culture used to resolve category URL segments.</param>
+    /// <param name="result">The dictionary to populate with category URL segments and keys.</param>
     private void CollectCategoryItems(IPublishedContent node, string? culture, Dictionary<string, Guid> result)
     {
         if (node?.ContentType?.Alias is null)

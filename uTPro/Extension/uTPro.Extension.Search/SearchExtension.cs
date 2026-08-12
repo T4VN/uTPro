@@ -21,6 +21,13 @@ internal sealed class SearchExtension : ISearchExtension
     private readonly ICurrentSiteExtension _currentSite;
     private readonly IServiceProvider _serviceProvider;
 
+    /// <summary>
+    /// Initializes a search extension with the services required to query Umbraco content and expand search terms.
+    /// </summary>
+    /// <param name="examineManager">The Examine manager used to access search indexes.</param>
+    /// <param name="umbracoContextAccessor">Provides access to the current Umbraco context.</param>
+    /// <param name="currentSite">Provides information about the current site.</param>
+    /// <param name="serviceProvider">Resolves optional search services, including synonym providers.</param>
     public SearchExtension(
         IExamineManager examineManager,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -33,7 +40,14 @@ internal sealed class SearchExtension : ISearchExtension
         _serviceProvider = serviceProvider;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Searches published site content using the specified query, scope, fields, ordering, and pagination.
+    /// </summary>
+    /// <param name="scope">The search scope; use <c>"allSite"</c> to search the entire site.</param>
+    /// <param name="scopeNodeId">The node ID that limits results to its content tree.</param>
+    /// <param name="fields">The fields to search.</param>
+    /// <param name="orderBy">The field ordering specifications to apply.</param>
+    /// <returns>The search results and pagination metadata.</returns>
     public SearchResultSet Search(
         string query,
         string? scope = "selectedSource",
@@ -141,7 +155,11 @@ internal sealed class SearchExtension : ISearchExtension
     /// Apply dynamic ordering from string array.
     /// Format: "fieldName [SortType] [asc|desc]"
     /// Examples: "updateDate Long desc", "nodeName String asc", "sortOrder Int"
+    /// <summary>
+    /// Applies the requested field ordering to a query.
     /// </summary>
+    /// <param name="orderParams">Ordering specifications containing a field name, optional sort type, and optional <c>desc</c> direction.</param>
+    /// <returns>The query with the specified ordering applied.</returns>
     private static IOrdering ApplyOrdering(IBooleanOperation query, string[]? orderParams)
     {
         if (orderParams == null || orderParams.Length == 0)
@@ -184,7 +202,11 @@ internal sealed class SearchExtension : ISearchExtension
     /// Expand query with synonyms if uTPro.Feature.SearchPlus is installed.
     /// Uses runtime service resolution so SearchPlus remains an optional dependency.
     /// Falls back to original query if SearchPlus is not installed.
+    /// <summary>
+    /// Expands a search query with available synonym terms.
     /// </summary>
+    /// <param name="query">The search query to expand.</param>
+    /// <returns>The expanded search terms, or the original query when synonym expansion is unavailable.</returns>
     private IReadOnlyList<string> ExpandWithSynonyms(string query)
     {
         try
