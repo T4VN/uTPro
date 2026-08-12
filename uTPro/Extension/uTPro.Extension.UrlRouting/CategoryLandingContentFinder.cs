@@ -107,7 +107,7 @@ public sealed class CategoryLandingContentFinder(
         // Without this check, any valid category slug appended to any page returns 200
         // with an empty list, creating phantom pages for search engines.
         var hasMatchingChild = parentPage.Children()?.Any(child =>
-            CategoryUrlService.PageHasCategory(child, categoryKey)) == true;
+            CategoryUrlService.PageHasCategory(child, categoryKey)) is true;
 
         if (!hasMatchingChild)
         {
