@@ -199,6 +199,13 @@ namespace uTPro.Foundation.Middleware
             return currentSite.DefaultCulture;
         }
 
+        /// <summary>
+        /// Builds a same-host redirect path for the current request when a culture prefix is required.
+        /// </summary>
+        /// <param name="prefixUrl">The URL containing the desired culture prefix.</param>
+        /// <param name="isRedirect">Indicates whether a redirect is required.</param>
+        /// <param name="domains">The configured domains used to validate the target host.</param>
+        /// <returns>The redirect path with the current query string, or an empty string when no redirect is required.</returns>
         private static string GetSchemeRedirect(HttpContext httpContext, string prefixUrl, bool isRedirect, IReadOnlyList<Umbraco.Cms.Core.Routing.Domain> domains)
         {
             if (!isRedirect) return string.Empty;
@@ -343,6 +350,11 @@ namespace uTPro.Foundation.Middleware
             return candidates[0];
         }
 
+        /// <summary>
+        /// Extracts the host name from a domain.
+        /// </summary>
+        /// <param name="domain">The domain whose host name is extracted.</param>
+        /// <returns>The domain host name, or an empty string when the domain name is invalid.</returns>
         private static string GetDomainHost(Umbraco.Cms.Core.Routing.Domain domain)
         {
             if (Uri.TryCreate(SchemeUrlHelper.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)
@@ -351,6 +363,11 @@ namespace uTPro.Foundation.Middleware
             return string.Empty;
         }
 
+        /// <summary>
+        /// Determines whether a domain contains a non-root path segment.
+        /// </summary>
+        /// <param name="domain">The domain to inspect.</param>
+        /// <returns><c>true</c> if the domain contains a path segment, <c>false</c> otherwise.</returns>
         private static bool HasPathSegment(Umbraco.Cms.Core.Routing.Domain domain)
         {
             if (Uri.TryCreate(SchemeUrlHelper.AddScheme(domain.Name), UriKind.RelativeOrAbsolute, out var uri)

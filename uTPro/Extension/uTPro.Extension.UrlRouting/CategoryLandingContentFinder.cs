@@ -19,6 +19,11 @@ public sealed class CategoryLandingContentFinder(
     /// <summary>Key used in <see cref="HttpContext.Items"/> to signal a category landing request.</summary>
     public const string CategoryLandingItemKey = "uTPro:CategoryLandingKey";
 
+    /// <summary>
+    /// Resolves a category landing URL to its parent published content.
+    /// </summary>
+    /// <param name="request">The published request to resolve.</param>
+    /// <returns><c>true</c> if the request matches a visible category landing URL; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {
         if (request.PublishedContent is not null)
