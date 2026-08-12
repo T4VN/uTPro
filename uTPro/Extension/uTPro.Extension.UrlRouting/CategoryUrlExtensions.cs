@@ -11,6 +11,13 @@ public static class CategoryUrlExtensions
     /// <summary>
     /// Gets the category-based URL for a page using the first visible category.
     /// </summary>
+    /// <remarks>
+    /// Delegates to <see cref="IPublishedUrlProvider.GetUrl"/> which routes through
+    /// <see cref="CategoryUrlProvider"/>, ensuring consistent URL generation that
+    /// correctly handles transparent containers.
+    /// When a specific <paramref name="categoryKey"/> is provided and doesn't match
+    /// the first visible category, falls back to path manipulation on the resolved URL.
+    /// </remarks>
     public static string? GetCategoryUrl(
         this IPublishedContent page,
         CategoryUrlService categoryUrlService,
@@ -39,19 +46,29 @@ public static class CategoryUrlExtensions
             targetCategory = visibleCategories[0];
         }
 
-        var categorySegment = categoryUrlService.GetCategorySegment(targetCategory, culture);
-        if (string.IsNullOrEmpty(categorySegment))
+        // When requesting the first category, GetUrl already goes through CategoryUrlProvider
+        // which handles transparent containers correctly.
+        var pageUrl = urlProvider.GetUrl(page.Key, UrlMode.Default, culture);
+        if (string.IsNullOrEmpty(pageUrl) || pageUrl == "#")
         {
             return null;
         }
 
-        var baseUrl = urlProvider.GetUrl(page.Key, UrlMode.Default, culture);
-        if (string.IsNullOrEmpty(baseUrl) || baseUrl == "#")
+        // If the target is the first category, the URL from the provider is already correct.
+        if (targetCategory.Key == visibleCategories[0].Key)
+        {
+            return pageUrl;
+        }
+
+        // For a non-default category, swap the category segment in the provider-generated URL.
+        var defaultSegment = categoryUrlService.GetCategorySegment(visibleCategories[0], culture);
+        var targetSegment = categoryUrlService.GetCategorySegment(targetCategory, culture);
+        if (string.IsNullOrEmpty(defaultSegment) || string.IsNullOrEmpty(targetSegment))
         {
             return null;
         }
 
-        return InsertCategorySegment(baseUrl, categorySegment);
+        return ReplaceCategorySegment(pageUrl, defaultSegment, targetSegment);
     }
 
     /// <summary>
@@ -69,23 +86,37 @@ public static class CategoryUrlExtensions
             return [];
         }
 
-        var baseUrl = urlProvider.GetUrl(page.Key, UrlMode.Default, culture);
-        if (string.IsNullOrEmpty(baseUrl) || baseUrl == "#")
+        // Get the URL from the provider (uses CategoryUrlProvider, handles containers correctly)
+        var pageUrl = urlProvider.GetUrl(page.Key, UrlMode.Default, culture);
+        if (string.IsNullOrEmpty(pageUrl) || pageUrl == "#")
+        {
+            return [];
+        }
+
+        // The provider-generated URL already contains the first category segment
+        var defaultCategory = visibleCategories[0];
+        var defaultSegment = categoryUrlService.GetCategorySegment(defaultCategory, culture);
+        if (string.IsNullOrEmpty(defaultSegment))
         {
             return [];
         }
 
         var result = new List<(Guid, string)>();
 
-        foreach (var cat in visibleCategories)
+        // First category is already in the provider URL
+        result.Add((defaultCategory.Key, pageUrl));
+
+        // For remaining categories, swap the segment
+        for (int i = 1; i < visibleCategories.Count; i++)
         {
+            var cat = visibleCategories[i];
             var segment = categoryUrlService.GetCategorySegment(cat, culture);
             if (string.IsNullOrEmpty(segment))
             {
                 continue;
             }
 
-            var url = InsertCategorySegment(baseUrl, segment);
+            var url = ReplaceCategorySegment(pageUrl, defaultSegment, segment);
             if (url is not null)
             {
                 result.Add((cat.Key, url));
@@ -95,22 +126,48 @@ public static class CategoryUrlExtensions
         return result;
     }
 
-    private static string? InsertCategorySegment(string url, string categorySegment)
+    /// <summary>
+    /// Replaces a category segment within a URL (handles both relative and absolute URLs safely).
+    /// </summary>
+    private static string? ReplaceCategorySegment(string url, string oldSegment, string newSegment)
     {
-        var trailingSlash = url.EndsWith('/');
-        var path = url.TrimEnd('/');
+        // Extract just the path portion, handling both absolute and relative URLs
+        if (Uri.TryCreate(url, UriKind.Absolute, out var absoluteUri))
+        {
+            var path = absoluteUri.AbsolutePath;
+            var newPath = ReplaceSegmentInPath(path, oldSegment, newSegment);
+            if (newPath is null) return null;
+            return absoluteUri.GetLeftPart(UriPartial.Authority) + newPath;
+        }
 
-        var lastSlash = path.LastIndexOf('/');
-        if (lastSlash < 0)
+        // Relative URL — operate on the string directly as a path
+        return ReplaceSegmentInPath(url, oldSegment, newSegment);
+    }
+
+    /// <summary>
+    /// Replaces the penultimate segment (category position) in a path string.
+    /// </summary>
+    private static string? ReplaceSegmentInPath(string path, string oldSegment, string newSegment)
+    {
+        var trailingSlash = path.EndsWith('/');
+        var trimmed = path.TrimEnd('/');
+
+        var segments = trimmed.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length < 2)
         {
             return null;
         }
 
-        var beforePage = path[..lastSlash];
-        var pageSegment = path[(lastSlash + 1)..];
+        // Category is always at penultimate position (just before page segment)
+        var categoryIndex = segments.Length - 2;
+        if (!segments[categoryIndex].Equals(oldSegment, StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
 
-        var result = $"{beforePage}/{categorySegment}/{pageSegment}";
+        segments[categoryIndex] = newSegment;
 
+        var result = "/" + string.Join("/", segments);
         if (trailingSlash)
         {
             result += "/";

@@ -206,7 +206,7 @@ internal sealed class SearchExtension : ISearchExtension
                 return new[] { query };
 
             var result = expandMethod.Invoke(synonymProvider, new object[] { query }) as IReadOnlyList<string>;
-            return result ?? new[] { query };
+            return result is { Count: > 0 } ? result : new[] { query };
         }
         catch
         {

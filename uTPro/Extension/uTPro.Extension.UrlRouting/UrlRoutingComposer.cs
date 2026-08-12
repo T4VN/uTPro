@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -49,5 +50,8 @@ public sealed class UrlRoutingComposer : IComposer
         builder.ContentFinders().Append<TransparentContainerContentFinder>();
         builder.ContentFinders().Append<CategoryUrlContentFinder>();
         builder.ContentFinders().Append<CategoryLandingContentFinder>();
+
+        // Invalidate category slug cache on content publish
+        builder.AddNotificationHandler<ContentPublishedNotification, CategorySlugCacheInvalidator>();
     }
 }

@@ -134,9 +134,9 @@
     // ── Auto-filter search results by category from URL ──
     var isCategoryFiltered = false;
     string? categoryFilterName = null;
-    if (Context.Items.TryGetValue(CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem))
+    if (Context.Items.TryGetValue(CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem)
+        && categoryLandingItem is Guid urlCategoryKey)
     {
-        var urlCategoryKey = (Guid)categoryLandingItem!;
         if (urlCategoryKey != Guid.Empty && results.Items.Any())
         {
             isCategoryFiltered = true;

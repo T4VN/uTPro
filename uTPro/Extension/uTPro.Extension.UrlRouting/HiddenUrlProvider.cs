@@ -124,12 +124,29 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
 
     private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
 
-    private static string StripSegmentsFromPath(string path, HashSet<string> segments)
+    /// <summary>
+    /// Strips container segments from the path by position. Container ancestors appear
+    /// from the root down, so their segments occupy prefix positions in the path.
+    /// Only removes a segment when it matches the expected container at that position,
+    /// preventing false removal of legitimate page segments that happen to share the name.
+    /// </summary>
+    private static string StripSegmentsFromPath(string path, IReadOnlyList<string?> ancestorSegments)
     {
-        var kept = path.Split('/', StringSplitOptions.RemoveEmptyEntries)
-            .Where(p => !segments.Contains(p));
+        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        var result = "/" + string.Join("/", kept);
+        // ancestorSegments is ordered root→down. Null entries represent non-container ancestors.
+        // Walk from the beginning of the path: for each ancestor segment, if the path part matches
+        // at that position, remove it (shift remaining parts left).
+        for (var i = Math.Min(ancestorSegments.Count, parts.Count) - 1; i >= 0; i--)
+        {
+            if (ancestorSegments[i] is { } s
+                && string.Equals(parts[i], s, StringComparison.OrdinalIgnoreCase))
+            {
+                parts.RemoveAt(i);
+            }
+        }
+
+        var result = "/" + string.Join("/", parts);
 
         if (path.EndsWith('/') && result.Length > 1)
         {
@@ -139,57 +156,62 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
         return result;
     }
 
-    private HashSet<string> GetAncestorContainerSegments(
+    /// <summary>
+    /// Builds an ordered list (root→leaf) of ancestor URL segments. Entries are null for
+    /// non-container ancestors, and non-null for transparent containers. This preserves
+    /// positional information needed by <see cref="StripSegmentsFromPath"/>.
+    /// </summary>
+    private IReadOnlyList<string?> GetAncestorContainerSegments(
         Umbraco.Cms.Core.Models.IContent content, ISet<UrlInfo> urls)
     {
-        var segments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
             || umbracoContext.Content is null)
         {
-            return segments;
+            return [];
         }
 
         var node = umbracoContext.Content.GetById(content.Key);
         if (node is null)
         {
-            return segments;
+            return [];
         }
 
-        var containers = node.Ancestors().Where(a => _hidden.IsTransparent(a)).ToList();
-        if (containers.Count == 0)
+        // Ancestors() returns parent→root order; reverse to get root→leaf.
+        var ancestors = node.Ancestors().Reverse().ToList();
+        if (!ancestors.Any(a => _hidden.IsTransparent(a)))
         {
-            return segments;
+            return [];
         }
 
-        var cultures = urls.Select(u => u.Culture).Distinct().ToList();
-        if (cultures.Count == 0)
-        {
-            cultures.Add(null);
-        }
+        // Determine the primary culture for segment resolution
+        var culture = urls.Select(u => u.Culture).FirstOrDefault(c => c is not null) ?? string.Empty;
 
-        foreach (var container in containers)
+        var result = new List<string?>(ancestors.Count);
+        foreach (var ancestor in ancestors)
         {
-            foreach (var culture in cultures)
+            if (_hidden.IsTransparent(ancestor))
             {
-                var segment = _documentUrlService.GetUrlSegment(container.Key, culture ?? string.Empty, false);
-                if (!string.IsNullOrEmpty(segment))
-                {
-                    segments.Add(segment);
-                }
+                var segment = _documentUrlService.GetUrlSegment(ancestor.Key, culture, false);
+                result.Add(segment);
+            }
+            else
+            {
+                result.Add(null);
             }
         }
 
-        return segments;
+        return result;
     }
 
-    private static bool PathContainsSegment(Uri url, HashSet<string> segments)
+    private static bool PathContainsSegment(Uri url, IReadOnlyList<string?> ancestorSegments)
     {
         var path = url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
+        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-        foreach (var part in path.Split('/', StringSplitOptions.RemoveEmptyEntries))
+        for (var i = 0; i < Math.Min(ancestorSegments.Count, parts.Length); i++)
         {
-            if (segments.Contains(part))
+            if (ancestorSegments[i] is { } s
+                && string.Equals(parts[i], s, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }

@@ -65,21 +65,20 @@ public sealed class TransparentContainerContentFinder : IContentFinder
             return Task.FromResult(false);
         }
 
-        var decodedPath = Uri.UnescapeDataString(request.Uri.AbsolutePath).Trim('/');
-
+        // Split path first, then decode each segment individually.
+        // This prevents encoded slashes (%2F) from being decoded into '/' and creating extra segments.
+        var rawPath = request.Uri.AbsolutePath.Trim('/');
         var domainPath = request.Domain.Uri?.AbsolutePath.Trim('/') ?? string.Empty;
-        if (domainPath.Length > 0
-            && decodedPath.StartsWith(domainPath, StringComparison.OrdinalIgnoreCase))
-        {
-            decodedPath = decodedPath[domainPath.Length..].Trim('/');
-        }
+        rawPath = RequestPathHelper.StripDomainPrefix(rawPath, domainPath);
 
-        if (decodedPath.Length == 0)
+        if (rawPath.Length == 0)
         {
             return Task.FromResult(false);
         }
 
-        var segments = decodedPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var segments = rawPath.Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Select(Uri.UnescapeDataString)
+            .ToArray();
         var culture = request.Culture;
 
         var current = root;
