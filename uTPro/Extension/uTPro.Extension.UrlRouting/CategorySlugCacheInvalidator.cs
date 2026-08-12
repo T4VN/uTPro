@@ -10,6 +10,10 @@ namespace uTPro.Extension.UrlRouting;
 internal sealed class CategorySlugCacheInvalidator(CategoryUrlService categoryUrlService)
     : INotificationHandler<ContentPublishedNotification>
 {
+    /// <summary>
+    /// Clears the category URL slug cache after content is published.
+    /// </summary>
+    /// <param name="notification">The content publication notification.</param>
     public void Handle(ContentPublishedNotification notification)
     {
         // Any publish could potentially affect category items or their parents,

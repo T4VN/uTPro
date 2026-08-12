@@ -206,6 +206,10 @@ internal sealed class SearchExtension : ISearchExtension
     /// Expands a search query with available synonym terms.
     /// </summary>
     /// <param name="query">The search query to expand.</param>
+    /// <summary>
+    /// Expands a search query with configured synonyms when available.
+    /// </summary>
+    /// <param name="query">The search query to expand.</param>
     /// <returns>The expanded search terms, or the original query when synonym expansion is unavailable.</returns>
     private IReadOnlyList<string> ExpandWithSynonyms(string query)
     {

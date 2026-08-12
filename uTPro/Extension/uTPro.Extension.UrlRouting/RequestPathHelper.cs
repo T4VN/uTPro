@@ -12,7 +12,14 @@ internal static class RequestPathHelper
     /// <remarks>
     /// Without the boundary check, a domain path of "vi" would incorrectly match "vietnam/bai-viet"
     /// and produce "etnam/bai-viet".
-    /// </remarks>
+    /// <summary>
+    /// Removes a matching domain path prefix from a request path.
+    /// </summary>
+    /// <param name="decodedPath">The request path from which to remove the prefix.</param>
+    /// <param name="domainPath">The domain path prefix to remove.</param>
+    /// <returns>
+    /// The trimmed remainder when the prefix matches at a path-segment boundary; otherwise, the original path.
+    /// </returns>
     public static string StripDomainPrefix(string decodedPath, string domainPath)
     {
         if (domainPath.Length > 0

@@ -16,7 +16,10 @@ public sealed class CategoryUrlContentFinder(
     /// Resolves a published page from a URL containing a visible category segment.
     /// </summary>
     /// <param name="request">The published request to resolve.</param>
-    /// <returns><c>true</c> if a matching page is found; <c>false</c> otherwise.</returns>
+    /// <summary>
+    /// Resolves a published page from a URL containing a visible category segment.
+    /// </summary>
+    /// <returns><c>true</c> if a matching page is found and assigned to the category; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {
         if (request.PublishedContent is not null)

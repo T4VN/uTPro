@@ -18,6 +18,9 @@ public sealed class UrlRoutingComposer : IComposer
     /// <summary>
     /// Registers URL-routing configuration, services, URL providers, and content finders with Umbraco.
     /// </summary>
+    /// <summary>
+    /// Configures URL-routing services, providers, content finders, and related notification handling.
+    /// </summary>
     /// <param name="builder">The Umbraco builder used to configure the application.</param>
     public void Compose(IUmbracoBuilder builder)
     {

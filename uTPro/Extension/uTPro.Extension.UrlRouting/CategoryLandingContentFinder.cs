@@ -23,6 +23,9 @@ public sealed class CategoryLandingContentFinder(
     /// Resolves a category landing URL to its parent published content.
     /// </summary>
     /// <param name="request">The published request to resolve.</param>
+    /// <summary>
+    /// Resolves a category landing URL to its parent page.
+    /// </summary>
     /// <returns><c>true</c> if the request matches a visible category landing URL; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {
