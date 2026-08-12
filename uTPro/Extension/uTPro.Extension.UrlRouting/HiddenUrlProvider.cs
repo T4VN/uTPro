@@ -98,12 +98,6 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
     }
 
     /// <summary>
-    /// Retrieves URL information while suppressing transparent container URLs and removing transparent ancestor segments from descendant URLs.
-    /// </summary>
-    /// <param name="content">The content whose URL information is retrieved.</param>
-    /// <returns>
-    /// URL information for the content, including a no-URL message for transparent containers and cleaned URLs for descendants of transparent containers.
-    /// <summary>
     /// Retrieves URLs for content while removing URL segments belonging to transparent ancestor containers.
     /// </summary>
     /// <param name="content">The content whose URLs are retrieved.</param>
@@ -194,11 +188,9 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
     private static string PathKey(string? culture, string path) => (culture ?? string.Empty) + "|" + path;
 
     /// <summary>
-/// Extracts the path from a URI.
-/// </summary>
-/// <param name="url">The URI whose path is extracted.</param>
-/// <returns>The absolute path for an absolute URI, or the original string for a relative URI.</returns>
-private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
+    /// Extracts the path from a URI.
+    /// </summary>
+    private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
 
     /// <summary>
     /// Strips container segments from the path. Uses the ordered ancestor list to determine
@@ -280,15 +272,8 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     }
 
     /// <summary>
-    /// Builds an ordered list (root→leaf) of ancestor URL segments. Entries are null for
-    /// non-container ancestors, and non-null for transparent containers. This preserves
-    /// positional information needed by <see cref="StripSegmentsFromPath"/>.
-    /// <summary>
     /// Builds the ordered URL segment list for the specified ancestors.
     /// </summary>
-    /// <param name="ancestors">The ancestors and whether each one is a transparent container.</param>
-    /// <param name="culture">The culture used to resolve transparent ancestor URL segments.</param>
-    /// <returns>A positional list containing URL segments for transparent ancestors and null entries for other ancestors.</returns>
     private IReadOnlyList<string?> BuildAncestorSegments(
         IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)> ancestors, string culture)
     {
@@ -309,16 +294,9 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     }
 
     /// <summary>
-    /// Gets the ordered ancestor list with transparency flags. Returns null if no transparent
-    /// containers exist in the ancestry (indicating no work to do).
-    /// <summary>
     /// Gets the content's ancestors in root-to-leaf order with their transparency status.
+    /// Returns null if no transparent containers exist in the ancestry.
     /// </summary>
-    /// <param name="content">The content whose ancestors are resolved.</param>
-    /// <returns>
-    /// The ordered ancestors and their transparency status, or <c>null</c> if the content cannot be resolved
-    /// or has no transparent ancestors.
-    /// </returns>
     private IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)>? GetAncestorContainers(
         Umbraco.Cms.Core.Models.IContent content)
     {

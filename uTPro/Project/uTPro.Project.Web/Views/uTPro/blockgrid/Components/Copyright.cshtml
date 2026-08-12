@@ -18,7 +18,11 @@ else
         <div class="copyright">
             @foreach (var item in Model.Content.ListLink ?? [])
             {
-                <a href="@item.Url" target="@item.Target" rel="noopener">@item.Name</a> 
+                var safeUrl = SchemeUrlHelper.GetSafeUrl(item.Url);
+                if (safeUrl is not null)
+                {
+                    <a href="@safeUrl" target="@item.Target" rel="noopener">@item.Name</a>
+                }
             }
             <br />
             <ul>

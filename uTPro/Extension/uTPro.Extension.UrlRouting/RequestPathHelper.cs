@@ -12,9 +12,7 @@ internal static class RequestPathHelper
     /// <remarks>
     /// Without the boundary check, a domain path of "vi" would incorrectly match "vietnam/bai-viet"
     /// and produce "etnam/bai-viet".
-    /// <summary>
-    /// Removes a matching domain path prefix from a request path.
-    /// </summary>
+    /// </remarks>
     /// <param name="decodedPath">The request path from which to remove the prefix.</param>
     /// <param name="domainPath">The domain path prefix to remove.</param>
     /// <returns>

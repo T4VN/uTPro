@@ -20,11 +20,8 @@ public sealed class CategoryLandingContentFinder(
     public const string CategoryLandingItemKey = "uTPro:CategoryLandingKey";
 
     /// <summary>
-    /// Resolves a category landing URL to its parent published content.
-    /// </summary>
-    /// <param name="request">The published request to resolve.</param>
-    /// <summary>
-    /// Resolves a category landing URL to its parent page.
+    /// Resolves a category landing URL to its parent page, returning the category key
+    /// via <see cref="HttpContext.Items"/> for downstream filtering.
     /// </summary>
     /// <returns><c>true</c> if the request matches a visible category landing URL; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
@@ -102,6 +99,17 @@ public sealed class CategoryLandingContentFinder(
         }
 
         if (hidden.IsTransparent(parentPage))
+        {
+            return Task.FromResult(false);
+        }
+
+        // Verify at least one child of parentPage actually belongs to this category.
+        // Without this check, any valid category slug appended to any page returns 200
+        // with an empty list, creating phantom pages for search engines.
+        var hasMatchingChild = parentPage.Children()?.Any(child =>
+            CategoryUrlService.PageHasCategory(child, categoryKey)) == true;
+
+        if (!hasMatchingChild)
         {
             return Task.FromResult(false);
         }
