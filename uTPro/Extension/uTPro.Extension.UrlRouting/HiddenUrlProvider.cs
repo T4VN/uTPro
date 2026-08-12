@@ -201,29 +201,30 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
 private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
 
     /// <summary>
-    /// Strips container segments from the path by position. Container ancestors appear
-    /// from the root down, so their segments occupy prefix positions in the path.
-    /// Only removes a segment when it matches the expected container at that position,
-    /// preventing false removal of legitimate page segments that happen to share the name.
-    /// <summary>
-    /// Removes matching transparent-container segments from a URL path at their expected ancestor positions.
+    /// Strips container segments from the path. Uses the ordered ancestor list to determine
+    /// which segments to remove, accounting for domain-root offset (the URL may not contain
+    /// segments for ancestors above the domain root).
     /// </summary>
-    /// <param name="path">The URL path to clean.</param>
-    /// <param name="ancestorSegments">Ancestor segments ordered from root to leaf, with null entries for non-container ancestors.</param>
-    /// <returns>The path with matching container segments removed while preserving leading and trailing slashes.</returns>
     private static string StripSegmentsFromPath(string path, IReadOnlyList<string?> ancestorSegments)
     {
         var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        // ancestorSegments is ordered root→down. Null entries represent non-container ancestors.
-        // Walk from the beginning of the path: for each ancestor segment, if the path part matches
-        // at that position, remove it (shift remaining parts left).
-        for (var i = Math.Min(ancestorSegments.Count, parts.Count) - 1; i >= 0; i--)
+        // Find the offset where ancestor segments start appearing in the path.
+        // Ancestors above the domain root won't appear in the URL, so we need to
+        // find where the first non-null ancestor segment actually matches in the path.
+        var offset = FindAncestorOffset(parts, ancestorSegments);
+
+        // Walk backwards to avoid index shift issues when removing.
+        for (var i = Math.Min(ancestorSegments.Count, parts.Count + offset) - 1; i >= offset; i--)
         {
-            if (ancestorSegments[i] is { } s
-                && string.Equals(parts[i], s, StringComparison.OrdinalIgnoreCase))
+            if (ancestorSegments[i] is { } s)
             {
-                parts.RemoveAt(i);
+                var pathIndex = i - offset;
+                if (pathIndex >= 0 && pathIndex < parts.Count
+                    && string.Equals(parts[pathIndex], s, StringComparison.OrdinalIgnoreCase))
+                {
+                    parts.RemoveAt(pathIndex);
+                }
             }
         }
 
@@ -235,6 +236,47 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Determines the offset in <paramref name="ancestorSegments"/> where the path begins.
+    /// Ancestors above the domain root don't appear in the URL, so we scan for the first
+    /// non-null ancestor segment that matches a path part at a consistent offset.
+    /// </summary>
+    private static int FindAncestorOffset(List<string> parts, IReadOnlyList<string?> ancestorSegments)
+    {
+        // Try each possible offset: how many ancestor entries are "above" the URL
+        for (var offset = 0; offset < ancestorSegments.Count; offset++)
+        {
+            var match = true;
+            var foundAny = false;
+
+            for (var i = offset; i < ancestorSegments.Count; i++)
+            {
+                var pathIndex = i - offset;
+                if (pathIndex >= parts.Count) break;
+
+                if (ancestorSegments[i] is null)
+                {
+                    // Non-container ancestor — its segment should be in the URL
+                    continue;
+                }
+
+                foundAny = true;
+                if (!string.Equals(parts[pathIndex], ancestorSegments[i], StringComparison.OrdinalIgnoreCase))
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match && foundAny)
+            {
+                return offset;
+            }
+        }
+
+        return 0;
     }
 
     /// <summary>
@@ -303,20 +345,23 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     }
 
     /// <summary>
-    /// Determines whether a URL path contains a transparent ancestor segment at its expected position.
+    /// Determines whether a URL path contains a transparent ancestor segment at its expected position,
+    /// accounting for domain-root offset.
     /// </summary>
-    /// <param name="url">The URL whose path is examined.</param>
-    /// <param name="ancestorSegments">The ordered ancestor segments, including null entries for non-transparent ancestors.</param>
-    /// <returns><c>true</c> if a matching ancestor segment occurs at its corresponding position; otherwise, <c>false</c>.</returns>
     private static bool PathContainsSegment(Uri url, IReadOnlyList<string?> ancestorSegments)
     {
         var path = url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;
-        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        for (var i = 0; i < Math.Min(ancestorSegments.Count, parts.Length); i++)
+        var offset = FindAncestorOffset(parts, ancestorSegments);
+
+        for (var i = offset; i < ancestorSegments.Count; i++)
         {
+            var pathIndex = i - offset;
+            if (pathIndex >= parts.Count) break;
+
             if (ancestorSegments[i] is { } s
-                && string.Equals(parts[i], s, StringComparison.OrdinalIgnoreCase))
+                && string.Equals(parts[pathIndex], s, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
