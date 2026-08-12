@@ -15,6 +15,7 @@ export const UTPRO_PREFIX = 'uTPro.';
 
 const SECTION_SETTINGS = 'Umb.Section.Settings';
 const SETTINGS_MENU = 'Umb.Menu.AdvancedSettings';
+const UTPRO_FEATURE_MENU = 'uTPro.Feature.Menu';
 
 // uTPro-branded extensions that are NOT navigable apps (the dashboard/header app itself).
 const EXCLUDED_ALIASES = new Set([
@@ -45,7 +46,7 @@ const fromSection = (m) => {
 const fromMenuItem = (m) => {
     const entityType = m.meta?.entityType;
     const menus = m.meta?.menus || [];
-    if (!entityType || !menus.includes(SETTINGS_MENU)) return null;
+    if (!entityType || (!menus.includes(SETTINGS_MENU) && !menus.includes(UTPRO_FEATURE_MENU))) return null;
     return {
         key: m.alias,
         id: m.meta?.id,

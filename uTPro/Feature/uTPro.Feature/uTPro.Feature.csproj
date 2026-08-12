@@ -21,6 +21,7 @@
     <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="5.0.1" />
     <PackageReference Include="uTPro.Feature.UrlViewer" Version="3.1.0" />
     <PackageReference Include="uTPro.Feature.SEOAudit" Version="2.0.3" />
+    <PackageReference Include="uTPro.Feature.SearchPlus" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
