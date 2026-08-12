@@ -116,10 +116,24 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
 
         var urls = await _inner.GetAllAsync(content);
 
-        var containerSegments = GetAncestorContainerSegments(content, urls);
-        if (containerSegments.Count == 0)
+        var ancestorContainers = GetAncestorContainers(content);
+        if (ancestorContainers is null)
         {
             return urls;
+        }
+
+        // Cache ancestor segments per culture to avoid redundant GetUrlSegment calls
+        var segmentsByCulture = new Dictionary<string, IReadOnlyList<string?>>(StringComparer.OrdinalIgnoreCase);
+
+        IReadOnlyList<string?> GetSegmentsForCulture(string? culture)
+        {
+            var key = culture ?? string.Empty;
+            if (!segmentsByCulture.TryGetValue(key, out var segments))
+            {
+                segments = BuildAncestorSegments(ancestorContainers, key);
+                segmentsByCulture[key] = segments;
+            }
+            return segments;
         }
 
         var result = new HashSet<UrlInfo>();
@@ -133,7 +147,8 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
                 continue;
             }
 
-            if (!PathContainsSegment(info.Url, containerSegments))
+            var ancestorSegments = GetSegmentsForCulture(info.Culture);
+            if (!PathContainsSegment(info.Url, ancestorSegments))
             {
                 result.Add(info);
                 seenPaths.Add(PathKey(info.Culture, PathOf(info.Url)));
@@ -142,12 +157,18 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
 
         foreach (var info in urls)
         {
-            if (info.Url is null || !PathContainsSegment(info.Url, containerSegments))
+            if (info.Url is null)
             {
                 continue;
             }
 
-            var cleanedPath = StripSegmentsFromPath(PathOf(info.Url), containerSegments);
+            var ancestorSegments = GetSegmentsForCulture(info.Culture);
+            if (!PathContainsSegment(info.Url, ancestorSegments))
+            {
+                continue;
+            }
+
+            var cleanedPath = StripSegmentsFromPath(PathOf(info.Url), ancestorSegments);
             if (!seenPaths.Add(PathKey(info.Culture, cleanedPath)))
             {
                 continue;
@@ -210,35 +231,13 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     /// non-container ancestors, and non-null for transparent containers. This preserves
     /// positional information needed by <see cref="StripSegmentsFromPath"/>.
     /// </summary>
-    private IReadOnlyList<string?> GetAncestorContainerSegments(
-        Umbraco.Cms.Core.Models.IContent content, ISet<UrlInfo> urls)
+    private IReadOnlyList<string?> BuildAncestorSegments(
+        IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)> ancestors, string culture)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
-            || umbracoContext.Content is null)
-        {
-            return [];
-        }
-
-        var node = umbracoContext.Content.GetById(content.Key);
-        if (node is null)
-        {
-            return [];
-        }
-
-        // Ancestors() returns parent→root order; reverse to get root→leaf.
-        var ancestors = node.Ancestors().Reverse().ToList();
-        if (!ancestors.Any(a => _hidden.IsTransparent(a)))
-        {
-            return [];
-        }
-
-        // Determine the primary culture for segment resolution
-        var culture = urls.Select(u => u.Culture).FirstOrDefault(c => c is not null) ?? string.Empty;
-
         var result = new List<string?>(ancestors.Count);
-        foreach (var ancestor in ancestors)
+        foreach (var (ancestor, isTransparent) in ancestors)
         {
-            if (_hidden.IsTransparent(ancestor))
+            if (isTransparent)
             {
                 var segment = _documentUrlService.GetUrlSegment(ancestor.Key, culture, false);
                 result.Add(segment);
@@ -248,8 +247,36 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
                 result.Add(null);
             }
         }
-
         return result;
+    }
+
+    /// <summary>
+    /// Gets the ordered ancestor list with transparency flags. Returns null if no transparent
+    /// containers exist in the ancestry (indicating no work to do).
+    /// </summary>
+    private IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)>? GetAncestorContainers(
+        Umbraco.Cms.Core.Models.IContent content)
+    {
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
+            || umbracoContext.Content is null)
+        {
+            return null;
+        }
+
+        var node = umbracoContext.Content.GetById(content.Key);
+        if (node is null)
+        {
+            return null;
+        }
+
+        // Ancestors() returns parent→root order; reverse to get root→leaf.
+        var ancestors = node.Ancestors().Reverse().ToList();
+        if (!ancestors.Any(a => _hidden.IsTransparent(a)))
+        {
+            return null;
+        }
+
+        return ancestors.Select(a => (a, _hidden.IsTransparent(a))).ToList();
     }
 
     private static bool PathContainsSegment(Uri url, IReadOnlyList<string?> ancestorSegments)
