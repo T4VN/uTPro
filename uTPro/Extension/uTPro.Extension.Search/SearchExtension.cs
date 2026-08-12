@@ -1,5 +1,6 @@
 using Examine;
 using Examine.Search;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
@@ -11,21 +12,25 @@ namespace uTPro.Extension.Search;
 /// Full-text search service using Umbraco's Examine ExternalIndex (Lucene).
 /// Uses ManagedQuery for proper tokenization and relevance scoring,
 /// combined with in-memory path filtering for scope restriction.
+/// When uTPro.Feature.SearchPlus is installed, automatically expands queries with synonyms.
 /// </summary>
 internal sealed class SearchExtension : ISearchExtension
 {
     private readonly IExamineManager _examineManager;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly ICurrentSiteExtension _currentSite;
+    private readonly IServiceProvider _serviceProvider;
 
     public SearchExtension(
         IExamineManager examineManager,
         IUmbracoContextAccessor umbracoContextAccessor,
-        ICurrentSiteExtension currentSite)
+        ICurrentSiteExtension currentSite,
+        IServiceProvider serviceProvider)
     {
         _examineManager = examineManager;
         _umbracoContextAccessor = umbracoContextAccessor;
         _currentSite = currentSite;
+        _serviceProvider = serviceProvider;
     }
 
     /// <inheritdoc />
@@ -52,10 +57,32 @@ internal sealed class SearchExtension : ISearchExtension
         // Build the Examine query using ManagedQuery (best for full-text relevance)
         var examineQuery = searcher.CreateQuery("content");
 
-        // ManagedQuery handles tokenization, fuzzy matching, and field boosting automatically
-        var boolOp = fields != null && fields.Length > 0
-            ? examineQuery.ManagedQuery(query.Trim(), fields)
-            : examineQuery.ManagedQuery(query.Trim());
+        // Expand query with synonyms if SearchPlus is installed
+        var searchTerms = ExpandWithSynonyms(query.Trim());
+
+        // Build OR query across all expanded terms
+        IBooleanOperation boolOp;
+        if (searchTerms.Count == 1)
+        {
+            // Single term (no synonyms found) — use standard ManagedQuery
+            boolOp = fields != null && fields.Length > 0
+                ? examineQuery.ManagedQuery(searchTerms[0], fields)
+                : examineQuery.ManagedQuery(searchTerms[0]);
+        }
+        else
+        {
+            // Multiple synonyms — OR them together for broader results
+            boolOp = fields != null && fields.Length > 0
+                ? examineQuery.ManagedQuery(searchTerms[0], fields)
+                : examineQuery.ManagedQuery(searchTerms[0]);
+
+            for (var i = 1; i < searchTerms.Count; i++)
+            {
+                boolOp = fields != null && fields.Length > 0
+                    ? boolOp.Or().ManagedQuery(searchTerms[i], fields)
+                    : boolOp.Or().ManagedQuery(searchTerms[i]);
+            }
+        }
 
         // Apply ordering
         IOrdering ordered = ApplyOrdering(boolOp, orderBy);
@@ -151,5 +178,39 @@ internal sealed class SearchExtension : ISearchExtension
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Expand query with synonyms if uTPro.Feature.SearchPlus is installed.
+    /// Uses runtime service resolution so SearchPlus remains an optional dependency.
+    /// Falls back to original query if SearchPlus is not installed.
+    /// </summary>
+    private IReadOnlyList<string> ExpandWithSynonyms(string query)
+    {
+        try
+        {
+            // Try to resolve ISynonymProvider from DI (only available if SearchPlus is installed)
+            var synonymProviderType = Type.GetType(
+                "uTPro.Feature.SearchPlus.Services.ISynonymProvider, uTPro.Feature.SearchPlus");
+
+            if (synonymProviderType == null)
+                return new[] { query };
+
+            var synonymProvider = _serviceProvider.GetService(synonymProviderType);
+            if (synonymProvider == null)
+                return new[] { query };
+
+            // Call Expand(string) via reflection to avoid compile-time dependency
+            var expandMethod = synonymProviderType.GetMethod("Expand");
+            if (expandMethod == null)
+                return new[] { query };
+
+            var result = expandMethod.Invoke(synonymProvider, new object[] { query }) as IReadOnlyList<string>;
+            return result ?? new[] { query };
+        }
+        catch
+        {
+            return new[] { query };
+        }
     }
 }

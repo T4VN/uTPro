@@ -1,4 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
 using System.Drawing;
 
 namespace uTPro.Extension
