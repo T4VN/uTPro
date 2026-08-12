@@ -6,8 +6,7 @@
     var bkg = string.Empty;
     var bkgImg = Model.Content?.BackgroundImage?.Url() ?? "";
     var bkgColor = Model.Content?.BackgroundColor?.Color ?? "";
-    var bkgOpacity = Model.Content?.BackgroundOpacity ?? 1m;
-
+    var bkgOpacity = Math.Clamp(Model.Content?.BackgroundOpacity ?? 1m, 0, 1);
     if (!string.IsNullOrEmpty(bkgImg))
     {
         if (!string.IsNullOrEmpty(bkgColor) && bkgOpacity < 1)

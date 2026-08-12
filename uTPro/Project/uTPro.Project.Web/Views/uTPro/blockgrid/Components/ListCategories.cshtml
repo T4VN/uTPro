@@ -1,6 +1,6 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTpro__ListCategories>>
 @{
-    var categoryUrlService = Context.RequestServices.GetService<uTPro.Project.Web.Configure.CategoryUrlService>();
+    var categoryUrlService = Context.RequestServices.GetService<CategoryUrlService>();
     var currentPage = Umbraco.AssignedContentItem;
 }
 

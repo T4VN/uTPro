@@ -28,9 +28,9 @@
     string? categoryCrumbName = null;
     string? categoryCrumbUrl = null;
     var isCategoryLanding = Context.Items.TryGetValue(
-        uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingValue);
+        CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingValue);
 
-    var categoryUrlService = Context.RequestServices.GetService<uTPro.Project.Web.Configure.CategoryUrlService>();
+    var categoryUrlService = Context.RequestServices.GetService<CategoryUrlService>();
 
     if (!isCategoryLanding)
     {

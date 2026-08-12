@@ -38,9 +38,9 @@
     var isCategoryFiltered = false;
     string? categoryFilterName = null;
     if ((filterCategory == null || !filterCategory.Any())
-        && Context.Items.TryGetValue(uTPro.Project.Web.Configure.CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem))
+        && Context.Items.TryGetValue(CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingItem)
+        && categoryLandingItem is Guid urlCategoryKey)
     {
-        var urlCategoryKey = (Guid)categoryLandingItem!;
         if (urlCategoryKey != Guid.Empty)
         {
             isCategoryFiltered = true;

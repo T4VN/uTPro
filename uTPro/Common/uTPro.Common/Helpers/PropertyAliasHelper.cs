@@ -17,7 +17,11 @@ namespace uTPro.Extension
     {
         /// <summary>
         /// Converts a PascalCase property name to its camelCase Umbraco property alias.
-        /// </summary>
+        /// <summary>
+                /// Converts a PascalCase property name to a camelCase alias.
+                /// </summary>
+                /// <param name="propertyName">The property name to convert.</param>
+                /// <returns>The camelCase alias, or the original value if it is null or empty.</returns>
         public static string ToAlias(string propertyName)
             => string.IsNullOrEmpty(propertyName)
                 ? propertyName

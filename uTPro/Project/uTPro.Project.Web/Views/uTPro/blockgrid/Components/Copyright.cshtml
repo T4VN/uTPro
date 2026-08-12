@@ -15,7 +15,16 @@ else
 }
 <div style="background-color: #282b34">
     <div class="container">
-        <div id="copyright">
+        <div class="copyright">
+            @foreach (var item in Model.Content.ListLink ?? [])
+            {
+                var safeUrl = SchemeUrlHelper.GetSafeUrl(item.Url);
+                if (safeUrl is not null)
+                {
+                    <a href="@safeUrl" target="@item.Target" rel="noopener">@item.Name</a>
+                }
+            }
+            <br />
             <ul>
                 <li>&copy; T4VN</li>
                 <li>Design: <a target="_blank" rel="noopener" href="https://html5up.net">HTML5 UP</a></li>

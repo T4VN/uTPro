@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\uTPro.Extension.CurrentSite\uTPro.Extension.CurrentSite.csproj" />
     <ProjectReference Include="..\uTPro.Extension.Search\uTPro.Extension.Search.csproj" />
+    <ProjectReference Include="..\uTPro.Extension.UrlRouting\uTPro.Extension.UrlRouting.csproj" />
   </ItemGroup>
 
 </Project>
