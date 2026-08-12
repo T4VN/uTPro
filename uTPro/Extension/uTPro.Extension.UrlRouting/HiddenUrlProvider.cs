@@ -103,6 +103,12 @@ public sealed class HiddenContainerUrlInfoProvider : IPublishedUrlInfoProvider
     /// <param name="content">The content whose URL information is retrieved.</param>
     /// <returns>
     /// URL information for the content, including a no-URL message for transparent containers and cleaned URLs for descendants of transparent containers.
+    /// <summary>
+    /// Retrieves URLs for content while removing URL segments belonging to transparent ancestor containers.
+    /// </summary>
+    /// <param name="content">The content whose URLs are retrieved.</param>
+    /// <returns>
+    /// The content URLs with transparent ancestor segments removed, or a no-URL message for transparent content.
     /// </returns>
     public async Task<ISet<UrlInfo>> GetAllAsync(Umbraco.Cms.Core.Models.IContent content)
     {
@@ -199,7 +205,12 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     /// from the root down, so their segments occupy prefix positions in the path.
     /// Only removes a segment when it matches the expected container at that position,
     /// preventing false removal of legitimate page segments that happen to share the name.
+    /// <summary>
+    /// Removes matching transparent-container segments from a URL path at their expected ancestor positions.
     /// </summary>
+    /// <param name="path">The URL path to clean.</param>
+    /// <param name="ancestorSegments">Ancestor segments ordered from root to leaf, with null entries for non-container ancestors.</param>
+    /// <returns>The path with matching container segments removed while preserving leading and trailing slashes.</returns>
     private static string StripSegmentsFromPath(string path, IReadOnlyList<string?> ancestorSegments)
     {
         var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -230,7 +241,12 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     /// Builds an ordered list (root→leaf) of ancestor URL segments. Entries are null for
     /// non-container ancestors, and non-null for transparent containers. This preserves
     /// positional information needed by <see cref="StripSegmentsFromPath"/>.
+    /// <summary>
+    /// Builds the ordered URL segment list for the specified ancestors.
     /// </summary>
+    /// <param name="ancestors">The ancestors and whether each one is a transparent container.</param>
+    /// <param name="culture">The culture used to resolve transparent ancestor URL segments.</param>
+    /// <returns>A positional list containing URL segments for transparent ancestors and null entries for other ancestors.</returns>
     private IReadOnlyList<string?> BuildAncestorSegments(
         IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)> ancestors, string culture)
     {
@@ -253,7 +269,14 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
     /// <summary>
     /// Gets the ordered ancestor list with transparency flags. Returns null if no transparent
     /// containers exist in the ancestry (indicating no work to do).
+    /// <summary>
+    /// Gets the content's ancestors in root-to-leaf order with their transparency status.
     /// </summary>
+    /// <param name="content">The content whose ancestors are resolved.</param>
+    /// <returns>
+    /// The ordered ancestors and their transparency status, or <c>null</c> if the content cannot be resolved
+    /// or has no transparent ancestors.
+    /// </returns>
     private IReadOnlyList<(IPublishedContent Ancestor, bool IsTransparent)>? GetAncestorContainers(
         Umbraco.Cms.Core.Models.IContent content)
     {
@@ -279,6 +302,12 @@ private static string PathOf(Uri url) => url.IsAbsoluteUri ? url.AbsolutePath : 
         return ancestors.Select(a => (a, _hidden.IsTransparent(a))).ToList();
     }
 
+    /// <summary>
+    /// Determines whether a URL path contains a transparent ancestor segment at its expected position.
+    /// </summary>
+    /// <param name="url">The URL whose path is examined.</param>
+    /// <param name="ancestorSegments">The ordered ancestor segments, including null entries for non-transparent ancestors.</param>
+    /// <returns><c>true</c> if a matching ancestor segment occurs at its corresponding position; otherwise, <c>false</c>.</returns>
     private static bool PathContainsSegment(Uri url, IReadOnlyList<string?> ancestorSegments)
     {
         var path = url.IsAbsoluteUri ? url.AbsolutePath : url.OriginalString;

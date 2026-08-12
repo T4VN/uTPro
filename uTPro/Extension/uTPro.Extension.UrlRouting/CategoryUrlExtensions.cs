@@ -19,7 +19,12 @@ public static class CategoryUrlExtensions
     /// correctly handles transparent containers.
     /// When a specific <paramref name="categoryKey"/> is provided and doesn't match
     /// the first visible category, falls back to path manipulation on the resolved URL.
-    /// </remarks>
+    /// <summary>
+    /// Generates a URL for the page using a visible category.
+    /// </summary>
+    /// <param name="culture">The culture used to resolve the URL and category segments.</param>
+    /// <param name="categoryKey">The key of the category to use; when omitted, the first visible category is used.</param>
+    /// <returns>The category-specific page URL, or <see langword="null"/> when no matching category or valid URL exists.</returns>
     public static string? GetCategoryUrl(
         this IPublishedContent page,
         CategoryUrlService categoryUrlService,
@@ -81,7 +86,11 @@ public static class CategoryUrlExtensions
     /// <param name="culture">The culture used to resolve the page URL and category segments.</param>
     /// <returns>
     /// The category keys and corresponding URLs for categories with valid segments, or an empty list when no valid URLs can be generated.
-    /// </returns>
+    /// <summary>
+    /// Generates URLs for all visible categories associated with the page.
+    /// </summary>
+    /// <param name="culture">The culture used to resolve category segments and the page URL.</param>
+    /// <returns>A list of category keys paired with their generated URLs.</returns>
     public static IReadOnlyList<(Guid CategoryKey, string Url)> GetAllCategoryUrls(
         this IPublishedContent page,
         CategoryUrlService categoryUrlService,
@@ -134,6 +143,12 @@ public static class CategoryUrlExtensions
         return result;
     }
 
+    /// <summary>
+    /// Replaces the category segment immediately before the page segment in a URL.
+    /// </summary>
+    /// <param name="url">The URL containing the category and page segments.</param>
+    /// <param name="categorySegment">The category segment to insert.</param>
+    /// <returns>The URL with the category segment replaced, or null if the URL does not contain a replaceable category segment.</returns>
     private static string? InsertCategorySegment(string url, string categorySegment)
     {
         var trailingSlash = path.EndsWith('/');

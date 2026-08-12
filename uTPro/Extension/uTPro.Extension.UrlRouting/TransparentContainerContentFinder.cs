@@ -55,6 +55,10 @@ public sealed class TransparentContainerContentFinder : IContentFinder
     /// Resolves a clean URL to published content by bypassing configured transparent containers.
     /// </summary>
     /// <param name="request">The published request to resolve.</param>
+    /// <summary>
+    /// Resolves content for a URL that bypasses one or more transparent containers.
+    /// </summary>
+    /// <param name="request">The published request to resolve.</param>
     /// <returns><c>true</c> if content is resolved after bypassing a transparent container; <c>false</c> otherwise.</returns>
     public Task<bool> TryFindContent(IPublishedRequestBuilder request)
     {

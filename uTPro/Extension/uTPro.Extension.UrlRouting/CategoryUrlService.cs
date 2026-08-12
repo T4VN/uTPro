@@ -49,7 +49,12 @@ public sealed class CategoryUrlService(
     /// </summary>
     /// <param name="categoryItem">The category item whose URL segment is resolved.</param>
     /// <param name="culture">The culture used to resolve the URL segment, or the current variation culture when omitted.</param>
-    /// <returns>The normalized custom or generated URL segment, or <c>null</c> when the category item is unavailable or invalid.</returns>
+    /// <summary>
+    /// Resolves the URL segment for a category item.
+    /// </summary>
+    /// <param name="categoryItem">The category item whose URL segment is resolved.</param>
+    /// <param name="culture">The culture used to resolve the generated segment.</param>
+    /// <returns>The sanitized custom segment or generated segment, or <c>null</c> when the category item or segment is invalid.</returns>
     public string? GetCategorySegment(IPublishedContent? categoryItem, string? culture)
     {
         if (categoryItem is null || categoryItem.Key == Guid.Empty)
@@ -78,7 +83,9 @@ public sealed class CategoryUrlService(
 
     /// <summary>
     /// Invalidates the cached category slugs. Call this when category content is published.
-    /// </summary>
+    /// <summary>
+/// Clears all cached category slug mappings.
+/// </summary>
     public void InvalidateCache() => _slugCache.Clear();
 
     /// <summary>
@@ -90,6 +97,13 @@ public sealed class CategoryUrlService(
     /// <param name="siteRoot">The root content node from which to collect categories.</param>
     /// <returns>
     /// A case-insensitive mapping of category URL segments to category keys.
+    /// <summary>
+    /// Retrieves the visible category URL slugs for a site root.
+    /// </summary>
+    /// <param name="culture">The culture used to resolve category URLs.</param>
+    /// <param name="siteRoot">The site root whose visible category slugs are retrieved.</param>
+    /// <returns>
+    /// A case-insensitive mapping of category URL slugs to category keys, or an empty mapping when no site root is supplied.
     /// </returns>
     public Dictionary<string, Guid> GetAllVisibleCategorySlugs(string? culture, IPublishedContent? siteRoot = null)
     {
@@ -106,6 +120,11 @@ public sealed class CategoryUrlService(
     /// </summary>
     /// <param name="culture">The culture used to resolve category URL segments.</param>
     /// <param name="domainRootKey">The key of the domain root content item.</param>
+    /// <summary>
+    /// Gets the visible category URL slugs for a domain root and culture.
+    /// </summary>
+    /// <param name="culture">The culture used to resolve category URLs.</param>
+    /// <param name="domainRootKey">The key of the domain root content node.</param>
     /// <returns>A case-insensitive mapping of category URL slugs to category keys.</returns>
     public Dictionary<string, Guid> GetAllVisibleCategorySlugs(string? culture, Guid domainRootKey)
     {
@@ -152,7 +171,12 @@ public sealed class CategoryUrlService(
     /// </summary>
     /// <param name="currentNode">The content page for which to build the category URL.</param>
     /// <param name="currentCat">The category to use, or the page's first visible category when omitted.</param>
-    /// <returns>A tuple containing the category URL and display name, or empty values when the required content is unavailable.</returns>
+    /// <summary>
+    /// Builds the landing URL and display name for a page category.
+    /// </summary>
+    /// <param name="currentNode">The page for which to build the category landing URL.</param>
+    /// <param name="currentCat">The category to use; when omitted, the page's first visible category is used.</param>
+    /// <returns>A tuple containing the category URL and display name. The URL is empty when it cannot be built, while the name may still be available.</returns>
     public (string Url, string Name) GetUrlNameCategory(IPublishedContent currentNode, IPublishedContent? currentCat = null)
     {
         if (currentNode?.ContentType?.Alias is null)
