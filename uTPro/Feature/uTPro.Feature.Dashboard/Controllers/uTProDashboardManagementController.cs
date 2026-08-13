@@ -109,6 +109,7 @@ public class uTProDashboardManagementController(
     /// unrestricted content-root access (no content start-node configured).
     /// </summary>
     [HttpPost("create-site")]
+    [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
