@@ -43,6 +43,19 @@ async function authInit(authContext) {
     };
 }
 
+// Reads the anti-forgery token from the UMB-XSRF-TOKEN cookie (set by Umbraco).
+// Returns null when the cookie isn't present.
+function getAntiForgeryToken() {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'UMB-XSRF-TOKEN') {
+            return decodeURIComponent(value);
+        }
+    }
+    return null;
+}
+
 // Calls a management-API endpoint with auth; returns parsed JSON or null.
 // If the auth token isn't available yet, the request is skipped (avoids the 401 that
 // otherwise fires on tab/section navigation while the auth context is being re-provided).
@@ -140,11 +153,23 @@ export async function fetchMyTrail(authContext, range = 'month') {
 export async function createSite(authContext, name) {
     const init = await authInit(authContext);
     if (!init) return { ok: false, status: 0, body: { error: 'Not authenticated yet — try again.' } };
+
+    // The create-site endpoint requires an anti-forgery token (ValidateAntiForgeryToken attribute).
+    // Read the token from the UMB-XSRF-TOKEN cookie and include it in the Umb-Xsrf-Token header.
+    const xsrfToken = getAntiForgeryToken();
+    if (!xsrfToken) {
+        return { ok: false, status: 0, body: { error: 'Anti-forgery token not available.' } };
+    }
+
     try {
         const resp = await fetch(UTPRO.createSiteApi, {
             ...init,
             method: 'POST',
-            headers: { ...init.headers, 'Content-Type': 'application/json' },
+            headers: {
+                ...init.headers,
+                'Content-Type': 'application/json',
+                'Umb-Xsrf-Token': xsrfToken,
+            },
             body: JSON.stringify({ name }),
         });
         const body = await resp.json().catch(() => null);
