@@ -238,8 +238,8 @@ body {
 /* ── Content ── */
 .content {
     flex: 1;
-    padding: 40px 32px;
-    max-width: 820px;
+    padding: 40px 48px;
+    max-width: 100%;
 }
 
 .doc-content {
