@@ -611,10 +611,7 @@ html {
     box-sizing: border-box;
     word-break: normal;
     overflow-wrap: normal;
-    white-space: pre-wrap;
-    white-space: -moz-pre-wrap;
-    white-space: -pre-wrap;
-    white-space: -o-pre-wrap;
+    white-space: pre;
 }
 
 .doc-content pre code {
