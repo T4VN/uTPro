@@ -2,6 +2,7 @@
 layout: default
 title: "Home"
 description: "Developer documentation for uTPro - an Umbraco Starter Kit by T4VN. Setup guides, architecture, configurations, and developer reference."
+permalink: "/"
 ---
 
 # uTPro – Umbraco Turbo Pro
