@@ -123,18 +123,38 @@
             }
         });
 
-        // Auto-generate sub-navigation from h2/h3 headings in current page
+        // Auto-generate sub-navigation from headings in current page
+        // Docs use: h1 = main sections (4.1, 4.2...), h2 = sub (4.7.1...), h3 = sub-sub
         (function() {
             const subNav = document.getElementById('sub-nav');
             if (!subNav) return;
 
-            const headings = document.querySelectorAll('.doc-content h2, .doc-content h3');
+            // Get all headings h1-h3 inside doc content (skip the page title h1 if it's the first one)
+            const allHeadings = document.querySelectorAll('.doc-content h1, .doc-content h2, .doc-content h3');
+            if (allHeadings.length === 0) return;
+
+            // Determine the top-level heading tag used for sections
+            // (skip the very first h1 which is the page title)
+            const headings = [];
+            let skippedFirst = false;
+            allHeadings.forEach(h => {
+                if (!skippedFirst && h.tagName === 'H1') {
+                    skippedFirst = true;
+                    return; // skip page title
+                }
+                headings.push(h);
+            });
+
             if (headings.length === 0) return;
 
-            let currentH2List = null;
+            // Find the minimum heading level to use as "level 1"
+            const levels = headings.map(h => parseInt(h.tagName[1]));
+            const minLevel = Math.min(...levels);
+
+            let currentL1Container = subNav;
 
             headings.forEach((heading) => {
-                // Ensure heading has an id for anchor linking
+                // Ensure heading has an id
                 if (!heading.id) {
                     heading.id = heading.textContent
                         .trim()
@@ -143,28 +163,27 @@
                         .replace(/\s+/g, '-');
                 }
 
+                const level = parseInt(heading.tagName[1]) - minLevel; // 0 = level1, 1 = level2, 2 = level3
+
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = '#' + heading.id;
                 a.textContent = heading.textContent.trim();
                 li.appendChild(a);
 
-                if (heading.tagName === 'H2') {
-                    // Level 1 sub-item
+                if (level === 0) {
+                    // Main sub-section
                     li.classList.add('sub-level-1');
                     subNav.appendChild(li);
-                    // Create nested ul for potential h3 children
-                    currentH2List = document.createElement('ul');
-                    currentH2List.className = 'sub-nav-nested';
-                    subNav.appendChild(currentH2List);
-                } else if (heading.tagName === 'H3') {
-                    // Level 2 sub-item (nested under last h2)
+                    // Create container for children
+                    const nested = document.createElement('ul');
+                    nested.className = 'sub-nav-nested';
+                    subNav.appendChild(nested);
+                    currentL1Container = nested;
+                } else {
+                    // Child sub-section (level 2 or 3)
                     li.classList.add('sub-level-2');
-                    if (currentH2List) {
-                        currentH2List.appendChild(li);
-                    } else {
-                        subNav.appendChild(li);
-                    }
+                    currentL1Container.appendChild(li);
                 }
             });
 
@@ -179,7 +198,7 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         allSubLinks.forEach(link => link.classList.remove('active'));
-                        const activeLink = subNav.querySelector(`a[href="#${entry.target.id}"]`);
+                        const activeLink = subNav.querySelector(`a[href="#${CSS.escape(entry.target.id)}"]`);
                         if (activeLink) activeLink.classList.add('active');
                     }
                 });
