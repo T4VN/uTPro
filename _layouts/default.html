@@ -114,9 +114,9 @@
                 </a>
                 <button class="sidebar-close" id="sidebar-close" aria-label="Close navigation">✕</button>
             </div>
-            <div class="sidebar-search">
-                <input type="text" id="doc-search" placeholder="Search docs..." aria-label="Search documentation">
-                <div id="search-results" class="search-results"></div>
+            <div class="sidebar-search-mobile">
+                <input type="text" id="doc-search-mobile" placeholder="Search docs..." aria-label="Search documentation">
+                <div id="search-results-mobile" class="search-results"></div>
             </div>
             <nav class="sidebar-nav" aria-label="Documentation navigation">
                 <ul id="nav-list">
@@ -192,6 +192,10 @@
                     </svg>
                 </button>
                 <div class="topbar-title">{{ page.title | default: site.title }}</div>
+                <div class="topbar-search">
+                    <input type="text" id="doc-search" placeholder="Search docs..." aria-label="Search documentation">
+                    <div id="search-results" class="search-results"></div>
+                </div>
             </header>
 
             <main class="content">
@@ -281,14 +285,16 @@
             headings.forEach(h => observer.observe(h));
         })();
 
-        // Doc search
+        // Doc search (handles both desktop topbar and mobile sidebar inputs)
         (function() {
-            const searchInput = document.getElementById('doc-search');
-            const searchResults = document.getElementById('search-results');
-            if (!searchInput || !searchResults) return;
+            const inputs = [
+                { input: document.getElementById('doc-search'), results: document.getElementById('search-results') },
+                { input: document.getElementById('doc-search-mobile'), results: document.getElementById('search-results-mobile') }
+            ].filter(s => s.input && s.results);
+
+            if (inputs.length === 0) return;
 
             let searchData = null;
-            let debounceTimer = null;
 
             async function loadSearchData() {
                 if (searchData) return searchData;
@@ -310,10 +316,10 @@
                 return snippet.replace(new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>');
             }
 
-            async function doSearch(query) {
+            async function doSearch(query, resultsEl) {
                 if (query.length < 2) {
-                    searchResults.style.display = 'none';
-                    searchResults.innerHTML = '';
+                    resultsEl.style.display = 'none';
+                    resultsEl.innerHTML = '';
                     return;
                 }
 
@@ -324,33 +330,37 @@
                     .slice(0, 8);
 
                 if (results.length === 0) {
-                    searchResults.innerHTML = '<div class="search-no-result">No results found</div>';
-                    searchResults.style.display = 'block';
+                    resultsEl.innerHTML = '<div class="search-no-result">No results found</div>';
+                    resultsEl.style.display = 'block';
                     return;
                 }
 
-                searchResults.innerHTML = results.map(item => `
+                resultsEl.innerHTML = results.map(item => `
                     <a href="${item.url}" class="search-result-item">
                         <div class="search-result-title">${item.title}</div>
                         <div class="search-result-snippet">${highlightMatch(item.content, query)}</div>
                     </a>
                 `).join('');
-                searchResults.style.display = 'block';
+                resultsEl.style.display = 'block';
             }
 
-            searchInput.addEventListener('input', (e) => {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => doSearch(e.target.value.trim()), 200);
-            });
-
-            searchInput.addEventListener('focus', () => {
-                if (searchInput.value.trim().length >= 2) doSearch(searchInput.value.trim());
+            inputs.forEach(({ input, results }) => {
+                let timer = null;
+                input.addEventListener('input', (e) => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => doSearch(e.target.value.trim(), results), 200);
+                });
+                input.addEventListener('focus', () => {
+                    if (input.value.trim().length >= 2) doSearch(input.value.trim(), results);
+                });
             });
 
             document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.style.display = 'none';
-                }
+                inputs.forEach(({ input, results }) => {
+                    if (!input.contains(e.target) && !results.contains(e.target)) {
+                        results.style.display = 'none';
+                    }
+                });
             });
         })();
     </script>
