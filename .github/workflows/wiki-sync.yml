@@ -36,17 +36,33 @@ jobs:
 
       - name: Add Jekyll front matter to docs
         run: |
+          declare -A DESCRIPTIONS
+          DESCRIPTIONS["Home"]="Developer documentation for uTPro – an Umbraco Starter Kit by T4VN. Setup guides, architecture, configurations, and developer reference."
+          DESCRIPTIONS["1.-Intro"]="Introduction to uTPro – features, architecture overview, tech stack, and core principles of the Umbraco Starter Kit."
+          DESCRIPTIONS["2.-Setup"]="Step-by-step setup guide for uTPro: domain configuration, database setup, uSync data import, and first run."
+          DESCRIPTIONS["3.-Project-Structure"]="uTPro solution architecture: modular .NET projects, middleware pipeline, and Program.cs configuration."
+          DESCRIPTIONS["4.-Configurations"]="Complete configuration reference for uTPro: language, security, performance, SEO, database, load balancing, and feature packages."
+          DESCRIPTIONS["5.-Script-Queue"]="uTPro Script Queue system: load JS/CSS only when a block component renders. Dependency-aware, deferred, and optimized."
+          DESCRIPTIONS["6.-Dashboard"]="uTPro backoffice dashboard: version check, site statistics, audit trail chart, and quick management links."
+          DESCRIPTIONS["7.-Content-Editing"]="Content editing guide for uTPro: pages, Block Grid components, SEO fields, multilingual content, and media."
+          DESCRIPTIONS["8.-Global-Settings"]="CMS-driven global settings in uTPro: favicon, robots.txt, image optimization, forms, and security headers."
+          DESCRIPTIONS["9.-Developer-Reference"]="Developer reference for uTPro: Razor helpers, C# extension methods, tag helpers, and utility classes."
+          DESCRIPTIONS["10.-Backoffice-Tools"]="Backoffice tools in uTPro: Block Preview, error pages, SEO Audit, File Manager, Job Monitor, Form Builder."
+
           for file in docs/*.md; do
             # Skip if already has front matter
             if head -1 "$file" | grep -q "^---"; then
               continue
             fi
-            # Extract title from filename: "1.-Intro.md" -> "Intro"
+            # Extract basename without extension
             basename_noext=$(basename "$file" .md)
+            # Extract title from filename: "1.-Intro.md" -> "Intro"
             title=$(echo "$basename_noext" | sed 's/^[0-9]*\.-//' | sed 's/-/ /g' | sed 's/\./ /g')
+            # Get description or use default
+            desc="${DESCRIPTIONS[$basename_noext]:-"uTPro documentation – $title. Developer guide for the Umbraco Starter Kit by T4VN."}"
             # Prepend front matter
             tmpfile=$(mktemp)
-            printf '%s\n' "---" "layout: default" "title: \"$title\"" "---" "" | cat - "$file" > "$tmpfile"
+            printf '%s\n' "---" "layout: default" "title: \"$title\"" "description: \"$desc\"" "---" "" | cat - "$file" > "$tmpfile"
             mv "$tmpfile" "$file"
           done
           
