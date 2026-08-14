@@ -17,6 +17,8 @@ Works with **Umbraco 16, 17 and 18**. Optional durable telemetry on **SQL Server
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.JobMonitor.svg)](https://www.nuget.org/packages/uTPro.Feature.JobMonitor)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.jobmonitor)
 
+![uTPro Job Monitor](/screenshots/uTPro.Feature.JobMonitor/dashboard.png)
+
 ---
 
 ## Features

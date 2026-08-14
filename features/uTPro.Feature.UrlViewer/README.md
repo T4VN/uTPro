@@ -17,6 +17,8 @@ Supports **Umbraco 16, 17 and 18**.
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.UrlViewer.svg)](https://www.nuget.org/packages/uTPro.Feature.UrlViewer)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.urlviewer)
 
+![uTPro URL Viewer](/screenshots/uTPro.Feature.UrlViewer/3.0.0/ScanUrl.png)
+
 ---
 
 ## What it does

@@ -15,6 +15,8 @@ Site-wide SEO & content audit for **Umbraco 16, 17 and 18**. Crawls every Conten
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.SEOAudit.svg)](https://www.nuget.org/packages/uTPro.Feature.SEOAudit)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.seoaudit)
 
+![uTPro SEO Audit](/screenshots/uTPro.Feature.SEOAudit/SiteScan.png)
+
 ---
 
 ## What it adds

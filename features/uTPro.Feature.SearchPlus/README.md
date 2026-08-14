@@ -17,6 +17,8 @@ Works with **Umbraco 17**. Database support: **SQL Server**, **SQLite** and **Po
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.SearchPlus.svg)](https://www.nuget.org/packages/uTPro.Feature.SearchPlus)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.searchplus)
 
+![uTPro Search Plus](/screenshots/search-plus-backoffice.png)
+
 ---
 
 ## Features

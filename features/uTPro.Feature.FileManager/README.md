@@ -15,6 +15,8 @@ A powerful **File Manager** and **Media Cleanup** toolkit for the **Umbraco 16+*
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.FileManager.svg)](https://www.nuget.org/packages/uTPro.Feature.FileManager)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.filemanager)
 
+![uTPro File Manager](/screenshots/uTPro.Feature.FileManager/FileManager-default.png)
+
 ---
 
 ## Features

@@ -17,6 +17,8 @@ Supports **Umbraco 16, 17 and 18**. Works on **SQL Server**, **SQLite** and **Po
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.AuditLog.svg)](https://www.nuget.org/packages/uTPro.Feature.AuditLog)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.auditlog)
 
+![uTPro Audit Log](/screenshots/uTPro.Feature.AuditLog/Screenshot-1.png)
+
 ---
 
 ## Key features
