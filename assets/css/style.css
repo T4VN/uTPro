@@ -16,7 +16,7 @@
     --color-border: #e8e4de;
     --color-sidebar-bg: linear-gradient(135deg, #f6821f 0%, #ff9e40 100%);
     --color-sidebar-text: #000;
-    --color-sidebar-active: #f6821f;
+    --color-sidebar-active: #6b7280;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
     --sidebar-width: 280px;
@@ -142,7 +142,7 @@ body {
 
 .sub-nav li a {
     display: block;
-    color: rgba(240, 230, 220, 0.7);
+    color: var(--color-sidebar-text);
     text-decoration: none;
     font-size: 0.8rem;
     font-weight: 400;
@@ -203,7 +203,7 @@ body {
 
 .sidebar-footer a:hover {
     opacity: 1;
-    color: var(--color-primary-light);
+    color: var(--color-primary-hover);
 }
 
 /* ── Topbar ── */
