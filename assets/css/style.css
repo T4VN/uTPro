@@ -283,6 +283,64 @@ html {
     background: rgba(246, 130, 31, 0.5);
 }
 
+/* ── Nav Groups ── */
+.nav-group {
+    margin-bottom: 4px;
+}
+
+.nav-group-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.nav-group-toggle:hover {
+    color: #ffffff;
+    background: rgba(246, 130, 31, 0.04);
+}
+
+.nav-group-toggle.active {
+    color: var(--color-sidebar-active);
+    border-left-color: var(--color-sidebar-active);
+    background: rgba(246, 130, 31, 0.06);
+}
+
+.nav-group-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.nav-group-arrow {
+    margin-left: auto;
+    transition: transform 0.2s;
+    opacity: 0.5;
+}
+
+.nav-group-toggle.active .nav-group-arrow {
+    transform: rotate(90deg);
+    opacity: 1;
+}
+
+.nav-group-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+}
+
 .sidebar-nav ul {
     list-style: none;
 }

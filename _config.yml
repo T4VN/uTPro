@@ -25,6 +25,11 @@ defaults:
       path: "docs"
     values:
       layout: "default"
+  - scope:
+      path: "features"
+    values:
+      layout: "default"
+      feature: true
 
 # SEO
 author: T4VN
