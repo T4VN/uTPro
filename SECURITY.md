@@ -4,8 +4,8 @@
 
 | Version | Supported |
 |---------|-----------|
+| Umbraco 17.x + .NET 10 | Yes |
 | Umbraco 16.x + .NET 9 | Yes |
-| Umbraco 15.x + .NET 9 | Best effort |
 | Older versions | No |
 
 ## Built-in Security Features

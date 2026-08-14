@@ -24,7 +24,7 @@ permissions:
 
 on:
   push:
-    branches: [ "main", "gh-pages", 'v*/release' ]
+    branches: [ "main", 'v*/release' ]
   pull_request:
     branches: [ "main", 'v*/release' ]
   schedule:
