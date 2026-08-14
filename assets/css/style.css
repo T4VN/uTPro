@@ -335,6 +335,7 @@ body {
 .doc-content a {
     color: var(--color-primary);
     text-decoration: none;
+    border-bottom: 1px solid transparent;
     transition: border-color 0.15s;
 }
 
@@ -573,14 +574,13 @@ body {
     font-weight: 600;
     font-size: 1rem;
     text-decoration: none;
-    border: none;
-    transition: background 0.2s;
+    border: 2px solid transparent;
+    transition: background 0.2s, border-color 0.2s;
     margin: 0 6px;
 }
 
 .home-cta:hover {
     background: var(--color-primary-light);
-    border: none;
 }
 
 .home-cta-secondary {
