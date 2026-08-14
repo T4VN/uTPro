@@ -114,6 +114,10 @@
                 </a>
                 <button class="sidebar-close" id="sidebar-close" aria-label="Close navigation">✕</button>
             </div>
+            <div class="sidebar-search">
+                <input type="text" id="doc-search" placeholder="Search docs..." aria-label="Search documentation">
+                <div id="search-results" class="search-results"></div>
+            </div>
             <nav class="sidebar-nav" aria-label="Documentation navigation">
                 <ul id="nav-list">
                     <li>
@@ -275,6 +279,79 @@
             }, { rootMargin: '-80px 0px -60% 0px' });
 
             headings.forEach(h => observer.observe(h));
+        })();
+
+        // Doc search
+        (function() {
+            const searchInput = document.getElementById('doc-search');
+            const searchResults = document.getElementById('search-results');
+            if (!searchInput || !searchResults) return;
+
+            let searchData = null;
+            let debounceTimer = null;
+
+            async function loadSearchData() {
+                if (searchData) return searchData;
+                try {
+                    const res = await fetch('/search.json');
+                    searchData = await res.json();
+                } catch (e) {
+                    searchData = [];
+                }
+                return searchData;
+            }
+
+            function highlightMatch(text, query) {
+                const idx = text.toLowerCase().indexOf(query.toLowerCase());
+                if (idx === -1) return text.substring(0, 80) + '...';
+                const start = Math.max(0, idx - 30);
+                const end = Math.min(text.length, idx + query.length + 50);
+                let snippet = (start > 0 ? '...' : '') + text.substring(start, end) + (end < text.length ? '...' : '');
+                return snippet.replace(new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>');
+            }
+
+            async function doSearch(query) {
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    searchResults.innerHTML = '';
+                    return;
+                }
+
+                const data = await loadSearchData();
+                const q = query.toLowerCase();
+                const results = data
+                    .filter(item => item.title.toLowerCase().includes(q) || item.content.toLowerCase().includes(q))
+                    .slice(0, 8);
+
+                if (results.length === 0) {
+                    searchResults.innerHTML = '<div class="search-no-result">No results found</div>';
+                    searchResults.style.display = 'block';
+                    return;
+                }
+
+                searchResults.innerHTML = results.map(item => `
+                    <a href="${item.url}" class="search-result-item">
+                        <div class="search-result-title">${item.title}</div>
+                        <div class="search-result-snippet">${highlightMatch(item.content, query)}</div>
+                    </a>
+                `).join('');
+                searchResults.style.display = 'block';
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => doSearch(e.target.value.trim()), 200);
+            });
+
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim().length >= 2) doSearch(searchInput.value.trim());
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
         })();
     </script>
 </body>
