@@ -207,6 +207,15 @@
             }
         });
 
+        // Close sidebar when clicking a nav link (mobile)
+        sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+
         // Auto-generate sub-navigation from h1 headings only (skip page title)
         (function() {
             const subNav = document.getElementById('sub-nav');
