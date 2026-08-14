@@ -117,6 +117,10 @@
             <nav class="sidebar-nav" aria-label="Documentation navigation">
                 <ul id="nav-list">
                     <li>
+                        <a href="{{ '/quick-overview/' | relative_url }}" {% if page.url contains 'quick-overview' %}class="active"{% endif %} data-page="quick-overview">Quick Overview</a>
+                        {% if page.url contains 'quick-overview' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
                         <a href="{{ '/getting-started/' | relative_url }}" {% if page.url contains 'getting-started' %}class="active"{% endif %} data-page="getting-started">Getting Started</a>
                         {% if page.url contains 'getting-started' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
                     </li>
