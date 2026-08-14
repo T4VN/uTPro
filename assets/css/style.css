@@ -14,9 +14,9 @@
     --color-text: #1a1a2e;
     --color-text-muted: #6b7280;
     --color-border: #e8e4de;
-    --color-sidebar-bg: linear-gradient(135deg, #f6821f 0%, #ff9e40 100%);
-    --color-sidebar-text: #000;
-    --color-sidebar-active: #6b7280;
+    --color-sidebar-bg: #282b34;
+    --color-sidebar-text: #ffffff;
+    --color-sidebar-active: #f6821f;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
     --sidebar-width: 280px;
@@ -83,7 +83,7 @@ body {
     align-items: center;
     gap: 10px;
     text-decoration: none;
-    color: #ffffff;
+    color: var(--color-sidebar-active);
     font-weight: 600;
     font-size: 1rem;
 }
