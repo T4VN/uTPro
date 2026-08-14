@@ -216,16 +216,13 @@
             });
         });
 
-        // Auto-generate sub-navigation from h1 headings only (skip page title)
+        // Auto-generate sub-navigation from h2 headings (sub-sections)
         (function() {
             const subNav = document.getElementById('sub-nav');
             if (!subNav) return;
 
-            const allH1 = document.querySelectorAll('.doc-content h1');
-            if (allH1.length <= 1) return; // only page title, no sub-sections
-
-            // Skip the first h1 (page title)
-            const headings = Array.from(allH1).slice(1);
+            const headings = document.querySelectorAll('.doc-content h2');
+            if (headings.length === 0) return;
 
             headings.forEach((heading) => {
                 if (!heading.id) {

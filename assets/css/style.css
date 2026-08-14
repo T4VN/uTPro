@@ -67,7 +67,7 @@ body {
     display: flex;
     flex-direction: column;
     z-index: 200;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .sidebar-header {
@@ -104,6 +104,26 @@ body {
 .sidebar-nav {
     flex: 1;
     padding: 16px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Scrollbar styling for sidebar */
+.sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(246, 130, 31, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(246, 130, 31, 0.5);
 }
 
 .sidebar-nav ul {
