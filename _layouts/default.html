@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title | default: site.title }} – uTPro Docs</title>
+    <meta name="description" content="{{ page.description | default: site.description }}">
+    <meta name="theme-color" content="#f6821f">
+    <link rel="icon" type="image/png" href="{{ '/Logo.png' | relative_url }}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ page.title | default: site.title }}">
+    <meta property="og:description" content="{{ page.description | default: site.description }}">
+    <meta property="og:image" content="{{ '/Logo.png' | absolute_url }}">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    {% seo %}
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ '/' | relative_url }}" class="sidebar-brand">
+                    <img src="{{ '/Logo.png' | relative_url }}" alt="uTPro" width="32" height="32">
+                    <span>uTPro Docs</span>
+                </a>
+                <button class="sidebar-close" id="sidebar-close" aria-label="Close navigation">✕</button>
+            </div>
+            <nav class="sidebar-nav" aria-label="Documentation navigation">
+                <ul>
+                    <li><a href="{{ '/docs/Home' | relative_url }}" {% if page.url == '/docs/Home' or page.url == '/docs/Home.html' %}class="active"{% endif %}>Home</a></li>
+                    <li><a href="{{ '/docs/1.-Intro' | relative_url }}" {% if page.url contains '1.-Intro' %}class="active"{% endif %}>1. Introduction</a></li>
+                    <li><a href="{{ '/docs/2.-Setup' | relative_url }}" {% if page.url contains '2.-Setup' %}class="active"{% endif %}>2. Setup</a></li>
+                    <li><a href="{{ '/docs/3.-Project-Structure' | relative_url }}" {% if page.url contains '3.-Project-Structure' %}class="active"{% endif %}>3. Project Structure</a></li>
+                    <li><a href="{{ '/docs/4.-Configurations' | relative_url }}" {% if page.url contains '4.-Configurations' %}class="active"{% endif %}>4. Configurations</a></li>
+                    <li><a href="{{ '/docs/5.-Script-Queue' | relative_url }}" {% if page.url contains '5.-Script-Queue' %}class="active"{% endif %}>5. Script Queue</a></li>
+                    <li><a href="{{ '/docs/6.-Dashboard' | relative_url }}" {% if page.url contains '6.-Dashboard' %}class="active"{% endif %}>6. Dashboard</a></li>
+                    <li><a href="{{ '/docs/7.-Content-Editing' | relative_url }}" {% if page.url contains '7.-Content-Editing' %}class="active"{% endif %}>7. Content Editing</a></li>
+                    <li><a href="{{ '/docs/8.-Global-Settings' | relative_url }}" {% if page.url contains '8.-Global-Settings' %}class="active"{% endif %}>8. Global Settings</a></li>
+                    <li><a href="{{ '/docs/9.-Developer-Reference' | relative_url }}" {% if page.url contains '9.-Developer-Reference' %}class="active"{% endif %}>9. Developer Reference</a></li>
+                    <li><a href="{{ '/docs/10.-Backoffice-Tools' | relative_url }}" {% if page.url contains '10.-Backoffice-Tools' %}class="active"{% endif %}>10. Backoffice Tools</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="https://github.com/T4VN/uTPro" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <span>·</span>
+                <a href="https://t4vn.com" target="_blank" rel="noopener noreferrer">T4VN</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-wrapper">
+            <header class="topbar">
+                <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 4.5A.5.5 0 012.5 4h15a.5.5 0 010 1h-15A.5.5 0 012 4.5zm0 5A.5.5 0 012.5 9h15a.5.5 0 010 1h-15A.5.5 0 012 9.5zm0 5a.5.5 0 01.5-.5h15a.5.5 0 010 1h-15a.5.5 0 01-.5-.5z"/>
+                    </svg>
+                </button>
+                <div class="topbar-title">{{ page.title | default: site.title }}</div>
+            </header>
+
+            <main class="content">
+                <article class="doc-content">
+                    {{ content }}
+                </article>
+            </main>
+
+            <footer class="doc-footer">
+                <p>© uTPro · powered by <a href="https://t4vn.com" target="_blank" rel="noopener noreferrer">T4VN</a></p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Mobile sidebar toggle -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('menu-toggle');
+        const close = document.getElementById('sidebar-close');
+
+        toggle.addEventListener('click', () => sidebar.classList.add('open'));
+        close.addEventListener('click', () => sidebar.classList.remove('open'));
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggle) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>

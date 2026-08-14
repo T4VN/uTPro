@@ -1,3 +1,8 @@
+---
+layout: default
+title: "Home"
+---
+
 # uTPro – Umbraco Turbo Pro
 
 ## 🙏 Thank You for Choosing uTPro
