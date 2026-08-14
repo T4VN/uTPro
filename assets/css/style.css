@@ -226,7 +226,17 @@ body {
     border: none;
     color: var(--color-text);
     cursor: pointer;
-    padding: 4px;
+    padding: 12px;
+    margin: -12px;
+    border-radius: var(--radius);
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-toggle:hover {
+    background: var(--color-bg-alt);
 }
 
 .topbar-title {
@@ -447,7 +457,7 @@ body {
     }
 
     .menu-toggle {
-        display: block;
+        display: flex;
     }
 
     .content {
