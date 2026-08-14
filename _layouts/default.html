@@ -123,13 +123,15 @@
             }
         });
 
-        // Auto-generate sub-navigation from h2 headings in current page
+        // Auto-generate sub-navigation from h2/h3 headings in current page
         (function() {
             const subNav = document.getElementById('sub-nav');
             if (!subNav) return;
 
-            const headings = document.querySelectorAll('.doc-content h2');
+            const headings = document.querySelectorAll('.doc-content h2, .doc-content h3');
             if (headings.length === 0) return;
+
+            let currentH2List = null;
 
             headings.forEach((heading) => {
                 // Ensure heading has an id for anchor linking
@@ -146,15 +148,37 @@
                 a.href = '#' + heading.id;
                 a.textContent = heading.textContent.trim();
                 li.appendChild(a);
-                subNav.appendChild(li);
+
+                if (heading.tagName === 'H2') {
+                    // Level 1 sub-item
+                    li.classList.add('sub-level-1');
+                    subNav.appendChild(li);
+                    // Create nested ul for potential h3 children
+                    currentH2List = document.createElement('ul');
+                    currentH2List.className = 'sub-nav-nested';
+                    subNav.appendChild(currentH2List);
+                } else if (heading.tagName === 'H3') {
+                    // Level 2 sub-item (nested under last h2)
+                    li.classList.add('sub-level-2');
+                    if (currentH2List) {
+                        currentH2List.appendChild(li);
+                    } else {
+                        subNav.appendChild(li);
+                    }
+                }
+            });
+
+            // Remove empty nested lists
+            subNav.querySelectorAll('.sub-nav-nested').forEach(ul => {
+                if (ul.children.length === 0) ul.remove();
             });
 
             // Highlight active sub-nav on scroll
-            const subLinks = subNav.querySelectorAll('a');
+            const allSubLinks = subNav.querySelectorAll('a');
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        subLinks.forEach(link => link.classList.remove('active'));
+                        allSubLinks.forEach(link => link.classList.remove('active'));
                         const activeLink = subNav.querySelector(`a[href="#${entry.target.id}"]`);
                         if (activeLink) activeLink.classList.add('active');
                     }
