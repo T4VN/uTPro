@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Security Policy"
+description: "Security policy for uTPro: supported versions, built-in security features, and vulnerability reporting."
+permalink: "/SECURITY/"
+---
+
 # Security Policy
 
 ## Supported Versions

@@ -1,3 +1,10 @@
+---
+layout: default
+title: "License"
+description: "MIT License for uTPro - Umbraco Turbo Pro Starter Kit by T4VN."
+permalink: "/LICENSE/"
+---
+
 MIT License
 
 Copyright (c) 2025 T4VN

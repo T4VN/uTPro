@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Contributing"
+description: "Guidelines for contributing to uTPro: how to report issues, submit pull requests, and follow coding standards."
+permalink: "/CONTRIBUTING/"
+---
+
 # Contributing to uTPro
 
 Thank you for your interest in contributing to **uTPro - Umbraco Turbo Pro**!
