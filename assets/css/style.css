@@ -106,6 +106,7 @@ body {
     padding: 16px 0;
     overflow-y: auto;
     overflow-x: hidden;
+    min-height: 0;
 }
 
 /* Scrollbar styling for sidebar */
@@ -477,6 +478,12 @@ body {
     .sidebar.open {
         transform: translateX(0);
         box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+        overflow: hidden;
+    }
+
+    .sidebar.open .sidebar-nav {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .sidebar-close {
