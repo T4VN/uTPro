@@ -4,7 +4,7 @@
 
 A production-ready **Starter Kit** that accelerates website development on the **Umbraco** platform. Enterprise-grade architecture, performance, SEO, and security — out of the box.
 
-[![Umbraco 17 / 18](https://img.shields.io/badge/Umbraco-17-3544B1)](https://umbraco.com)
+[![Umbraco 17](https://img.shields.io/badge/Umbraco-17-3544B1)](https://umbraco.com)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/Docs-docs.utpro.dev-f6821f)](https://docs.utpro.dev)
@@ -15,8 +15,10 @@ A production-ready **Starter Kit** that accelerates website development on the *
 
 ```bash
 git clone https://github.com/T4VN/uTPro.git
+cd uTPro
 # Configure database in appsettings.json
-dotnet run
+dotnet run --project Project/uTPro.Project.Web/uTPro.Project.Web.csproj
+# Open /umbraco and complete the Umbraco installation
 # Import data via uSync in backoffice
 ```
 
