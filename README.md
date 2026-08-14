@@ -9,16 +9,16 @@ It enables developers to create **enterprise-grade websites** faster, more relia
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4)](https://dotnet.microsoft.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> 📖 **Full documentation**: [docs/Home.md](docs/Home.md)
+> 📖 **Full documentation**: [docs.utpro.dev](https://docs.utpro.dev)
 
 ---
 
 ## 🚀 Quick Start
 
 1. **Clone** the repository
-2. **Configure** database connection in `appsettings.json` ([details](docs/2.-Setup.md))
+2. **Configure** database connection in `appsettings.json` ([details](https://docs.utpro.dev/docs/2.-Setup))
 3. **Build & Run** with `dotnet run`
-4. **Import data** via uSync ([details](docs/2.-Setup.md#23-setup-data))
+4. **Import data** via uSync ([details](https://docs.utpro.dev/docs/2.-Setup#23-setup-data))
 5. **Start building** your site!
 
 ---
@@ -71,7 +71,7 @@ Each block component registers its own scripts; they're emitted only when that b
 
 ![Script Queue Output](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/readme-script-queue-output.png)
 
-> 📖 See [Script Queue documentation](docs/5.-Script-Queue.md) for dependency-aware loading (jQuery-dependent vs standalone).
+> 📖 See [Script Queue documentation](https://docs.utpro.dev/docs/5.-Script-Queue) for dependency-aware loading (jQuery-dependent vs standalone).
 
 ### SEO — production-ready from day one
 
@@ -138,16 +138,16 @@ uTPro (solution)
 
 | # | Page | Description |
 |---|------|-------------|
-| 1 | [Introduction](docs/1.-Intro.md) | Overview, features, architecture |
-| 2 | [Setup](docs/2.-Setup.md) | Domain, project, and data setup |
-| 3 | [Project Structure](docs/3.-Project-Structure.md) | Solution architecture, middleware pipeline |
-| 4 | [Configurations](docs/4.-Configurations.md) | Language, backoffice, security, performance, SEO, database |
-| 5 | [Script Queue](docs/5.-Script-Queue.md) | JS/CSS loading system for block components |
-| 6 | [Dashboard](docs/6.-Dashboard.md) | Backoffice dashboard & header app |
-| 7 | [Content Editing](docs/7.-Content-Editing.md) | Guide for content editors |
-| 8 | [Global Settings](docs/8.-Global-Settings.md) | CMS-driven settings (favicon, robots, images, forms) |
-| 9 | [Developer Reference](docs/9.-Developer-Reference.md) | Razor helpers & C# extensions |
-| 10 | [Backoffice Tools](docs/10.-Backoffice-Tools.md) | Block preview, error pages, optional packages |
+| 1 | [Introduction](https://docs.utpro.dev/docs/1.-Intro) | Overview, features, architecture |
+| 2 | [Setup](https://docs.utpro.dev/docs/2.-Setup) | Domain, project, and data setup |
+| 3 | [Project Structure](https://docs.utpro.dev/docs/3.-Project-Structure) | Solution architecture, middleware pipeline |
+| 4 | [Configurations](https://docs.utpro.dev/docs/4.-Configurations) | Language, backoffice, security, performance, SEO, database |
+| 5 | [Script Queue](https://docs.utpro.dev/docs/5.-Script-Queue) | JS/CSS loading system for block components |
+| 6 | [Dashboard](https://docs.utpro.dev/docs/6.-Dashboard) | Backoffice dashboard & header app |
+| 7 | [Content Editing](https://docs.utpro.dev/docs/7.-Content-Editing) | Guide for content editors |
+| 8 | [Global Settings](https://docs.utpro.dev/docs/8.-Global-Settings) | CMS-driven settings (favicon, robots, images, forms) |
+| 9 | [Developer Reference](https://docs.utpro.dev/docs/9.-Developer-Reference) | Razor helpers & C# extensions |
+| 10 | [Backoffice Tools](https://docs.utpro.dev/docs/10.-Backoffice-Tools) | Block preview, error pages, optional packages |
 
 ---
 
