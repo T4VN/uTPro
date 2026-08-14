@@ -123,38 +123,18 @@
             }
         });
 
-        // Auto-generate sub-navigation from headings in current page
-        // Docs use: h1 = main sections (4.1, 4.2...), h2 = sub (4.7.1...), h3 = sub-sub
+        // Auto-generate sub-navigation from h1 headings only (skip page title)
         (function() {
             const subNav = document.getElementById('sub-nav');
             if (!subNav) return;
 
-            // Get all headings h1-h3 inside doc content (skip the page title h1 if it's the first one)
-            const allHeadings = document.querySelectorAll('.doc-content h1, .doc-content h2, .doc-content h3');
-            if (allHeadings.length === 0) return;
+            const allH1 = document.querySelectorAll('.doc-content h1');
+            if (allH1.length <= 1) return; // only page title, no sub-sections
 
-            // Determine the top-level heading tag used for sections
-            // (skip the very first h1 which is the page title)
-            const headings = [];
-            let skippedFirst = false;
-            allHeadings.forEach(h => {
-                if (!skippedFirst && h.tagName === 'H1') {
-                    skippedFirst = true;
-                    return; // skip page title
-                }
-                headings.push(h);
-            });
-
-            if (headings.length === 0) return;
-
-            // Find the minimum heading level to use as "level 1"
-            const levels = headings.map(h => parseInt(h.tagName[1]));
-            const minLevel = Math.min(...levels);
-
-            let currentL1Container = subNav;
+            // Skip the first h1 (page title)
+            const headings = Array.from(allH1).slice(1);
 
             headings.forEach((heading) => {
-                // Ensure heading has an id
                 if (!heading.id) {
                     heading.id = heading.textContent
                         .trim()
@@ -163,33 +143,13 @@
                         .replace(/\s+/g, '-');
                 }
 
-                const level = parseInt(heading.tagName[1]) - minLevel; // 0 = level1, 1 = level2, 2 = level3
-
                 const li = document.createElement('li');
+                li.classList.add('sub-level-1');
                 const a = document.createElement('a');
                 a.href = '#' + heading.id;
                 a.textContent = heading.textContent.trim();
                 li.appendChild(a);
-
-                if (level === 0) {
-                    // Main sub-section
-                    li.classList.add('sub-level-1');
-                    subNav.appendChild(li);
-                    // Create container for children
-                    const nested = document.createElement('ul');
-                    nested.className = 'sub-nav-nested';
-                    subNav.appendChild(nested);
-                    currentL1Container = nested;
-                } else {
-                    // Child sub-section (level 2 or 3)
-                    li.classList.add('sub-level-2');
-                    currentL1Container.appendChild(li);
-                }
-            });
-
-            // Remove empty nested lists
-            subNav.querySelectorAll('.sub-nav-nested').forEach(ul => {
-                if (ul.children.length === 0) ul.remove();
+                subNav.appendChild(li);
             });
 
             // Highlight active sub-nav on scroll
