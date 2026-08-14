@@ -14,8 +14,8 @@
     --color-text: #1a1a2e;
     --color-text-muted: #6b7280;
     --color-border: #e8e4de;
-    --color-sidebar-bg: #1a1a2e;
-    --color-sidebar-text: #e0ddd6;
+    --color-sidebar-bg: #2d1a0a;
+    --color-sidebar-text: #f0e6dc;
     --color-sidebar-active: #f6821f;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -72,7 +72,7 @@ body {
 
 .sidebar-header {
     padding: 20px 24px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(246, 130, 31, 0.15);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -122,20 +122,53 @@ body {
 }
 
 .sidebar-nav li a:hover {
-    background: rgba(255,255,255,0.04);
+    background: rgba(246, 130, 31, 0.06);
     color: #ffffff;
 }
 
 .sidebar-nav li a.active {
     color: var(--color-sidebar-active);
     border-left-color: var(--color-sidebar-active);
-    background: rgba(246, 130, 31, 0.08);
+    background: rgba(246, 130, 31, 0.12);
     font-weight: 500;
+}
+
+/* Sub-navigation (auto-generated from h2 headings) */
+.sub-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sub-nav li a {
+    display: block;
+    padding: 5px 24px 5px 36px;
+    color: rgba(224, 221, 214, 0.7);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 400;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sub-nav li a:hover {
+    color: #ffffff;
+    background: rgba(246, 130, 31, 0.06);
+}
+
+.sub-nav li a.active {
+    color: var(--color-sidebar-active);
+    border-left-color: rgba(246, 130, 31, 0.5);
+    background: none;
+    font-weight: 400;
 }
 
 .sidebar-footer {
     padding: 16px 24px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(246, 130, 31, 0.15);
     font-size: 0.8rem;
     display: flex;
     align-items: center;

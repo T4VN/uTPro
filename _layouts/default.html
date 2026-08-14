@@ -35,18 +35,48 @@
                 <button class="sidebar-close" id="sidebar-close" aria-label="Close navigation">✕</button>
             </div>
             <nav class="sidebar-nav" aria-label="Documentation navigation">
-                <ul>
-                    <li><a href="{{ '/docs/Home' | relative_url }}" {% if page.url == '/docs/Home' or page.url == '/docs/Home.html' %}class="active"{% endif %}>Home</a></li>
-                    <li><a href="{{ '/docs/1.-Intro' | relative_url }}" {% if page.url contains '1.-Intro' %}class="active"{% endif %}>1. Introduction</a></li>
-                    <li><a href="{{ '/docs/2.-Setup' | relative_url }}" {% if page.url contains '2.-Setup' %}class="active"{% endif %}>2. Setup</a></li>
-                    <li><a href="{{ '/docs/3.-Project-Structure' | relative_url }}" {% if page.url contains '3.-Project-Structure' %}class="active"{% endif %}>3. Project Structure</a></li>
-                    <li><a href="{{ '/docs/4.-Configurations' | relative_url }}" {% if page.url contains '4.-Configurations' %}class="active"{% endif %}>4. Configurations</a></li>
-                    <li><a href="{{ '/docs/5.-Script-Queue' | relative_url }}" {% if page.url contains '5.-Script-Queue' %}class="active"{% endif %}>5. Script Queue</a></li>
-                    <li><a href="{{ '/docs/6.-Dashboard' | relative_url }}" {% if page.url contains '6.-Dashboard' %}class="active"{% endif %}>6. Dashboard</a></li>
-                    <li><a href="{{ '/docs/7.-Content-Editing' | relative_url }}" {% if page.url contains '7.-Content-Editing' %}class="active"{% endif %}>7. Content Editing</a></li>
-                    <li><a href="{{ '/docs/8.-Global-Settings' | relative_url }}" {% if page.url contains '8.-Global-Settings' %}class="active"{% endif %}>8. Global Settings</a></li>
-                    <li><a href="{{ '/docs/9.-Developer-Reference' | relative_url }}" {% if page.url contains '9.-Developer-Reference' %}class="active"{% endif %}>9. Developer Reference</a></li>
-                    <li><a href="{{ '/docs/10.-Backoffice-Tools' | relative_url }}" {% if page.url contains '10.-Backoffice-Tools' %}class="active"{% endif %}>10. Backoffice Tools</a></li>
+                <ul id="nav-list">
+                    <li><a href="{{ '/docs/Home' | relative_url }}" {% if page.url == '/docs/Home' or page.url == '/docs/Home.html' %}class="active"{% endif %} data-page="Home">Home</a></li>
+                    <li>
+                        <a href="{{ '/docs/1.-Intro' | relative_url }}" {% if page.url contains '1.-Intro' %}class="active"{% endif %} data-page="1.-Intro">1. Introduction</a>
+                        {% if page.url contains '1.-Intro' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/2.-Setup' | relative_url }}" {% if page.url contains '2.-Setup' %}class="active"{% endif %} data-page="2.-Setup">2. Setup</a>
+                        {% if page.url contains '2.-Setup' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/3.-Project-Structure' | relative_url }}" {% if page.url contains '3.-Project-Structure' %}class="active"{% endif %} data-page="3.-Project-Structure">3. Project Structure</a>
+                        {% if page.url contains '3.-Project-Structure' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/4.-Configurations' | relative_url }}" {% if page.url contains '4.-Configurations' %}class="active"{% endif %} data-page="4.-Configurations">4. Configurations</a>
+                        {% if page.url contains '4.-Configurations' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/5.-Script-Queue' | relative_url }}" {% if page.url contains '5.-Script-Queue' %}class="active"{% endif %} data-page="5.-Script-Queue">5. Script Queue</a>
+                        {% if page.url contains '5.-Script-Queue' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/6.-Dashboard' | relative_url }}" {% if page.url contains '6.-Dashboard' %}class="active"{% endif %} data-page="6.-Dashboard">6. Dashboard</a>
+                        {% if page.url contains '6.-Dashboard' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/7.-Content-Editing' | relative_url }}" {% if page.url contains '7.-Content-Editing' %}class="active"{% endif %} data-page="7.-Content-Editing">7. Content Editing</a>
+                        {% if page.url contains '7.-Content-Editing' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/8.-Global-Settings' | relative_url }}" {% if page.url contains '8.-Global-Settings' %}class="active"{% endif %} data-page="8.-Global-Settings">8. Global Settings</a>
+                        {% if page.url contains '8.-Global-Settings' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/9.-Developer-Reference' | relative_url }}" {% if page.url contains '9.-Developer-Reference' %}class="active"{% endif %} data-page="9.-Developer-Reference">9. Developer Reference</a>
+                        {% if page.url contains '9.-Developer-Reference' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
+                    <li>
+                        <a href="{{ '/docs/10.-Backoffice-Tools' | relative_url }}" {% if page.url contains '10.-Backoffice-Tools' %}class="active"{% endif %} data-page="10.-Backoffice-Tools">10. Backoffice Tools</a>
+                        {% if page.url contains '10.-Backoffice-Tools' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                    </li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -79,21 +109,60 @@
         </div>
     </div>
 
-    <!-- Mobile sidebar toggle -->
     <script>
+        // Mobile sidebar toggle
         const sidebar = document.getElementById('sidebar');
         const toggle = document.getElementById('menu-toggle');
-        const close = document.getElementById('sidebar-close');
+        const closeBtn = document.getElementById('sidebar-close');
 
         toggle.addEventListener('click', () => sidebar.classList.add('open'));
-        close.addEventListener('click', () => sidebar.classList.remove('open'));
-
-        // Close sidebar when clicking outside on mobile
+        closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
         document.addEventListener('click', (e) => {
             if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggle) {
                 sidebar.classList.remove('open');
             }
         });
+
+        // Auto-generate sub-navigation from h2 headings in current page
+        (function() {
+            const subNav = document.getElementById('sub-nav');
+            if (!subNav) return;
+
+            const headings = document.querySelectorAll('.doc-content h2');
+            if (headings.length === 0) return;
+
+            headings.forEach((heading) => {
+                // Ensure heading has an id for anchor linking
+                if (!heading.id) {
+                    heading.id = heading.textContent
+                        .trim()
+                        .toLowerCase()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/\s+/g, '-');
+                }
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#' + heading.id;
+                a.textContent = heading.textContent.trim();
+                li.appendChild(a);
+                subNav.appendChild(li);
+            });
+
+            // Highlight active sub-nav on scroll
+            const subLinks = subNav.querySelectorAll('a');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        subLinks.forEach(link => link.classList.remove('active'));
+                        const activeLink = subNav.querySelector(`a[href="#${entry.target.id}"]`);
+                        if (activeLink) activeLink.classList.add('active');
+                    }
+                });
+            }, { rootMargin: '-80px 0px -60% 0px' });
+
+            headings.forEach(h => observer.observe(h));
+        })();
     </script>
 </body>
 </html>
