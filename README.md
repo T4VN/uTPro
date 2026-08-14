@@ -12,7 +12,7 @@ permalink: "/quick-overview/"
 A powerful **Starter Kit Template** built to **accelerate website development on the Umbraco platform**.
 It enables developers to create **enterprise-grade websites** faster, more reliably, and with a professional structure from day one.
 
-[![Umbraco 17 / 18](https://img.shields.io/badge/Umbraco-17%20%7C%2018-3544B1)](https://umbraco.com)
+[![Umbraco 17](https://img.shields.io/badge/Umbraco-17-3544B1)](https://umbraco.com)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](/LICENSE/)
 
