@@ -235,6 +235,10 @@ body {
     justify-content: center;
 }
 
+.menu-toggle svg {
+    pointer-events: none;
+}
+
 .menu-toggle:hover {
     background: var(--color-bg-alt);
 }
