@@ -1,3 +1,8 @@
+---
+layout: default
+title: "_Footer"
+---
+
 
 #### Technologies Used
 - **Platform:** .NET 10 (SDK 10.0.301)
