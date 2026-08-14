@@ -1,11 +1,9 @@
 ---
 layout: default
-title: "Getting Started"
-description: "Get started with uTPro – quick start guide, documentation overview, and contact information for the Umbraco Starter Kit by T4VN."
-permalink: "/getting-started/"
+title: "Home"
 ---
 
-# Getting Started
+# uTPro – Umbraco Turbo Pro
 
 ## 🙏 Thank You for Choosing uTPro
 
@@ -24,25 +22,25 @@ Your feedback — comments, reviews, or suggestions — is incredibly valuable. 
 
 | # | Page | Description |
 |---|------|-------------|
-| 1 | [Introduction](/1-Intro/) | Overview, features, architecture, tech stack |
-| 2 | [Setup](/2-Setup/) | Domain, project, and data setup |
-| 3 | [Project Structure](/3-Project-Structure/) | Solution architecture, middleware pipeline, Program.cs |
-| 4 | [Configurations](/4-Configurations/) | Language, backoffice, security, performance, SEO, load balancing, database, forwarded headers, category URLs, feature packages |
-| 5 | [Script Queue](/5-Script-Queue/) | JS loading system for block components |
-| 6 | [Dashboard](/6-Dashboard/) | Backoffice dashboard & header app |
-| 7 | [Content Editing](/7-Content-Editing/) | Guide for content editors (pages, blocks, SEO, multilingual) |
-| 8 | [Global Settings](/8-Global-Settings/) | CMS-driven settings (favicon, robots, images, forms, security headers) |
-| 9 | [Developer Reference](/9-Developer-Reference/) | Razor helpers & C# extensions |
-| 10 | [Backoffice Tools](/10-Backoffice-Tools/) | Block preview, error pages, optional packages |
+| 1 | [Introduction](1.-Intro) | Overview, features, architecture, tech stack |
+| 2 | [Setup](2.-Setup) | Domain, project, and data setup |
+| 3 | [Project Structure](3.-Project-Structure) | Solution architecture, middleware pipeline, Program.cs |
+| 4 | [Configurations](4.-Configurations) | Language, backoffice, security, performance, SEO, load balancing, database, forwarded headers, category URLs, feature packages |
+| 5 | [Script Queue](5.-Script-Queue) | JS loading system for block components |
+| 6 | [Dashboard](6.-Dashboard) | Backoffice dashboard & header app |
+| 7 | [Content Editing](7.-Content-Editing) | Guide for content editors (pages, blocks, SEO, multilingual) |
+| 8 | [Global Settings](8.-Global-Settings) | CMS-driven settings (favicon, robots, images, forms, security headers) |
+| 9 | [Developer Reference](9.-Developer-Reference) | Razor helpers & C# extensions |
+| 10 | [Backoffice Tools](10.-Backoffice-Tools) | Block preview, error pages, optional packages |
 
 ---
 
 ## 🚀 Quick Start
 
 1. **Clone** the repository
-2. **Configure** database connection in `appsettings.json` ([details](/2-Setup/))
+2. **Configure** database connection in `appsettings.json` ([details](2.-Setup))
 3. **Build & Run** with `dotnet run`
-4. **Import data** via uSync ([details](/2-Setup/#23-setup-data))
+4. **Import data** via uSync ([details](2.-Setup#23-setup-data))
 5. **Start building** your site!
 
-See [2. Setup](/2-Setup/) for the full guide.
+See [2. Setup](2.-Setup) for the full guide.
