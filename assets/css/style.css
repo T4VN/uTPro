@@ -838,7 +838,7 @@ html {
     text-decoration: none;
     border: 2px solid transparent;
     transition: background 0.2s, border-color 0.2s;
-    margin: 0 6px;
+    margin: 6px;
 }
 
 .home-cta:hover {
