@@ -225,7 +225,7 @@
             if (allH1.length <= 1) return; // only page title, no sub-sections
 
             // Skip the first h1 (page title)
-            const headings = Array.from(allH1);
+            const headings = Array.from(allH1).slice(1);
 
             headings.forEach((heading) => {
                 if (!heading.id) {
@@ -245,8 +245,16 @@
                 subNav.appendChild(li);
             });
 
-            // Highlight active sub-nav on scroll
+            // Set active on click
             const allSubLinks = subNav.querySelectorAll('a');
+            allSubLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    allSubLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+
+            // Highlight active sub-nav on scroll
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
