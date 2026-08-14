@@ -490,6 +490,7 @@ html {
 .content {
     flex: 1;
     padding: 40px 48px;
+    width: 100%;
     max-width: 100%;
     overflow-x: hidden;
     overflow-wrap: break-word;
@@ -497,6 +498,7 @@ html {
 }
 
 .doc-content {
+    width: 100%;
     max-width: 100%;
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -590,6 +592,8 @@ html {
     padding: 2px 6px;
     border-radius: 4px;
     color: var(--color-primary-dark);
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 .doc-content pre {
@@ -603,8 +607,14 @@ html {
     font-size: 0.85rem;
     line-height: 1.6;
     max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
     word-break: normal;
     overflow-wrap: normal;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
 }
 
 .doc-content pre code {
@@ -620,9 +630,10 @@ html {
     border-collapse: collapse;
     margin-bottom: 20px;
     font-size: 0.875rem;
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    display: table;
+    table-layout: fixed;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .doc-content thead {
@@ -635,11 +646,15 @@ html {
     font-weight: 600;
     border-bottom: 2px solid var(--color-border);
     color: var(--color-text);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .doc-content td {
     padding: 10px 14px;
     border-bottom: 1px solid var(--color-border);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .doc-content tbody tr:hover {
@@ -775,10 +790,11 @@ html {
 
     .doc-content table {
         font-size: 0.75rem;
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        white-space: nowrap;
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     .doc-content th,
