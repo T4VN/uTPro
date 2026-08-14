@@ -1,4 +1,4 @@
-# <img width="50" height="50" alt="Logo" src="https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/logo-utpro.png" /> uTPro – Umbraco Turbo Pro
+# <img width="50" height="50" alt="Logo" src="/docs/screenshots/logo-utpro.png" /> uTPro – Umbraco Turbo Pro
 
 ## For developers, by developers
 
@@ -55,21 +55,21 @@ It enables developers to create **enterprise-grade websites** faster, more relia
 
 Components render exactly as they appear on the frontend, directly in the Block Grid editor.
 
-![Block Preview](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/readme-block-preview-live.png)
+![Block Preview](/docs/screenshots/readme-block-preview-live.png)
 
 ### Shared Components (Top/Bottom for layout)
 
 Set a Top/Bottom component once on a parent and it inherits down the content tree — site-wide headers, CTAs, footers with zero duplication.
 
-![Shared Component](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/readme-shared-component.png)
+![Shared Component](/docs/screenshots/readme-shared-component.png)
 
 ### Script Queue — CSS/JS loaded only when a component renders
 
 Each block component registers its own scripts; they're emitted only when that block is on the page.
 
-![Script Queue Code](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/readme-script-queue-code.png)
+![Script Queue Code](/docs/screenshots/readme-script-queue-code.png)
 
-![Script Queue Output](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/readme-script-queue-output.png)
+![Script Queue Output](/docs/screenshots/readme-script-queue-output.png)
 
 > 📖 See [Script Queue documentation](docs/5.-Script-Queue.md) for dependency-aware loading (jQuery-dependent vs standalone).
 
@@ -77,21 +77,21 @@ Each block component registers its own scripts; they're emitted only when that b
 
 Open Graph, Twitter Card, JSON-LD, hreflang, canonical — all generated automatically from content fields.
 
-![SEO Page Source](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/readme-seo-page-source.png)
+![SEO Page Source](/docs/screenshots/readme-seo-page-source.png)
 
 ### uTPro Dashboard
 
 Version check, site statistics, audit trail chart, and quick links — all in one backoffice tab.
 
-![Dashboard](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/readme-dashboard.png)
+![Dashboard](/docs/screenshots/readme-dashboard.png)
 
 ### Content Editing — Block Grid with components
 
-![Block Grid Editor](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/content-blockgrid-editor.png)
+![Block Grid Editor](/docs/screenshots/content-blockgrid-editor.png)
 
 ### SEO Audit — site-wide crawler (optional package)
 
-![SEO Audit](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/docs/screenshots/tools-seo-audit.png)
+![SEO Audit](/docs/screenshots/tools-seo-audit.png)
 
 ---
 
