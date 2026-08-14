@@ -116,7 +116,6 @@
             </div>
             <nav class="sidebar-nav" aria-label="Documentation navigation">
                 <ul id="nav-list">
-                    <li><a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %} data-page="Home">Home</a></li>
                     <li>
                         <a href="{{ '/getting-started/' | relative_url }}" {% if page.url contains 'getting-started' %}class="active"{% endif %} data-page="getting-started">Getting Started</a>
                         {% if page.url contains 'getting-started' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
