@@ -21,25 +21,13 @@ A powerful **File Manager** and **Media Cleanup** toolkit for the **Umbraco 16+*
 
 ## Features
 
-### File Manager
-- Windows Explorer-style navigation
-- Upload, download, create, rename, delete
-- Built-in Monaco Editor with syntax highlighting
-- Media preview (images, video, audio, PDF)
-- Import file via URL, Extract ZIP
-- Multi-root "Locations" support
-
-### Media Cleanup
-- Unused, Broken, Duplicates, Orphaned, Large files, Recycle Bin
-- Bulk actions, smart duplicate cleanup, preview
-
-### Security
-- Role-based: Admin / Settings / Sensitive Data
-- RCE guard, SSRF protection, path traversal protection
+- File Manager: browse, upload, download, edit (Monaco), preview, rename, delete, ZIP extract, multi-root
+- Media Cleanup: unused, broken, duplicates, orphaned, large files, recycle bin
+- Security: role-based, RCE guard, SSRF protection, path traversal protection
 
 ---
 
-## Installation
+## Quick Start
 
 ```bash
 dotnet add package uTPro.Feature.FileManager
@@ -49,16 +37,13 @@ Navigate to **Settings → File Manager**. No configuration needed.
 
 ---
 
-## Configuration
+## Documentation
 
-Under `uTPro:Feature:FileManager` in `appsettings.json`:
-
-| Key | Default | Description |
-|-----|---------|-------------|
-| `MaxUploadSizeMB` | `50` | Max upload size |
-| `MediaLargeFileThresholdMB` | `100` | Large file threshold |
-| `MediaScanCacheSeconds` | `30` | Scan cache |
-| `Roots` | `[]` | Multi-root locations |
+| Guide | Description |
+|---|---|
+| [Getting Started](getting-started/) | Install, permissions, UI overview |
+| [Media Cleanup](media-cleanup/) | Scan categories, actions, smart duplicates |
+| [Configuration](configuration/) | Upload limits, multi-root, security lists |
 
 ---
 

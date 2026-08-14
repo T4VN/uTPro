@@ -23,21 +23,14 @@ Supports **Umbraco 16, 17 and 18**. Works on **SQL Server**, **SQLite** and **Po
 
 ## Key features
 
-- **Three views** — Timeline, Content Logs, Audit Trail
-- **Full-text search** across all fields
-- **Rich filtering** — by user, event type, date range
-- **Quick date ranges** — This month, Last 30/7 days, Today, Custom
-- **Sortable columns** — server-side
-- **Quick edit links** — jump to content editor
-- **Local / UTC time toggle**
-- **Export to CSV** — up to 50,000 rows
-- **Shareable & bookmarkable filters**
-- **Admin-only access**
-- **Read-only** — no tables created, no data modified
+- Three views: Timeline, Content Logs, Audit Trail
+- Full-text search, rich filtering, sortable columns
+- Quick date ranges, Local/UTC toggle, CSV export
+- Admin-only access, read-only (zero schema changes)
 
 ---
 
-## Installation
+## Quick Start
 
 ```bash
 dotnet add package uTPro.Feature.AuditLog
@@ -47,21 +40,11 @@ Navigate to **Settings → Advanced → Audit Log Viewer**. No configuration req
 
 ---
 
-## The three views
+## Documentation
 
-| View | Source |
-|------|--------|
-| **Timeline** | `umbracoAudit` + `umbracoLog` merged |
-| **Content Logs** | `umbracoLog` |
-| **Audit Trail** | `umbracoAudit` |
-
----
-
-## Security
-
-- Admin-only (Settings + Administrators group)
-- CSV export neutralizes formula injection
-- Read-only — zero schema changes
+| Guide | Description |
+|---|---|
+| [Getting Started](getting-started/) | Install, three views, features, security, how it works |
 
 ---
 

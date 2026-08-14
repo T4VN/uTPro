@@ -192,11 +192,23 @@
                     <ul class="nav-group-list" id="nav-list-features" {% unless page.feature %}style="display:none"{% endunless %}>
                         <li>
                             <a href="{{ '/uTPro.Feature.SEOAudit/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SEOAudit' %}class="active"{% endif %} data-page="uTPro.Feature.SEOAudit">SEO Audit</a>
-                            {% if page.url contains 'uTPro.Feature.SEOAudit' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                            {% if page.url contains 'uTPro.Feature.SEOAudit' %}
+                            <ul class="sub-nav" id="sub-nav-feature">
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/site-audit/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/site-audit/' %}class="active"{% endif %}>Site Audit</a></li>
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/configuration/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/configuration/' %}class="active"{% endif %}>Configuration</a></li>
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/extensibility/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/extensibility/' %}class="active"{% endif %}>Extensibility</a></li>
+                            </ul>
+                            {% endif %}
                         </li>
                         <li>
                             <a href="{{ '/uTPro.Feature.UrlViewer/' | relative_url }}" {% if page.url contains 'uTPro.Feature.UrlViewer' %}class="active"{% endif %} data-page="uTPro.Feature.UrlViewer">URL Viewer</a>
-                            {% if page.url contains 'uTPro.Feature.UrlViewer' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                            {% if page.url contains 'uTPro.Feature.UrlViewer' %}
+                            <ul class="sub-nav" id="sub-nav-feature">
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.UrlViewer/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.UrlViewer/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.UrlViewer/analysis/' | relative_url }}" {% if page.url == '/uTPro.Feature.UrlViewer/analysis/' %}class="active"{% endif %}>SEO Analysis</a></li>
+                            </ul>
+                            {% endif %}
                         </li>
                         <li>
                             <a href="{{ '/uTPro.Feature.SimpleFormBuilder/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SimpleFormBuilder' %}class="active"{% endif %} data-page="uTPro.Feature.SimpleFormBuilder">Simple Form Builder</a>
@@ -228,7 +240,13 @@
                         </li>
                         <li>
                             <a href="{{ '/uTPro.Feature.FileManager/' | relative_url }}" {% if page.url contains 'uTPro.Feature.FileManager' %}class="active"{% endif %} data-page="uTPro.Feature.FileManager">File Manager</a>
-                            {% if page.url contains 'uTPro.Feature.FileManager' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                            {% if page.url contains 'uTPro.Feature.FileManager' %}
+                            <ul class="sub-nav" id="sub-nav-feature">
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.FileManager/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.FileManager/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.FileManager/media-cleanup/' | relative_url }}" {% if page.url == '/uTPro.Feature.FileManager/media-cleanup/' %}class="active"{% endif %}>Media Cleanup</a></li>
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.FileManager/configuration/' | relative_url }}" {% if page.url == '/uTPro.Feature.FileManager/configuration/' %}class="active"{% endif %}>Configuration</a></li>
+                            </ul>
+                            {% endif %}
                         </li>
                         <li>
                             <a href="{{ '/uTPro.Feature.JobMonitor/' | relative_url }}" {% if page.url contains 'uTPro.Feature.JobMonitor' %}class="active"{% endif %} data-page="uTPro.Feature.JobMonitor">Job Monitor</a>
@@ -245,7 +263,11 @@
                         </li>
                         <li>
                             <a href="{{ '/uTPro.Feature.AuditLog/' | relative_url }}" {% if page.url contains 'uTPro.Feature.AuditLog' %}class="active"{% endif %} data-page="uTPro.Feature.AuditLog">Audit Log</a>
-                            {% if page.url contains 'uTPro.Feature.AuditLog' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
+                            {% if page.url contains 'uTPro.Feature.AuditLog' %}
+                            <ul class="sub-nav" id="sub-nav-feature">
+                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.AuditLog/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.AuditLog/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
+                            </ul>
+                            {% endif %}
                         </li>
                     </ul>
                 </div>
