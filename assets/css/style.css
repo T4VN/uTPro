@@ -350,7 +350,7 @@ body {
 }
 
 .doc-content pre {
-    background: var(--color-sidebar-bg);
+    background: var(--color-bg-code);
     color: #e0ddd6;
     padding: 20px 24px;
     border-radius: var(--radius);
@@ -363,7 +363,7 @@ body {
 .doc-content pre code {
     background: none;
     padding: 0;
-    color: inherit;
+    color: var(--color-text);
     font-size: inherit;
 }
 
