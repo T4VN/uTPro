@@ -14,8 +14,8 @@
     --color-text: #1a1a2e;
     --color-text-muted: #6b7280;
     --color-border: #e8e4de;
-    --color-sidebar-bg: #2d1a0a;
-    --color-sidebar-text: #f0e6dc;
+    --color-sidebar-bg: linear-gradient(135deg, #f6821f 0%, #ff9e40 100%);
+    --color-sidebar-text: #000;
     --color-sidebar-active: #f6821f;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
