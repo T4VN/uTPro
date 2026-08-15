@@ -34,6 +34,7 @@ Your feedback — comments, reviews, or suggestions — is incredibly valuable. 
 | 8 | [Global Settings](/8-Global-Settings/) | CMS-driven settings (favicon, robots, images, forms, security headers) |
 | 9 | [Developer Reference](/9-Developer-Reference/) | Razor helpers & C# extensions |
 | 10 | [Backoffice Tools](/10-Backoffice-Tools/) | Block preview, error pages, optional packages |
+| 11 | [Search](/11-Search/) | Full-text search, synonym expansion, diacritics-insensitive |
 
 ---
 
