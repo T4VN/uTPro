@@ -149,10 +149,12 @@
             }
             // Scroll to the target element
             var targetEl = document.getElementById(hash.substring(1));
-            if (targetEl && scrollContainer) {
+            if (targetEl) {
                 setTimeout(function() {
                     targetEl.scrollIntoView({ behavior: 'auto', block: 'start' });
-                }, 100);
+                    // Re-run after scroll settles to ensure correct active state
+                    setTimeout(updateActiveToc, 200);
+                }, 50);
             }
         } else {
             updateActiveToc();
