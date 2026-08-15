@@ -27,13 +27,9 @@ A powerful **File Manager** and **Media Cleanup** toolkit for the **Umbraco 16+*
 
 ---
 
-## Quick Start
+## Configuration
 
-```bash
-dotnet add package uTPro.Feature.FileManager
-```
-
-Navigate to **Settings → File Manager**. No configuration needed.
+See [Configuration](configuration/) for all `appsettings.json` options (upload limits, multi-root, security lists).
 
 ---
 

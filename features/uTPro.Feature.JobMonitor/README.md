@@ -45,11 +45,7 @@ Open **Settings → Background Jobs Monitor**.
 
 ## Configuration
 
-| Key | Default | Description |
-|---|---|---|
-| `Storage` | `InMemory` | `InMemory` or `Durable` |
-| `HistoryCapacity` | `50` | Records per job |
-| `DiscoveryCacheSeconds` | `30` | Cache duration |
+See [Configuration](configuration/) for all `appsettings.json` options (storage mode, history, cache).
 
 ---
 

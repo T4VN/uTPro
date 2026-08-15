@@ -53,6 +53,12 @@ User searches "laptop"
 
 ---
 
+## Configuration
+
+No configuration required. The package works out of the box. See [Getting Started](getting-started/) for details.
+
+---
+
 ## Documentation
 
 | Guide | Description |

@@ -60,15 +60,7 @@ Render a form anywhere:
 
 ## Configuration
 
-Under `uTPro:Feature:Form` in `appsettings.json`:
-
-| Key | Default | Description |
-|-----|---------|-------------|
-| `RateLimit:Enabled` | `true` | Enable per-IP + per-form rate limit |
-| `RateLimit:PermitLimit` | `5` | Max submissions per window |
-| `RateLimit:WindowSeconds` | `60` | Rate limit window |
-| `FileUploadsPath` | `""` | Custom file upload folder |
-| `MaxExportEntries` | `10000` | Cap for ZIP export |
+See [Configuration](configuration/) for all `appsettings.json` options (rate limiting, file uploads, export).
 
 ---
 
@@ -83,6 +75,7 @@ Under `uTPro:Feature:Form` in `appsettings.json`:
 | [Conditions](conditions/) | Show/hide fields based on another field's value, operators, runtime |
 | [Public APIs & Import/Export](public-apis/) | REST endpoints, submission pipeline, JSON import/export |
 | [Security & Permissions](security/) | Roles, encryption, rate limiting, file uploads |
+| [Configuration](configuration/) | Rate limiting, file uploads path, export settings |
 | [Reference](reference/) | Project structure, database tables, migrations |
 
 ---

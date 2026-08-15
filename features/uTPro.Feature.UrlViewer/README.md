@@ -35,12 +35,19 @@ dotnet add package uTPro.Feature.UrlViewer
 
 ---
 
+## Configuration
+
+See [Configuration](configuration/) for SSRF guard options.
+
+---
+
 ## Documentation
 
 | Guide | Description |
 |---|---|
-| [Getting Started](getting-started/) | Install, architecture, security, configuration |
-| [SEO Analysis](analysis/) | Redirect chain, score breakdown, social, technical, carbon, cloaking, API |
+| [Getting Started](getting-started/) | Install, architecture, security |
+| [SEO Analysis](analysis/) | Redirect chain, score breakdown, social, technical, carbon, API |
+| [Configuration](configuration/) | SSRF guard relaxation for internal/dev hosts |
 
 ---
 

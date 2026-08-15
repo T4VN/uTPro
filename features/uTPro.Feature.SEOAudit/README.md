@@ -29,11 +29,9 @@ Site-wide SEO & content audit for **Umbraco 16, 17 and 18**. Crawls every Conten
 
 ---
 
-## Quick Start
+## Configuration
 
-```bash
-dotnet add package uTPro.Feature.SEOAudit
-```
+See [Configuration](configuration/) for all `appsettings.json` options.
 
 ---
 
@@ -43,7 +41,7 @@ dotnet add package uTPro.Feature.SEOAudit
 |---|---|
 | [Getting Started](getting-started/) | Install, architecture, backoffice location, security |
 | [Site Audit](site-audit/) | How the crawler works, checks, per-page detail, CSV export |
-| [Configuration](configuration/) | All appsettings keys: scheduling, concurrency, links, CWV |
+| [Configuration](configuration/) | Scheduling, concurrency, links, Core Web Vitals, URL patterns |
 | [Extensibility](extensibility/) | Custom issue checks with IUrlScanIssue, per-node tab |
 
 ---
