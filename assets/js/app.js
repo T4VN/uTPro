@@ -104,9 +104,11 @@
                     currentId = headings[i].id;
                 }
             }
+            var activeText = '';
             for (var j = 0; j < tocLinks.length; j++) {
                 if (tocLinks[j].getAttribute('href') === '#' + currentId) {
                     tocLinks[j].classList.add('active');
+                    activeText = tocLinks[j].textContent;
                 } else {
                     tocLinks[j].classList.remove('active');
                 }
@@ -117,6 +119,11 @@
                 } else {
                     tocMobileLinks[k].classList.remove('active');
                 }
+            }
+            // Update mobile toggle text with active section name
+            var mobileToggleText = document.querySelector('#toc-mobile-toggle span');
+            if (mobileToggleText) {
+                mobileToggleText.textContent = activeText || 'On this page';
             }
             // Update URL hash to match active section
             if (currentId && window.location.hash !== '#' + currentId) {
