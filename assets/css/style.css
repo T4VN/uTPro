@@ -737,9 +737,6 @@ html {
 }
 
 .doc-content pre {
-    background: var(--color-bg-code);
-    color: #e0ddd6;
-    padding: 20px 24px;
     border-radius: var(--radius);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -755,14 +752,60 @@ html {
 }
 
 .doc-content pre code {
-    background: none;
     padding: 0;
-    color: var(--color-text);
+    color: inherit;
     font-size: inherit;
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+/* ── highlight.js overrides ── */
+.doc-content pre code.hljs {
+    padding: 0;
+    border-radius: var(--radius);
+}
+
+/* Line numbers */
+.hljs-ln {
+    width: 100%;
+    padding: 16px;
+    border-collapse: collapse;
+}
+
+.hljs-ln td {
+    padding: 0;
+    border: none;
+    /* background: transparent; */
+}
+.hljs-ln tr:first-child td{
+    padding-top:10px
+}
+
+.hljs-ln tr:last-child td{
+    padding-bottom:10px
+}
+.hljs-ln tr {
+    background: transparent;
+}
+
+.hljs-ln-numbers {
+    user-select: none;
+    text-align: right;
+    color: var(--color-primary);
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+    width: 32px;
+    vertical-align: top;
+    background: var(--color-sidebar-bg)
+}
+
+.hljs-ln-code {
+    padding-left: 12px !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ── Tables ── */
-.doc-content table {
+.doc-content table:not(.hljs-ln) {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
@@ -776,11 +819,11 @@ html {
     overflow: hidden;
 }
 
-.doc-content thead {
+.doc-content table:not(.hljs-ln) thead {
     background: var(--color-sidebar-bg);
 }
 
-.doc-content th {
+.doc-content table:not(.hljs-ln) th {
     text-align: left;
     padding: 12px 16px;
     font-weight: 600;
@@ -790,12 +833,12 @@ html {
     overflow-wrap: break-word;
 }
 
-.doc-content th:first-child,
-.doc-content td:first-child {
+.doc-content table:not(.hljs-ln) th:first-child,
+.doc-content table:not(.hljs-ln) td:first-child {
     width: auto;
 }
 
-.doc-content td {
+.doc-content table:not(.hljs-ln) td {
     padding: 14px 16px;
     border-bottom: 1px solid var(--color-border);
     word-wrap: break-word;
@@ -803,8 +846,8 @@ html {
 }
 
 /* Thu nhỏ cột # (cột đầu tiên chứa số thứ tự) */
-.doc-content table th:first-child:is([abbr="#"], :empty),
-.doc-content table td:first-child {
+.doc-content table:not(.hljs-ln) th:first-child:is([abbr="#"], :empty),
+.doc-content table:not(.hljs-ln) td:first-child {
     /* fallback: CSS không detect nội dung, dùng JS bổ trợ */
 }
 
@@ -816,19 +859,22 @@ html {
     text-align: center;
 }
 
-.doc-content tbody tr:last-child td {
+.doc-content table:not(.hljs-ln) tbody tr:last-child td {
     border-bottom: none;
 }
 
-.doc-content tbody tr:nth-child(odd) {
+.doc-content > table:not(.hljs-ln) tbody tr:nth-child(odd),
+.doc-content > .table-wrapper tbody tr:nth-child(odd) {
     background: #ffffff;
 }
 
-.doc-content tbody tr:nth-child(even) {
+.doc-content > table:not(.hljs-ln) tbody tr:nth-child(even),
+.doc-content > .table-wrapper tbody tr:nth-child(even) {
     background: #f5f3ef;
 }
 
-.doc-content tbody tr:hover {
+.doc-content > table:not(.hljs-ln) tbody tr:hover,
+.doc-content > .table-wrapper tbody tr:hover {
     background: #f0ede8;
 }
 
