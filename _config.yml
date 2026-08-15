@@ -24,6 +24,15 @@ kramdown:
 sass:
   style: compressed
 
+# Compress HTML (exclude JS to prevent single-line comment issues)
+compress_html:
+  clippings: all
+  comments: ["<!-- ", " -->"]
+  endings: all
+  startings: []
+  blanklines: false
+  profile: false
+
 # Defaults - apply layout to all md files
 defaults:
   - scope:

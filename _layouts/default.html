@@ -100,11 +100,12 @@ layout: compress
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="{{ '/assets/css/atom-one-dark.min.css' | relative_url }}">
     {% seo %}
 </head>
 <body>
@@ -332,7 +333,7 @@ layout: compress
     </div>
 
     <script>
-        // Mobile sidebar toggle
+        /* Mobile sidebar toggle */
         const sidebar = document.getElementById('sidebar');
         const toggle = document.getElementById('menu-toggle');
         const closeBtn = document.getElementById('sidebar-close');
@@ -348,7 +349,7 @@ layout: compress
             }
         });
 
-        // Close sidebar when clicking a nav link (mobile)
+        /* Close sidebar when clicking a nav link (mobile) */
         sidebar.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 900) {
@@ -357,7 +358,7 @@ layout: compress
             });
         });
 
-        // Nav group toggle — clicking a group shows its list and hides the other
+        /* Nav group toggle */
         (function() {
             const toggleProject = document.getElementById('toggle-project');
             const toggleFeatures = document.getElementById('toggle-features');
@@ -365,7 +366,6 @@ layout: compress
             const listFeatures = document.getElementById('nav-list-features');
 
             function activateGroup(activeToggle, activeList, inactiveToggle, inactiveList) {
-                // If already active, do nothing (don't allow collapsing active group)
                 if (activeToggle.classList.contains('active')) return;
 
                 activeToggle.classList.add('active');
@@ -387,7 +387,7 @@ layout: compress
             }
         })();
 
-        // Auto-generate sub-navigation from h2 headings (sub-sections)
+        /* Auto-generate sub-navigation from h2 headings */
         (function() {
             const subNav = document.getElementById('sub-nav');
             if (!subNav) return;
@@ -413,7 +413,7 @@ layout: compress
                 subNav.appendChild(li);
             });
 
-            // Set active on click
+            /* Set active on click */
             const allSubLinks = subNav.querySelectorAll('a');
             allSubLinks.forEach(link => {
                 link.addEventListener('click', () => {
@@ -422,7 +422,7 @@ layout: compress
                 });
             });
 
-            // Highlight active sub-nav on scroll
+            /* Highlight active sub-nav on scroll */
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -436,7 +436,7 @@ layout: compress
             headings.forEach(h => observer.observe(h));
         })();
 
-        // Doc search (handles both desktop topbar and mobile sidebar inputs)
+        /* Doc search */
         (function() {
             const inputs = [
                 { input: document.getElementById('doc-search'), results: document.getElementById('search-results') },
@@ -532,7 +532,7 @@ layout: compress
                 });
             });
 
-            // Ctrl+K shortcut to focus search
+            /* Ctrl+K shortcut to focus search */
             document.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                     e.preventDefault();
@@ -541,7 +541,7 @@ layout: compress
                 }
             });
         })();
-        // Auto-detect tables with "#" column and add class for narrow first column
+        /* Auto-detect tables with "#" column and add class for narrow first column */
         (function() {
             document.querySelectorAll('.doc-content table').forEach(function(table) {
                 var firstTh = table.querySelector('thead th:first-child');
@@ -551,9 +551,9 @@ layout: compress
             });
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/csharp.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2/dist/highlightjs-line-numbers.min.js" defer></script>
+    <script src="{{ '/assets/js/highlight.min.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/js/csharp.min.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/js/highlightjs-line-numbers.min.js' | relative_url }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('pre code').forEach(function(block) {
