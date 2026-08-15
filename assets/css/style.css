@@ -817,27 +817,33 @@ html {
 
 .home-hero {
     text-align: center;
-    padding: 48px 20px 40px;
+    padding: 64px 20px 56px;
+    background: linear-gradient(rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.75)), url('/assets/img/hero-bg.webp') center/cover no-repeat;
+    border-radius: var(--radius);
+    margin-bottom: 32px;
+    position: relative;
 }
 
 .home-hero img {
     box-shadow: none;
     margin-bottom: 16px;
+    filter: drop-shadow(0 0 8px rgba(246, 130, 31, 1)) drop-shadow(0 0 20px rgba(246, 130, 31, 0.7)) drop-shadow(0 0 40px rgba(246, 130, 31, 0.4));
 }
 
 .home-hero h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
     margin-bottom: 12px;
     border: none;
     padding: 0;
+    color: var(--color-primary);
 }
 
 .home-hero p {
     font-size: 1.05rem;
-    color: var(--color-text-muted);
-    max-width: 540px;
-    margin: 0 auto 24px;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 580px;
+    margin: 0 auto 28px;
 }
 
 .home-cta {
@@ -859,14 +865,15 @@ html {
 }
 
 .home-cta-secondary {
-    background: transparent;
-    color: var(--color-primary) !important;
-    border: 2px solid var(--color-primary);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff !important;
+    border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .home-cta-secondary:hover {
     background: var(--color-primary);
     color: #fff !important;
+    border-color: var(--color-primary);
 }
 
 .home-grid {
