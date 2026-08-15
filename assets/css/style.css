@@ -269,12 +269,12 @@ html {
 
 .topbar-search .search-clear-btn {
     right: 56px;
-    color: var(--color-text-muted);
+    color: #ffffff;
 }
 
 .topbar-search .search-clear-btn:hover {
-    color: var(--color-text);
-    background: rgba(0,0,0,0.06);
+    color: #ffffff;
+    background: rgba(255,255,255,0.2);
 }
 
 .hero-search .search-clear-btn {
