@@ -9,6 +9,12 @@ permalink: "/"
     <img src="/Logo.png" alt="uTPro Logo" width="72" height="72">
     <h1>uTPro Documentation</h1>
     <p>Documentation for <strong>uTPro – Umbraco Turbo Pro</strong>, a production-ready Starter Kit for the Umbraco platform. For both <strong>Developers</strong> and <strong>Content Editors</strong>.</p>
+    <div class="hero-search">
+        <svg class="hero-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="hero-search" placeholder="Search documentation..." aria-label="Search documentation">
+        <button type="button" class="search-clear-btn" aria-label="Clear search" style="display:none;">✕</button>
+        <div id="hero-search-results" class="search-results"></div>
+    </div>
     <a href="/getting-started/" class="home-cta">Getting Started →</a>
     <a href="https://release.utpro.dev/" class="home-cta home-cta-secondary" target="_blank" rel="noopener noreferrer">Release Stats ↗</a>
     <a href="https://notebook.google.com/notebook/027a8e55-9621-4cf9-852b-576de09c03ca/preview/" class="home-cta home-cta-secondary" target="_blank" rel="noopener noreferrer">Ask AI *</a>
@@ -66,31 +72,52 @@ permalink: "/"
 
 <div class="home-grid">
     <a href="/uTPro.Feature.SEOAudit/" class="home-card">
-        <strong>SEO Audit</strong>
+        <div class="home-card-header">
+            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.seoaudit/2.0.4/icon" alt="" width="20" height="20" class="home-card-icon" loading="lazy">
+            <strong>SEO Audit</strong>
+        </div>
         <span>Site-wide SEO crawler, health score, issues & CSV export</span>
     </a>
     <a href="/uTPro.Feature.UrlViewer/" class="home-card">
-        <strong>URL Viewer</strong>
+        <div class="home-card-header">
+            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.urlviewer/3.1.0/icon" alt="" width="20" height="20" class="home-card-icon" loading="lazy">
+            <strong>URL Viewer</strong>
+        </div>
         <span>Fetch URLs, redirect chain, SEO score analysis</span>
     </a>
     <a href="/uTPro.Feature.SimpleFormBuilder/" class="home-card">
-        <strong>Simple Form Builder</strong>
+        <div class="home-card-header">
+            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.simpleformbuilder/5.0.1/icon" alt="" width="20" height="20" class="home-card-icon" loading="lazy">
+            <strong>Simple Form Builder</strong>
+        </div>
         <span>Visual form builder, entries, file uploads, API</span>
     </a>
     <a href="/uTPro.Feature.SearchPlus/" class="home-card">
-        <strong>Search Plus</strong>
+        <div class="home-card-header">
+            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.searchplus/1.0.0/icon" alt="" width="20" height="20" class="home-card-icon" loading="lazy">
+            <strong>Search Plus</strong>
+        </div>
         <span>Synonym expansion & diacritics-insensitive search</span>
     </a>
     <a href="/uTPro.Feature.FileManager/" class="home-card">
-        <strong>File Manager</strong>
+        <div class="home-card-header">
+            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.filemanager/6.0.0/icon" alt="" width="20" height="20" class="home-card-icon" loading="lazy">
+            <strong>File Manager</strong>
+        </div>
         <span>Server file browser, code editor, media cleanup</span>
     </a>
     <a href="/uTPro.Feature.JobMonitor/" class="home-card">
-        <strong>Job Monitor</strong>
+        <div class="home-card-header">
+            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.jobmonitor/2.0.0/icon" alt="" width="20" height="20" class="home-card-icon" loading="lazy">
+            <strong>Job Monitor</strong>
+        </div>
         <span>Background jobs dashboard, telemetry, manual trigger</span>
     </a>
     <a href="/uTPro.Feature.AuditLog/" class="home-card">
-        <strong>Audit Log</strong>
+        <div class="home-card-header">
+            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.auditlog/5.0.0/icon" alt="" width="20" height="20" class="home-card-icon" loading="lazy">
+            <strong>Audit Log</strong>
+        </div>
         <span>Browse, search & export audit trail and content logs</span>
     </a>
 </div>

@@ -116,6 +116,7 @@
             </div>
             <div class="sidebar-search-mobile">
                 <input type="text" id="doc-search-mobile" placeholder="Search docs..." aria-label="Search documentation">
+                <button type="button" class="search-clear-btn" aria-label="Clear search" style="display:none;">✕</button>
                 <div id="search-results-mobile" class="search-results"></div>
             </div>
             <nav class="sidebar-nav" aria-label="Documentation navigation">
@@ -293,7 +294,10 @@
                 </button>
                 <div class="topbar-title">{{ page.title | default: site.title }}</div>
                 <div class="topbar-search">
+                    <svg class="topbar-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     <input type="text" id="doc-search" placeholder="Search docs..." aria-label="Search documentation">
+                    <button type="button" class="search-clear-btn" aria-label="Clear search" style="display:none;">✕</button>
+                    <kbd class="topbar-search-kbd">Ctrl+K</kbd>
                     <div id="search-results" class="search-results"></div>
                 </div>
             </header>
@@ -423,7 +427,8 @@
         (function() {
             const inputs = [
                 { input: document.getElementById('doc-search'), results: document.getElementById('search-results') },
-                { input: document.getElementById('doc-search-mobile'), results: document.getElementById('search-results-mobile') }
+                { input: document.getElementById('doc-search-mobile'), results: document.getElementById('search-results-mobile') },
+                { input: document.getElementById('hero-search'), results: document.getElementById('hero-search-results') }
             ].filter(s => s.input && s.results);
 
             if (inputs.length === 0) return;
@@ -480,13 +485,30 @@
 
             inputs.forEach(({ input, results }) => {
                 let timer = null;
+                const clearBtn = input.parentElement.querySelector('.search-clear-btn');
+
+                function updateClearBtn() {
+                    if (clearBtn) clearBtn.style.display = input.value.length > 0 ? '' : 'none';
+                }
+
                 input.addEventListener('input', (e) => {
                     clearTimeout(timer);
+                    updateClearBtn();
                     timer = setTimeout(() => doSearch(e.target.value.trim(), results), 200);
                 });
                 input.addEventListener('focus', () => {
                     if (input.value.trim().length >= 2) doSearch(input.value.trim(), results);
                 });
+
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', () => {
+                        input.value = '';
+                        results.style.display = 'none';
+                        results.innerHTML = '';
+                        updateClearBtn();
+                        input.focus();
+                    });
+                }
             });
 
             document.addEventListener('click', (e) => {
@@ -495,6 +517,15 @@
                         results.style.display = 'none';
                     }
                 });
+            });
+
+            // Ctrl+K shortcut to focus search
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('doc-search');
+                    if (searchInput) searchInput.focus();
+                }
             });
         })();
         // Auto-detect tables with "#" column and add class for narrow first column
