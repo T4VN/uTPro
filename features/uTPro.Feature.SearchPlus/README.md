@@ -1,4 +1,4 @@
----
+﻿---
 layout: default
 title: "uTPro.Feature.SearchPlus"
 description: "Enhance Umbraco site search with synonym expansion and diacritics-insensitive matching – managed from the backoffice."
@@ -17,7 +17,7 @@ Works with **Umbraco 17**. Database support: **SQL Server**, **SQLite** and **Po
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.SearchPlus.svg)](https://www.nuget.org/packages/uTPro.Feature.SearchPlus)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.searchplus)
 
-![uTPro Search Plus](/screenshots/search-plus-backoffice.png)
+![uTPro Search Plus](/screenshots/uTPro/search-plus-backoffice.png)
 
 ---
 

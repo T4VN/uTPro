@@ -34,6 +34,15 @@ The package ships a ready-to-use **uTPro Form Picker** data type (created automa
 
 The dropdown only lists forms whose **Show in content picker** toggle is on.
 
+## Show in content picker toggle
+
+Each form has a **Show in content picker** toggle in the form editor's settings panel:
+
+- **ON** (default for new forms) — the form appears in Form Picker dropdowns across content
+- **OFF** — the form is hidden from all pickers (useful for forms used only via direct alias rendering or API, or archived forms you don't want editors to accidentally select)
+
+This setting is stored as the `ShowInPicker` column in the database. Turning it off does not affect forms already selected on published content — those continue rendering normally. It only controls whether the form appears as an option in the picker dropdown going forward.
+
 ## Restricting a picker to specific forms
 
 ![Form Picker data type — Allowed forms setting](/screenshots/uTPro.Feature.SimpleFormBuilder/form-picker.png)

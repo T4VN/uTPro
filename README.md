@@ -1,4 +1,4 @@
----
+﻿---
 layout: default
 title: "Quick Overview"
 description: "Quick overview of uTPro – features, architecture, tech stack, screenshots, and what's included in the Umbraco Starter Kit."
@@ -7,7 +7,7 @@ permalink: "/quick-overview/"
 
 # Quick Overview
 
-<img width="50" height="50" alt="Logo" src="/screenshots/logo-utpro.png" /> **uTPro – Umbraco Turbo Pro**
+<img width="50" height="50" alt="Logo" src="/screenshots/uTPro/logo-utpro.png" /> **uTPro – Umbraco Turbo Pro**
 
 A powerful **Starter Kit Template** built to **accelerate website development on the Umbraco platform**.
 It enables developers to create **enterprise-grade websites** faster, more reliably, and with a professional structure from day one.
@@ -50,21 +50,21 @@ It enables developers to create **enterprise-grade websites** faster, more relia
 
 Components render exactly as they appear on the frontend, directly in the Block Grid editor.
 
-![Block Preview](/screenshots/readme-block-preview-live.png)
+![Block Preview](/screenshots/uTPro/readme-block-preview-live.png)
 
 ### Shared Components (Top/Bottom for layout)
 
 Set a Top/Bottom component once on a parent and it inherits down the content tree — site-wide headers, CTAs, footers with zero duplication.
 
-![Shared Component](/screenshots/readme-shared-component.png)
+![Shared Component](/screenshots/uTPro/readme-shared-component.png)
 
 ### Script Queue — CSS/JS loaded only when a component renders
 
 Each block component registers its own scripts; they're emitted only when that block is on the page.
 
-![Script Queue Code](/screenshots/readme-script-queue-code.png)
+![Script Queue Code](/screenshots/uTPro/readme-script-queue-code.png)
 
-![Script Queue Output](/screenshots/readme-script-queue-output.png)
+![Script Queue Output](/screenshots/uTPro/readme-script-queue-output.png)
 
 > 📖 See [Script Queue documentation](/5-Script-Queue/) for dependency-aware loading.
 
@@ -72,21 +72,21 @@ Each block component registers its own scripts; they're emitted only when that b
 
 Open Graph, Twitter Card, JSON-LD, hreflang, canonical — all generated automatically from content fields.
 
-![SEO Page Source](/screenshots/readme-seo-page-source.png)
+![SEO Page Source](/screenshots/uTPro/readme-seo-page-source.png)
 
 ### uTPro Dashboard
 
 Version check, site statistics, audit trail chart, and quick links — all in one backoffice tab.
 
-![Dashboard](/screenshots/readme-dashboard.png)
+![Dashboard](/screenshots/uTPro/readme-dashboard.png)
 
 ### Content Editing — Block Grid with components
 
-![Block Grid Editor](/screenshots/content-blockgrid-editor.png)
+![Block Grid Editor](/screenshots/uTPro/content-blockgrid-editor.png)
 
 ### SEO Audit — site-wide crawler (optional package)
 
-![SEO Audit](/screenshots/tools-seo-audit.png)
+![SEO Audit](/screenshots/uTPro/tools-seo-audit.png)
 
 ---
 
