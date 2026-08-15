@@ -856,6 +856,22 @@ html {
     border-radius: var(--radius);
     margin-bottom: 32px;
     position: relative;
+    overflow: hidden;
+}
+
+.home-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 0;
+    border-radius: var(--radius);
+}
+
+.home-hero > * {
+    position: relative;
+    z-index: 1;
 }
 
 .home-hero img {
