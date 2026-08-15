@@ -1,4 +1,4 @@
-﻿---
+---
 layout: default
 title: "uTPro.Feature.SearchPlus"
 description: "Enhance Umbraco site search with synonym expansion and diacritics-insensitive matching – managed from the backoffice."
