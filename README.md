@@ -107,7 +107,7 @@ uTPro (solution)
 
 | Component | Version |
 |-----------|---------|
-| Umbraco CMS | 17 / 18 |
+| Umbraco CMS | 17 |
 | .NET | 10.0 |
 | Database | PostgreSQL (default) · SQL Server · SQLite |
 | uSync | latest |

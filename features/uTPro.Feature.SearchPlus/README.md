@@ -9,7 +9,7 @@ feature_name: "Search Plus"
 
 # uTPro Search Plus for Umbraco
 
-> 👤 Dành cho: **Cả hai** — Content Editor quản lý synonym từ backoffice, Developer tích hợp và cấu hình search.
+> 👤 For: **Both** — Content Editors manage synonyms from the backoffice; Developers integrate and configure search.
 
 Enhance site search with **synonym expansion** and **diacritics-insensitive matching** — managed directly from the Umbraco backoffice.
 

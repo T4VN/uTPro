@@ -13,7 +13,7 @@ title: "_Footer"
 ---
 #### AI Documentation Assistant
 
-Bạn có thể hỏi AI về tài liệu uTPro qua [Google NotebookLM](https://notebook.google.com/notebook/d2/atlas5-9621-4df9-b52b-5/5a0e9fd3ca) — hỗ trợ tiếng Việt & English.
+You can ask AI about uTPro documentation via [Google NotebookLM](https://notebook.google.com/notebook/d2/atlas5-9621-4df9-b52b-5/5a0e9fd3ca) — supports both English & Vietnamese.
 
 ---
 #### Contact & Support

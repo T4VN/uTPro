@@ -28,8 +28,8 @@ If you manage website content in the backoffice, start here:
 
 | # | Page | Description |
 |---|------|-------------|
-| 7 | [Content Editing](/7-Content-Editing/) | Create/edit pages, blocks, SEO fields, multilingual content |
 | 6 | [Dashboard](/6-Dashboard/) | Backoffice dashboard — version check, site statistics |
+| 7 | [Content Editing](/7-Content-Editing/) | Create/edit pages, blocks, SEO fields, multilingual content |
 | 8 | [Global Settings](/8-Global-Settings/) | Site settings — favicon, robots, images, forms, security headers |
 | 10 | [Backoffice Tools](/10-Backoffice-Tools/) | Tools — block preview, SEO audit, file manager |
 | 11 | [Search](/11-Search/) | Site search setup and configuration |

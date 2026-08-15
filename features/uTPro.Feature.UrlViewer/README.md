@@ -9,7 +9,7 @@ feature_name: "URL Viewer"
 
 # uTPro URL Viewer for Umbraco
 
-> 👤 Dành cho: **Cả hai** — Content Editor kiểm tra SEO & redirect, Developer cấu hình SSRF guard và dùng API.
+> 👤 For: **Both** — Content Editors check SEO & redirects; Developers configure SSRF guard and use the API.
 
 Fetch any URL from inside the Umbraco backoffice and see **exactly** what a search engine or browser sees — redirect chain, response headers, HTML source, and a full static analysis including a **composite SEO score**.
 
