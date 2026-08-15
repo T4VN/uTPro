@@ -115,8 +115,15 @@
                 <button class="sidebar-close" id="sidebar-close" aria-label="Close navigation">✕</button>
             </div>
             <div class="sidebar-search-mobile">
-                <input type="text" id="doc-search-mobile" placeholder="Search docs..." aria-label="Search documentation">
-                <button type="button" class="search-clear-btn" aria-label="Clear search" style="display:none;">✕</button>
+                <div class="sidebar-search-mobile-row">
+                    <div style="position:relative;flex:1;min-width:0;">
+                        <input type="text" id="doc-search-mobile" placeholder="Search documentation..." aria-label="Search documentation">
+                        <button type="button" class="search-clear-btn" aria-label="Clear search" style="display:none;">✕</button>
+                    </div>
+                    <a href="https://notebook.google.com/notebook/027a8e55-9621-4cf9-852b-576de09c03ca/preview/" target="_blank" rel="noopener noreferrer" class="sidebar-ai-link" title="Ask AI about uTPro docs">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a2 2 0 1 1 0 4h-1v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-1H2a2 2 0 1 1 0-4h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="14" r="1.5"/><circle cx="15" cy="14" r="1.5"/></svg>
+                    </a>
+                </div>
                 <div id="search-results-mobile" class="search-results"></div>
             </div>
             <nav class="sidebar-nav" aria-label="Documentation navigation">
@@ -295,11 +302,15 @@
                 <div class="topbar-title">{{ page.title | default: site.title }}</div>
                 <div class="topbar-search">
                     <svg class="topbar-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" id="doc-search" placeholder="Search docs..." aria-label="Search documentation">
+                    <input type="text" id="doc-search" placeholder="Search documentation..." aria-label="Search documentation">
                     <button type="button" class="search-clear-btn" aria-label="Clear search" style="display:none;">✕</button>
                     <kbd class="topbar-search-kbd">Ctrl+K</kbd>
                     <div id="search-results" class="search-results"></div>
                 </div>
+                <a href="https://notebook.google.com/notebook/027a8e55-9621-4cf9-852b-576de09c03ca/preview/" target="_blank" rel="noopener noreferrer" class="topbar-ai-link" title="Ask AI about uTPro docs">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a2 2 0 1 1 0 4h-1v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-1H2a2 2 0 1 1 0-4h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="14" r="1.5"/><circle cx="15" cy="14" r="1.5"/></svg>
+                    Ask AI
+                </a>
             </header>
 
             <main class="content">
@@ -310,8 +321,6 @@
 
             <footer class="doc-footer">
                 <p>
-                    <a href="https://notebook.google.com/notebook/027a8e55-9621-4cf9-852b-576de09c03ca/preview/" target="_blank" rel="noopener noreferrer" class="ai-chat-link" title="Ask AI about uTPro docs">Ask AI *</a>
-                    ·
                     © <a href="https://utpro.dev" target="_blank" rel="noopener noreferrer">uTPro</a> · powered by <a href="https://t4vn.com" target="_blank" rel="noopener noreferrer">T4VN</a>
                 </p>
             </footer>
