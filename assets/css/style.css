@@ -576,7 +576,7 @@ html {
     border-bottom: none;
     display: flex;
     align-items: center;
-    padding: 0 32px;
+    padding: 0 16px 0 32px;
     gap: 16px;
     position: sticky;
     top: 0;
