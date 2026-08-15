@@ -23,7 +23,6 @@
     <PackageReference Include="Our.Umbraco.PostgreSql" Version="17.6.0" />
     <PackageReference Include="uSync" Version="17.3.6" />
     <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.1" />
-    <ProjectReference Include="..\..\Extension\uTPro.Extension\uTPro.Extension.csproj" />
     <ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
     <ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
     <ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
