@@ -775,7 +775,6 @@ html {
 .hljs-ln td {
     padding: 0;
     border: none;
-    /* background: transparent; */
 }
 .hljs-ln tr:first-child td{
     padding-top:10px
@@ -843,12 +842,6 @@ html {
     border-bottom: 1px solid var(--color-border);
     word-wrap: break-word;
     overflow-wrap: break-word;
-}
-
-/* Thu nhỏ cột # (cột đầu tiên chứa số thứ tự) */
-.doc-content table:not(.hljs-ln) th:first-child:is([abbr="#"], :empty),
-.doc-content table:not(.hljs-ln) td:first-child {
-    /* fallback: CSS không detect nội dung, dùng JS bổ trợ */
 }
 
 .doc-content table.has-index-col th:first-child,
