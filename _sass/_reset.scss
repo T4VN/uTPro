@@ -18,8 +18,12 @@ body {
     background: var(--color-bg);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overscroll-behavior: none;
 }
 
 html {
     overflow-x: hidden;
+    height: -webkit-fill-available;
 }
