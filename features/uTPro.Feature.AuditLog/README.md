@@ -9,7 +9,7 @@ feature_name: "Audit Log"
 
 # uTPro Audit Log Viewer for Umbraco
 
-> 👤 For: **Admin** — View all activity history: logins, saves, publishes, deletes — with search, filter and export.
+> For: **Admin** — View all activity history: logins, saves, publishes, deletes — with search, filter and export.
 
 The missing audit log & content log viewer for the Umbraco backoffice. Browse, search, filter, sort, and export every login, save, publish, move, and delete in your Umbraco site.
 

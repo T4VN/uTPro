@@ -9,7 +9,7 @@ feature_name: "SEO Audit"
 
 # uTPro SEO Audit for Umbraco
 
-> 👤 For: **Both** — Content Editors run audits & view results; Developers configure scheduling and write custom checks.
+> For: **Both** — Content Editors run audits & view results; Developers configure scheduling and write custom checks.
 
 Site-wide SEO & content audit for **Umbraco 16, 17 and 18**. Crawls every Content and Media URL, checks for broken links/images/resources, and audits each page — producing a **composite SEO score**, a **health score**, prioritised **issues**, per-page details and **CSV export**, all in a dedicated backoffice section.
 

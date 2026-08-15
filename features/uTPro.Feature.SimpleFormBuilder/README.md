@@ -9,7 +9,7 @@ feature_name: "Simple Form Builder"
 
 # uTPro Simple Form Builder for Umbraco
 
-> 👤 For: **Both** — Content Editors build forms visually with no code; Developers customize field types and API.
+> For: **Both** — Content Editors build forms visually with no code; Developers customize field types and API.
 
 A lightweight form builder — create and manage dynamic forms directly from the Umbraco backoffice with no code required for everyday use.
 

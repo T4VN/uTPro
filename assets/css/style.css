@@ -9,7 +9,7 @@
     --color-primary-hover: #FFCE40;
     --color-primary-dark: #d96d10;
     --color-primary-gradient: linear-gradient(135deg, #f6821f 0%, #ff9e40 100%);
-    --color-bg: #ffffff;
+    --color-bg: #faf8f5;
     --color-bg-alt: #faf8f5;
     --color-bg-code: #f6f3ef;
     --color-text: #1a1a2e;
@@ -629,40 +629,74 @@ html {
     margin-bottom: 20px;
     font-size: 0.875rem;
     display: table;
-    table-layout: fixed;
+    table-layout: auto;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    border: none;
+    border-radius: var(--radius);
+    overflow: hidden;
 }
 
 .doc-content thead {
-    background: var(--color-bg-alt);
+    background: var(--color-sidebar-bg);
 }
 
 .doc-content th {
     text-align: left;
-    padding: 10px 14px;
+    padding: 12px 16px;
     font-weight: 600;
-    border-bottom: 2px solid var(--color-border);
-    color: var(--color-text);
+    border-bottom: none;
+    color: var(--color-primary);
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
+.doc-content th:first-child,
+.doc-content td:first-child {
+    width: auto;
+}
+
 .doc-content td {
-    padding: 10px 14px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--color-border);
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
+/* Thu nhỏ cột # (cột đầu tiên chứa số thứ tự) */
+.doc-content table th:first-child:is([abbr="#"], :empty),
+.doc-content table td:first-child {
+    /* fallback: CSS không detect nội dung, dùng JS bổ trợ */
+}
+
+.doc-content table.has-index-col th:first-child,
+.doc-content table.has-index-col td:first-child {
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    text-align: center;
+}
+
+.doc-content tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.doc-content tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+.doc-content tbody tr:nth-child(even) {
+    background: #f5f3ef;
+}
+
 .doc-content tbody tr:hover {
-    background: var(--color-bg-alt);
+    background: #f0ede8;
 }
 
 /* ── Blockquotes ── */
 .doc-content blockquote {
     border-left: 4px solid var(--color-primary);
-    background: var(--color-bg-alt);
+    background: #fff;
     padding: 14px 20px;
     margin-bottom: 16px;
     border-radius: 0 var(--radius) var(--radius) 0;
@@ -888,7 +922,7 @@ html {
     flex-direction: column;
     gap: 4px;
     padding: 20px;
-    background: var(--color-bg-alt);
+    background: #fff;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     text-decoration: none;

@@ -9,7 +9,7 @@ feature_name: "Job Monitor"
 
 # uTPro Background Jobs Monitor for Umbraco
 
-> 👤 For: **Developer / Admin** — Monitor background jobs, view telemetry and manually trigger runs.
+> For: **Developer / Admin** — Monitor background jobs, view telemetry and manually trigger runs.
 
 A read-and-trigger management UI for Umbraco recurring background jobs. Surfaces every recurring job under a **Settings** dashboard — with timing parameters, execution telemetry, estimated next run, server-role awareness, and **Run now** action.
 
