@@ -80,18 +80,13 @@
         -webkit-overflow-scrolling: touch;
     }
 
-    .doc-content table {
-        font-size: 0.75rem;
-        display: table;
-        table-layout: fixed;
-        width: 100%;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+    .doc-content table:not(.hljs-ln) {
+        font-size: 0.8rem;
     }
 
     .doc-content th,
     .doc-content td {
-        padding: 6px 8px;
+        padding: 10px 12px;
     }
 
     .doc-content img {

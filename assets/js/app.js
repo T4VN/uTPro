@@ -330,11 +330,25 @@
     }
 
     // Auto-detect tables with "#" column
-    var tables = document.querySelectorAll('.doc-content table');
+    var tables = document.querySelectorAll('.doc-content table:not(.hljs-ln)');
     for (var t = 0; t < tables.length; t++) {
         var firstTh = tables[t].querySelector('thead th:first-child');
         if (firstTh && firstTh.textContent.trim() === '#') {
             tables[t].classList.add('has-index-col');
+        }
+
+        // Add data-label to td for mobile card layout
+        var headers = tables[t].querySelectorAll('thead th');
+        if (headers.length > 0) {
+            var rows = tables[t].querySelectorAll('tbody tr');
+            for (var r = 0; r < rows.length; r++) {
+                var cells = rows[r].querySelectorAll('td');
+                for (var c = 0; c < cells.length; c++) {
+                    if (headers[c]) {
+                        cells[c].setAttribute('data-label', headers[c].textContent.trim());
+                    }
+                }
+            }
         }
     }
 })();
