@@ -118,6 +118,10 @@
                     tocMobileLinks[k].classList.remove('active');
                 }
             }
+            // Update URL hash to match active section
+            if (currentId && window.location.hash !== '#' + currentId) {
+                history.replaceState(null, '', '#' + currentId);
+            }
         }
 
         if (scrollContainer) {
@@ -125,7 +129,34 @@
         }
         window.addEventListener('scroll', updateActiveToc, { passive: true });
         document.addEventListener('scroll', updateActiveToc, { passive: true });
-        updateActiveToc();
+
+        // On load: activate TOC item matching URL hash and scroll to it
+        var hash = window.location.hash;
+        if (hash) {
+            for (var hi = 0; hi < tocLinks.length; hi++) {
+                if (tocLinks[hi].getAttribute('href') === hash) {
+                    tocLinks[hi].classList.add('active');
+                } else {
+                    tocLinks[hi].classList.remove('active');
+                }
+            }
+            for (var hm = 0; hm < tocMobileLinks.length; hm++) {
+                if (tocMobileLinks[hm].getAttribute('href') === hash) {
+                    tocMobileLinks[hm].classList.add('active');
+                } else {
+                    tocMobileLinks[hm].classList.remove('active');
+                }
+            }
+            // Scroll to the target element
+            var targetEl = document.getElementById(hash.substring(1));
+            if (targetEl && scrollContainer) {
+                setTimeout(function() {
+                    targetEl.scrollIntoView({ behavior: 'auto', block: 'start' });
+                }, 100);
+            }
+        } else {
+            updateActiveToc();
+        }
 
         // Active on click
         function handleTocClick(e) {
