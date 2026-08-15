@@ -140,58 +140,19 @@ layout: compress
                         <svg class="nav-group-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l4 4-4 4"/></svg>
                     </button>
                     <ul class="nav-group-list" id="nav-list-project" {% if page.feature %}style="display:none"{% endif %}>
-                        <li>
-                            <a href="{{ '/quick-overview/' | relative_url }}" {% if page.url contains 'quick-overview' %}class="active"{% endif %} data-page="quick-overview">Quick Overview</a>
-                            {% if page.url contains 'quick-overview' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/getting-started/' | relative_url }}" {% if page.url contains 'getting-started' %}class="active"{% endif %} data-page="getting-started">Getting Started</a>
-                            {% if page.url contains 'getting-started' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/1-Intro/' | relative_url }}" {% if page.url contains '1-Intro' %}class="active"{% endif %} data-page="1-Intro">1. Introduction</a>
-                            {% if page.url contains '1-Intro' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/2-Setup/' | relative_url }}" {% if page.url contains '2-Setup' %}class="active"{% endif %} data-page="2-Setup">2. Setup</a>
-                            {% if page.url contains '2-Setup' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/3-Project-Structure/' | relative_url }}" {% if page.url contains '3-Project-Structure' %}class="active"{% endif %} data-page="3-Project-Structure">3. Project Structure</a>
-                            {% if page.url contains '3-Project-Structure' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/4-Configurations/' | relative_url }}" {% if page.url contains '4-Configurations' %}class="active"{% endif %} data-page="4-Configurations">4. Configurations</a>
-                            {% if page.url contains '4-Configurations' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/5-Script-Queue/' | relative_url }}" {% if page.url contains '5-Script-Queue' %}class="active"{% endif %} data-page="5-Script-Queue">5. Script Queue</a>
-                            {% if page.url contains '5-Script-Queue' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/6-Dashboard/' | relative_url }}" {% if page.url contains '6-Dashboard' %}class="active"{% endif %} data-page="6-Dashboard">6. Dashboard</a>
-                            {% if page.url contains '6-Dashboard' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/7-Content-Editing/' | relative_url }}" {% if page.url contains '7-Content-Editing' %}class="active"{% endif %} data-page="7-Content-Editing">7. Content Editing</a>
-                            {% if page.url contains '7-Content-Editing' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/8-Global-Settings/' | relative_url }}" {% if page.url contains '8-Global-Settings' %}class="active"{% endif %} data-page="8-Global-Settings">8. Global Settings</a>
-                            {% if page.url contains '8-Global-Settings' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/9-Developer-Reference/' | relative_url }}" {% if page.url contains '9-Developer-Reference' %}class="active"{% endif %} data-page="9-Developer-Reference">9. Developer Reference</a>
-                            {% if page.url contains '9-Developer-Reference' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/10-Backoffice-Tools/' | relative_url }}" {% if page.url contains '10-Backoffice-Tools' %}class="active"{% endif %} data-page="10-Backoffice-Tools">10. Backoffice Tools</a>
-                            {% if page.url contains '10-Backoffice-Tools' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/11-Search/' | relative_url }}" {% if page.url contains '11-Search' %}class="active"{% endif %} data-page="11-Search">11. Search</a>
-                            {% if page.url contains '11-Search' %}<ul class="sub-nav" id="sub-nav"></ul>{% endif %}
-                        </li>
+                        <li><a href="{{ '/quick-overview/' | relative_url }}" {% if page.url contains 'quick-overview' %}class="active"{% endif %} data-page="quick-overview">Quick Overview</a></li>
+                        <li><a href="{{ '/getting-started/' | relative_url }}" {% if page.url contains 'getting-started' %}class="active"{% endif %} data-page="getting-started">Getting Started</a></li>
+                        <li><a href="{{ '/1-Intro/' | relative_url }}" {% if page.url contains '1-Intro' %}class="active"{% endif %} data-page="1-Intro">1. Introduction</a></li>
+                        <li><a href="{{ '/2-Setup/' | relative_url }}" {% if page.url contains '2-Setup' %}class="active"{% endif %} data-page="2-Setup">2. Setup</a></li>
+                        <li><a href="{{ '/3-Project-Structure/' | relative_url }}" {% if page.url contains '3-Project-Structure' %}class="active"{% endif %} data-page="3-Project-Structure">3. Project Structure</a></li>
+                        <li><a href="{{ '/4-Configurations/' | relative_url }}" {% if page.url contains '4-Configurations' %}class="active"{% endif %} data-page="4-Configurations">4. Configurations</a></li>
+                        <li><a href="{{ '/5-Script-Queue/' | relative_url }}" {% if page.url contains '5-Script-Queue' %}class="active"{% endif %} data-page="5-Script-Queue">5. Script Queue</a></li>
+                        <li><a href="{{ '/6-Dashboard/' | relative_url }}" {% if page.url contains '6-Dashboard' %}class="active"{% endif %} data-page="6-Dashboard">6. Dashboard</a></li>
+                        <li><a href="{{ '/7-Content-Editing/' | relative_url }}" {% if page.url contains '7-Content-Editing' %}class="active"{% endif %} data-page="7-Content-Editing">7. Content Editing</a></li>
+                        <li><a href="{{ '/8-Global-Settings/' | relative_url }}" {% if page.url contains '8-Global-Settings' %}class="active"{% endif %} data-page="8-Global-Settings">8. Global Settings</a></li>
+                        <li><a href="{{ '/9-Developer-Reference/' | relative_url }}" {% if page.url contains '9-Developer-Reference' %}class="active"{% endif %} data-page="9-Developer-Reference">9. Developer Reference</a></li>
+                        <li><a href="{{ '/10-Backoffice-Tools/' | relative_url }}" {% if page.url contains '10-Backoffice-Tools' %}class="active"{% endif %} data-page="10-Backoffice-Tools">10. Backoffice Tools</a></li>
+                        <li><a href="{{ '/11-Search/' | relative_url }}" {% if page.url contains '11-Search' %}class="active"{% endif %} data-page="11-Search">11. Search</a></li>
                     </ul>
                 </div>
 
@@ -203,87 +164,13 @@ layout: compress
                         <svg class="nav-group-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l4 4-4 4"/></svg>
                     </button>
                     <ul class="nav-group-list" id="nav-list-features" {% unless page.feature %}style="display:none"{% endunless %}>
-                        <li>
-                            <a href="{{ '/uTPro.Feature.SEOAudit/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SEOAudit' %}class="active"{% endif %} data-page="uTPro.Feature.SEOAudit">SEO Audit</a>
-                            {% if page.url contains 'uTPro.Feature.SEOAudit' %}
-                            <ul class="sub-nav" id="sub-nav-feature">
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/site-audit/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/site-audit/' %}class="active"{% endif %}>Site Audit</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/configuration/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/configuration/' %}class="active"{% endif %}>Configuration</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SEOAudit/extensibility/' | relative_url }}" {% if page.url == '/uTPro.Feature.SEOAudit/extensibility/' %}class="active"{% endif %}>Extensibility</a></li>
-                            </ul>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/uTPro.Feature.UrlViewer/' | relative_url }}" {% if page.url contains 'uTPro.Feature.UrlViewer' %}class="active"{% endif %} data-page="uTPro.Feature.UrlViewer">URL Viewer</a>
-                            {% if page.url contains 'uTPro.Feature.UrlViewer' %}
-                            <ul class="sub-nav" id="sub-nav-feature">
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.UrlViewer/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.UrlViewer/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.UrlViewer/analysis/' | relative_url }}" {% if page.url == '/uTPro.Feature.UrlViewer/analysis/' %}class="active"{% endif %}>SEO Analysis</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.UrlViewer/configuration/' | relative_url }}" {% if page.url == '/uTPro.Feature.UrlViewer/configuration/' %}class="active"{% endif %}>Configuration</a></li>
-                            </ul>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/uTPro.Feature.SimpleFormBuilder/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SimpleFormBuilder' %}class="active"{% endif %} data-page="uTPro.Feature.SimpleFormBuilder">Simple Form Builder</a>
-                            {% if page.url contains 'uTPro.Feature.SimpleFormBuilder' %}
-                            <ul class="sub-nav" id="sub-nav-feature">
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/rendering/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/rendering/' %}class="active"{% endif %}>Rendering</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/form-picker/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/form-picker/' %}class="active"{% endif %}>Form Picker</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/field-types/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/field-types/' %}class="active"{% endif %}>Field Types</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/conditions/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/conditions/' %}class="active"{% endif %}>Conditions</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/public-apis/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/public-apis/' %}class="active"{% endif %}>Public APIs</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/security/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/security/' %}class="active"{% endif %}>Security</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/configuration/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/configuration/' %}class="active"{% endif %}>Configuration</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SimpleFormBuilder/reference/' | relative_url }}" {% if page.url == '/uTPro.Feature.SimpleFormBuilder/reference/' %}class="active"{% endif %}>Reference</a></li>
-                            </ul>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/uTPro.Feature.SearchPlus/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SearchPlus' %}class="active"{% endif %} data-page="uTPro.Feature.SearchPlus">Search Plus</a>
-                            {% if page.url contains 'uTPro.Feature.SearchPlus' %}
-                            <ul class="sub-nav" id="sub-nav-feature">
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SearchPlus/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.SearchPlus/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SearchPlus/how-it-works/' | relative_url }}" {% if page.url == '/uTPro.Feature.SearchPlus/how-it-works/' %}class="active"{% endif %}>How It Works</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SearchPlus/synonym-management/' | relative_url }}" {% if page.url == '/uTPro.Feature.SearchPlus/synonym-management/' %}class="active"{% endif %}>Synonym Management</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SearchPlus/diacritics/' | relative_url }}" {% if page.url == '/uTPro.Feature.SearchPlus/diacritics/' %}class="active"{% endif %}>Diacritics</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SearchPlus/integration/' | relative_url }}" {% if page.url == '/uTPro.Feature.SearchPlus/integration/' %}class="active"{% endif %}>Integration</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.SearchPlus/api-reference/' | relative_url }}" {% if page.url == '/uTPro.Feature.SearchPlus/api-reference/' %}class="active"{% endif %}>API Reference</a></li>
-                            </ul>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/uTPro.Feature.FileManager/' | relative_url }}" {% if page.url contains 'uTPro.Feature.FileManager' %}class="active"{% endif %} data-page="uTPro.Feature.FileManager">File Manager</a>
-                            {% if page.url contains 'uTPro.Feature.FileManager' %}
-                            <ul class="sub-nav" id="sub-nav-feature">
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.FileManager/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.FileManager/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.FileManager/media-cleanup/' | relative_url }}" {% if page.url == '/uTPro.Feature.FileManager/media-cleanup/' %}class="active"{% endif %}>Media Cleanup</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.FileManager/configuration/' | relative_url }}" {% if page.url == '/uTPro.Feature.FileManager/configuration/' %}class="active"{% endif %}>Configuration</a></li>
-                            </ul>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/uTPro.Feature.JobMonitor/' | relative_url }}" {% if page.url contains 'uTPro.Feature.JobMonitor' %}class="active"{% endif %} data-page="uTPro.Feature.JobMonitor">Job Monitor</a>
-                            {% if page.url contains 'uTPro.Feature.JobMonitor' %}
-                            <ul class="sub-nav" id="sub-nav-feature">
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.JobMonitor/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.JobMonitor/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.JobMonitor/configuration/' | relative_url }}" {% if page.url == '/uTPro.Feature.JobMonitor/configuration/' %}class="active"{% endif %}>Configuration</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.JobMonitor/telemetry-and-storage/' | relative_url }}" {% if page.url == '/uTPro.Feature.JobMonitor/telemetry-and-storage/' %}class="active"{% endif %}>Telemetry & Storage</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.JobMonitor/manual-trigger/' | relative_url }}" {% if page.url == '/uTPro.Feature.JobMonitor/manual-trigger/' %}class="active"{% endif %}>Manual Trigger</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.JobMonitor/security/' | relative_url }}" {% if page.url == '/uTPro.Feature.JobMonitor/security/' %}class="active"{% endif %}>Security</a></li>
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.JobMonitor/reference/' | relative_url }}" {% if page.url == '/uTPro.Feature.JobMonitor/reference/' %}class="active"{% endif %}>Reference</a></li>
-                            </ul>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <a href="{{ '/uTPro.Feature.AuditLog/' | relative_url }}" {% if page.url contains 'uTPro.Feature.AuditLog' %}class="active"{% endif %} data-page="uTPro.Feature.AuditLog">Audit Log</a>
-                            {% if page.url contains 'uTPro.Feature.AuditLog' %}
-                            <ul class="sub-nav" id="sub-nav-feature">
-                                <li class="sub-level-1"><a href="{{ '/uTPro.Feature.AuditLog/getting-started/' | relative_url }}" {% if page.url == '/uTPro.Feature.AuditLog/getting-started/' %}class="active"{% endif %}>Getting Started</a></li>
-                            </ul>
-                            {% endif %}
-                        </li>
+                        <li><a href="{{ '/uTPro.Feature.SEOAudit/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SEOAudit' %}class="active"{% endif %} data-page="uTPro.Feature.SEOAudit">SEO Audit</a></li>
+                        <li><a href="{{ '/uTPro.Feature.UrlViewer/' | relative_url }}" {% if page.url contains 'uTPro.Feature.UrlViewer' %}class="active"{% endif %} data-page="uTPro.Feature.UrlViewer">URL Viewer</a></li>
+                        <li><a href="{{ '/uTPro.Feature.SimpleFormBuilder/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SimpleFormBuilder' %}class="active"{% endif %} data-page="uTPro.Feature.SimpleFormBuilder">Simple Form Builder</a></li>
+                        <li><a href="{{ '/uTPro.Feature.SearchPlus/' | relative_url }}" {% if page.url contains 'uTPro.Feature.SearchPlus' %}class="active"{% endif %} data-page="uTPro.Feature.SearchPlus">Search Plus</a></li>
+                        <li><a href="{{ '/uTPro.Feature.FileManager/' | relative_url }}" {% if page.url contains 'uTPro.Feature.FileManager' %}class="active"{% endif %} data-page="uTPro.Feature.FileManager">File Manager</a></li>
+                        <li><a href="{{ '/uTPro.Feature.JobMonitor/' | relative_url }}" {% if page.url contains 'uTPro.Feature.JobMonitor' %}class="active"{% endif %} data-page="uTPro.Feature.JobMonitor">Job Monitor</a></li>
+                        <li><a href="{{ '/uTPro.Feature.AuditLog/' | relative_url }}" {% if page.url contains 'uTPro.Feature.AuditLog' %}class="active"{% endif %} data-page="uTPro.Feature.AuditLog">Audit Log</a></li>
                     </ul>
                 </div>
             </nav>
@@ -318,10 +205,27 @@ layout: compress
                 </a>
             </header>
 
+            <!-- Mobile TOC (sticky below header) -->
+            <div class="toc-mobile" id="toc-mobile">
+                <button class="toc-mobile-toggle" id="toc-mobile-toggle" aria-expanded="false">
+                    <span>On this page</span>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 4l4 4 4-4"/></svg>
+                </button>
+                <nav class="toc-mobile-nav" id="toc-mobile-nav" style="display:none;"></nav>
+            </div>
+
             <main class="content">
-                <article class="doc-content">
-                    {{ content }}
-                </article>
+                <div class="content-with-toc">
+                    <article class="doc-content">
+                        {{ content }}
+                    </article>
+                    <aside class="toc-sidebar" id="toc-sidebar" aria-label="On this page">
+                        <div class="toc-sidebar-inner">
+                            <div class="toc-title">On this page</div>
+                            <nav class="toc-nav" id="toc-nav"></nav>
+                        </div>
+                    </aside>
+                </div>
             </main>
 
             <footer class="doc-footer">
@@ -387,15 +291,23 @@ layout: compress
             }
         })();
 
-        /* Auto-generate sub-navigation from h2 headings */
+        /* Auto-generate TOC from h2 headings */
         (function() {
-            const subNav = document.getElementById('sub-nav');
-            if (!subNav) return;
+            const tocNav = document.getElementById('toc-nav');
+            const tocMobileNav = document.getElementById('toc-mobile-nav');
+            if (!tocNav) return;
 
             const headings = document.querySelectorAll('.doc-content h2');
-            if (headings.length === 0) return;
+            if (headings.length === 0) {
+                var tocSidebar = document.getElementById('toc-sidebar');
+                var tocMobile = document.getElementById('toc-mobile');
+                if (tocSidebar) tocSidebar.style.display = 'none';
+                if (tocMobile) tocMobile.style.display = 'none';
+                return;
+            }
 
-            headings.forEach((heading) => {
+            var tocHtml = '';
+            headings.forEach(function(heading) {
                 if (!heading.id) {
                     heading.id = heading.textContent
                         .trim()
@@ -403,37 +315,43 @@ layout: compress
                         .replace(/[^\w\s-]/g, '')
                         .replace(/\s+/g, '-');
                 }
-
-                const li = document.createElement('li');
-                li.classList.add('sub-level-1');
-                const a = document.createElement('a');
-                a.href = '#' + heading.id;
-                a.textContent = heading.textContent.trim();
-                li.appendChild(a);
-                subNav.appendChild(li);
+                tocHtml += '<a href="#' + heading.id + '" class="toc-link">' + heading.textContent.trim() + '</a>';
             });
 
-            /* Set active on click */
-            const allSubLinks = subNav.querySelectorAll('a');
-            allSubLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    allSubLinks.forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-                });
-            });
+            tocNav.innerHTML = tocHtml;
+            if (tocMobileNav) tocMobileNav.innerHTML = tocHtml;
 
-            /* Highlight active sub-nav on scroll */
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+            /* Highlight active TOC item on scroll */
+            var tocLinks = tocNav.querySelectorAll('.toc-link');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
                     if (entry.isIntersecting) {
-                        allSubLinks.forEach(link => link.classList.remove('active'));
-                        const activeLink = subNav.querySelector(`a[href="#${CSS.escape(entry.target.id)}"]`);
+                        tocLinks.forEach(function(link) { link.classList.remove('active'); });
+                        var activeLink = tocNav.querySelector('a[href="#' + CSS.escape(entry.target.id) + '"]');
                         if (activeLink) activeLink.classList.add('active');
                     }
                 });
             }, { rootMargin: '-80px 0px -60% 0px' });
 
-            headings.forEach(h => observer.observe(h));
+            headings.forEach(function(h) { observer.observe(h); });
+
+            /* Mobile TOC toggle */
+            var mobileToggle = document.getElementById('toc-mobile-toggle');
+            if (mobileToggle && tocMobileNav) {
+                mobileToggle.addEventListener('click', function() {
+                    var expanded = mobileToggle.getAttribute('aria-expanded') === 'true';
+                    mobileToggle.setAttribute('aria-expanded', String(!expanded));
+                    tocMobileNav.style.display = expanded ? 'none' : 'block';
+                });
+
+                /* Close mobile TOC when clicking a link */
+                tocMobileNav.querySelectorAll('a').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        mobileToggle.setAttribute('aria-expanded', 'false');
+                        tocMobileNav.style.display = 'none';
+                    });
+                });
+            }
         })();
 
         /* Doc search */
