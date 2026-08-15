@@ -55,15 +55,6 @@ html {
     min-height: 100vh;
 }
 
-.main-wrapper {
-    flex: 1;
-    margin-left: var(--sidebar-width);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    max-width: calc(100vw - var(--sidebar-width));
-}
-
 /* ── Sidebar ── */
 .sidebar {
     position: fixed;
@@ -454,6 +445,17 @@ html {
     background: var(--color-primary-gradient);
     z-index: 100;
     box-shadow: 0 2px 8px rgba(246, 130, 31, 0.2);
+    flex-shrink: 0;
+}
+
+.main-wrapper {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: calc(100vw - var(--sidebar-width));
+    overflow-y: auto;
 }
 
 .menu-toggle {
