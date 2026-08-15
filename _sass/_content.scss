@@ -1,0 +1,114 @@
+// ═══════════════════════════════════════════════
+// Doc Content (headings, text, lists, blockquotes, images, hr)
+// ═══════════════════════════════════════════════
+
+// Headings
+.doc-content h1,
+.doc-content h2,
+.doc-content h3,
+.doc-content h4 {
+    scroll-margin-top: calc(var(--topbar-height) + 20px);
+}
+
+.doc-content h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--color-primary);
+    color: var(--color-text);
+}
+
+.doc-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 48px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.doc-content h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 8px;
+    color: var(--color-primary-dark);
+}
+
+.doc-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+// Paragraphs & Text
+.doc-content p {
+    margin-bottom: 16px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.doc-content strong {
+    font-weight: 600;
+}
+
+.doc-content a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: border-color 0.15s;
+
+    &:hover {
+        border-bottom-color: var(--color-primary);
+    }
+}
+
+// Lists
+.doc-content ul,
+.doc-content ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+.doc-content li {
+    margin-bottom: 6px;
+
+    & > ul,
+    & > ol {
+        margin-top: 6px;
+        margin-bottom: 0;
+    }
+}
+
+// Blockquotes
+.doc-content blockquote {
+    border-left: 4px solid var(--color-primary);
+    background: #fff;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--color-text-muted);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+}
+
+// Images
+.doc-content img {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    margin: 16px 0;
+}
+
+// Horizontal Rule
+.doc-content hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 40px 0;
+}

@@ -1,0 +1,83 @@
+// ═══════════════════════════════════════════════
+// Code & Syntax Highlighting (highlight.js)
+// ═══════════════════════════════════════════════
+
+.doc-content code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--color-bg-code);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--color-primary-dark);
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+.doc-content pre {
+    border-radius: var(--radius);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: pre;
+
+    code {
+        padding: 0;
+        color: inherit;
+        font-size: inherit;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
+}
+
+// highlight.js overrides
+.doc-content pre code.hljs {
+    padding: 0;
+    border-radius: var(--radius);
+}
+
+// Line numbers (highlightjs-line-numbers plugin)
+.hljs-ln {
+    width: 100%;
+    padding: 16px;
+    border-collapse: collapse;
+
+    td {
+        padding: 0;
+        border: none;
+    }
+
+    tr {
+        background: transparent;
+
+        &:first-child td {
+            padding-top: 10px;
+        }
+
+        &:last-child td {
+            padding-bottom: 10px;
+        }
+    }
+}
+
+.hljs-ln-numbers {
+    user-select: none;
+    text-align: right;
+    color: var(--color-primary);
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+    width: 32px;
+    vertical-align: top;
+    background: var(--color-sidebar-bg);
+}
+
+.hljs-ln-code {
+    padding-left: 12px !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}

@@ -1,0 +1,51 @@
+// ═══════════════════════════════════════════════
+// Layout
+// ═══════════════════════════════════════════════
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-wrapper {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: calc(100vw - var(--sidebar-width));
+    overflow-y: auto;
+}
+
+.content {
+    flex: 1;
+    padding: 40px 48px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.doc-content {
+    width: 100%;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.doc-footer {
+    padding: 20px 32px;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+
+    a {
+        color: var(--color-primary);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

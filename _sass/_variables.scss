@@ -1,0 +1,26 @@
+// ═══════════════════════════════════════════════
+// Design Tokens
+// ═══════════════════════════════════════════════
+
+:root {
+    --color-primary: #f6821f;
+    --color-primary-light: #ff9e40;
+    --color-primary-hover: #FFCE40;
+    --color-primary-dark: #d96d10;
+    --color-primary-gradient: linear-gradient(135deg, #f6821f 0%, #ff9e40 100%);
+    --color-bg: #faf8f5;
+    --color-bg-alt: #faf8f5;
+    --color-bg-code: #f6f3ef;
+    --color-text: #1a1a2e;
+    --color-text-muted: #6b7280;
+    --color-border: #e8e4de;
+    --color-sidebar-bg: #282b34;
+    --color-sidebar-text: #ffffff;
+    --color-sidebar-active: #f6821f;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --sidebar-width: 280px;
+    --topbar-height: 56px;
+    --radius: 8px;
+    --shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}

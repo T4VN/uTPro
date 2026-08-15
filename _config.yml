@@ -3,6 +3,11 @@ description: Developer documentation for uTPro – Umbraco Turbo Pro Starter Kit
 url: "https://docs.utpro.dev"
 baseurl: ""
 
+compress_html:
+  clippings: all
+  comments: ["<!--", "-->"]
+  blanklines: false
+
 # Plugins
 plugins:
   - jekyll-seo-tag
@@ -14,6 +19,10 @@ kramdown:
   input: GFM
   syntax_highlighter: none
   hard_wrap: false
+
+# Sass
+sass:
+  style: compressed
 
 # Defaults - apply layout to all md files
 defaults:
