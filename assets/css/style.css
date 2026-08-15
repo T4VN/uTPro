@@ -902,3 +902,27 @@ html {
     color: var(--color-text-muted);
     font-size: 0.8rem;
 }
+
+
+/* ── AI Chat Link ── */
+.ai-chat-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--color-primary);
+    color: #fff !important;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    border: none;
+}
+
+.ai-chat-link:hover {
+    background: var(--color-primary-light);
+    transform: translateY(-1px);
+    text-decoration: none;
+    border: none;
+}

@@ -9,6 +9,8 @@ feature_name: "Audit Log"
 
 # uTPro Audit Log Viewer for Umbraco
 
+> 👤 Dành cho: **Admin** — Xem toàn bộ lịch sử hoạt động: đăng nhập, lưu, publish, xóa — hỗ trợ search, filter và export.
+
 The missing audit log & content log viewer for the Umbraco backoffice. Browse, search, filter, sort, and export every login, save, publish, move, and delete in your Umbraco site.
 
 Supports **Umbraco 16, 17 and 18**. Works on **SQL Server**, **SQLite** and **PostgreSQL**.

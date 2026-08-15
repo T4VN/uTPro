@@ -9,6 +9,8 @@ feature_name: "Simple Form Builder"
 
 # uTPro Simple Form Builder for Umbraco
 
+> 👤 Dành cho: **Cả hai** — Content Editor xây dựng form trực quan không cần code, Developer tùy chỉnh field types và API.
+
 A lightweight form builder — create and manage dynamic forms directly from the Umbraco backoffice with no code required for everyday use.
 
 Works with **Umbraco 16, 17 and 18**. Database-agnostic: **SQL Server**, **SQLite** and **PostgreSQL**.

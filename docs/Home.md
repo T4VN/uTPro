@@ -7,6 +7,8 @@ permalink: "/getting-started/"
 
 # Getting Started
 
+> 👤 Dành cho: **Tất cả** — Developer, Content Editor, Project Manager
+
 ## 🙏 Thank You for Choosing uTPro
 
 Thank you for trusting and using **uTPro - Umbraco Turbo Pro**. This project is built with care and passion to help developers create enterprise-grade websites faster on the Umbraco platform.
@@ -22,23 +24,48 @@ Your feedback — comments, reviews, or suggestions — is incredibly valuable. 
 
 ## 📖 Documentation
 
+### Dành cho Content Editor (non-tech)
+
+Bạn là người quản trị nội dung, biên tập website? Bắt đầu từ đây:
+
 | # | Page | Description |
 |---|------|-------------|
-| 1 | [Introduction](/1-Intro/) | Overview, features, architecture, tech stack |
-| 2 | [Setup](/2-Setup/) | Domain, project, and data setup |
-| 3 | [Project Structure](/3-Project-Structure/) | Solution architecture, middleware pipeline, Program.cs |
-| 4 | [Configurations](/4-Configurations/) | Language, backoffice, security, performance, SEO, load balancing, database, forwarded headers, category URLs, feature packages |
-| 5 | [Script Queue](/5-Script-Queue/) | JS loading system for block components |
-| 6 | [Dashboard](/6-Dashboard/) | Backoffice dashboard & header app |
-| 7 | [Content Editing](/7-Content-Editing/) | Guide for content editors (pages, blocks, SEO, multilingual) |
-| 8 | [Global Settings](/8-Global-Settings/) | CMS-driven settings (favicon, robots, images, forms, security headers) |
+| 7 | [Content Editing](/7-Content-Editing/) | Hướng dẫn tạo/sửa nội dung, trang, block, SEO, đa ngôn ngữ |
+| 6 | [Dashboard](/6-Dashboard/) | Bảng điều khiển backoffice — kiểm tra phiên bản, thống kê |
+| 8 | [Global Settings](/8-Global-Settings/) | Cài đặt chung — favicon, robots, hình ảnh, form, bảo mật |
+| 10 | [Backoffice Tools](/10-Backoffice-Tools/) | Công cụ quản trị — preview block, SEO audit, file manager |
+| 11 | [Search](/11-Search/) | Tìm kiếm nội dung trên website |
+
+### Dành cho Developer (tech)
+
+Bạn là lập trình viên muốn cài đặt, tùy chỉnh hoặc phát triển mở rộng? Đọc theo thứ tự:
+
+| # | Page | Description |
+|---|------|-------------|
+| 1 | [Introduction](/1-Intro/) | Tổng quan, tính năng, kiến trúc, công nghệ |
+| 2 | [Setup](/2-Setup/) | Cài đặt domain, project, database, uSync |
+| 3 | [Project Structure](/3-Project-Structure/) | Kiến trúc solution, middleware pipeline, Program.cs |
+| 4 | [Configurations](/4-Configurations/) | Ngôn ngữ, backoffice, bảo mật, hiệu suất, SEO, load balancing, database |
+| 5 | [Script Queue](/5-Script-Queue/) | Hệ thống load JS cho block component |
 | 9 | [Developer Reference](/9-Developer-Reference/) | Razor helpers & C# extensions |
-| 10 | [Backoffice Tools](/10-Backoffice-Tools/) | Block preview, error pages, optional packages |
-| 11 | [Search](/11-Search/) | Full-text search, synonym expansion, diacritics-insensitive |
+
+### Tính năng mở rộng (Optional Packages)
+
+Tài liệu chi tiết cho từng gói tính năng có thể cài thêm:
+
+| Package | Description |
+|---------|-------------|
+| [SEO Audit & URL Viewer](/uTPro.Feature.SEOAudit/) | Kiểm tra sức khỏe SEO và phân tích chuỗi chuyển hướng |
+| [Simple Form Builder](/uTPro.Feature.SimpleFormBuilder/) | Xây dựng biểu mẫu trực quan |
+| [Search Plus](/uTPro.Feature.SearchPlus/) | Tìm kiếm nâng cao — từ đồng nghĩa, không dấu |
+| [File Manager](/uTPro.Feature.FileManager/) | Quản lý file server và media cleanup |
+| [Job Monitor](/uTPro.Feature.JobMonitor/) | Theo dõi background job |
+| [Audit Log](/uTPro.Feature.AuditLog/) | Nhật ký hoạt động chi tiết |
+| [Auto Translation](/uTPro.Feature.AutoTranslation/) | Dịch tự động nội dung đa ngôn ngữ |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Developer)
 
 1. **Clone** the repository
 2. **Configure** database connection in `appsettings.json` ([details](/2-Setup/))
@@ -47,3 +74,12 @@ Your feedback — comments, reviews, or suggestions — is incredibly valuable. 
 5. **Start building** your site!
 
 See [2. Setup](/2-Setup/) for the full guide.
+
+## 🚀 Quick Start (Content Editor)
+
+1. Truy cập `/umbraco` trên website của bạn
+2. Đăng nhập bằng tài khoản được cấp
+3. Vào **Content** section để tạo/sửa nội dung
+4. Đọc [7. Content Editing](/7-Content-Editing/) để biết cách sử dụng Block Grid, SEO fields, đa ngôn ngữ
+
+![Umbraco Backoffice Login](/screenshots/uTPro/backoffice-login.png)

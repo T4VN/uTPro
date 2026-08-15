@@ -9,6 +9,8 @@ feature_name: "SEO Audit"
 
 # uTPro SEO Audit for Umbraco
 
+> 👤 Dành cho: **Cả hai** — Content Editor chạy audit & xem kết quả, Developer cấu hình scheduling và viết custom checks.
+
 Site-wide SEO & content audit for **Umbraco 16, 17 and 18**. Crawls every Content and Media URL, checks for broken links/images/resources, and audits each page — producing a **composite SEO score**, a **health score**, prioritised **issues**, per-page details and **CSV export**, all in a dedicated backoffice section.
 
 [![NuGet](https://img.shields.io/nuget/v/uTPro.Feature.SEOAudit.svg)](https://www.nuget.org/packages/uTPro.Feature.SEOAudit)

@@ -6,9 +6,14 @@ title: "_Footer"
 
 #### Technologies Used
 - **Platform:** .NET 10 (SDK 10.0.301)
-- **CMS:** Umbraco CMS v17.5.3
+- **CMS:** Umbraco CMS v17.6.1
 - **Languages:** C#, Razor Views (.cshtml)
 - **License:** MIT License – completely free to use, modify, and distribute
+
+---
+#### AI Documentation Assistant
+
+Bạn có thể hỏi AI về tài liệu uTPro qua [Google NotebookLM](https://notebook.google.com/notebook/d2/atlas5-9621-4df9-b52b-5/5a0e9fd3ca) — hỗ trợ tiếng Việt & English.
 
 ---
 #### Contact & Support

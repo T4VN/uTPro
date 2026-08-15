@@ -9,6 +9,8 @@ feature_name: "File Manager"
 
 # uTPro File Manager & Media Cleanup for Umbraco
 
+> 👤 Dành cho: **Cả hai** — Content Editor quản lý file/media trực quan, Developer cấu hình multi-root và security.
+
 A powerful **File Manager** and **Media Cleanup** toolkit for the **Umbraco 16+** backoffice. Browse, upload, download, edit, preview, rename and delete server files — and scan the media library to recycle, restore or delete unused, broken, duplicate, orphaned, large and disallowed media.
 
 [![NuGet](https://img.shields.io/nuget/v/uTPro.Feature.FileManager.svg)](https://www.nuget.org/packages/uTPro.Feature.FileManager)
