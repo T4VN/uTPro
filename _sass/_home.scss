@@ -115,8 +115,8 @@
     align-items: center;
     gap: 5px;
     padding: 8px 14px;
-    background: #c05a00;
-    color: #fff !important;
+    background: var(--color-primary);
+    color: var(--color-text) !important;
     font-size: 0.8rem;
     font-weight: 600;
     text-decoration: none;
@@ -127,7 +127,7 @@
     z-index: 2;
 
     &:hover {
-        background: #a04d00;
+        background: var(--color-primary-dark);
         transform: translateY(-50%) scale(1.03);
     }
 
@@ -139,8 +139,8 @@
 // CTA Buttons
 .home-cta {
     display: inline-block;
-    background: #c05a00;
-    color: #fff !important;
+    background: var(--color-primary);
+    color: var(--color-text) !important;
     padding: 12px 28px;
     border-radius: var(--radius);
     font-weight: 600;
@@ -151,7 +151,7 @@
     margin: 6px;
 
     &:hover {
-        background: #a04d00;
+        background: var(--color-primary-dark);
     }
 }
 
@@ -161,9 +161,9 @@
     border: 2px solid rgba(255, 255, 255, 0.5);
 
     &:hover {
-        background: #c05a00;
+        background: var(--color-primary);
         color: #fff !important;
-        border-color: #c05a00;
+        border-color: var(--color-primary);
     }
 }
 

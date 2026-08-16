@@ -14,6 +14,7 @@ layout: compress
     <meta name="theme-color" content="#f6821f">
     <link rel="canonical" href="{{ page.url | absolute_url }}">
     <link rel="icon" type="image/png" href="{{ '/logo.webp' | relative_url }}">
+    {% if page.url == '/' %}<link rel="preload" as="image" href="/logo.webp" fetchpriority="high">{% endif %}
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ page.title | default: site.title }} – uTPro Documentation">
