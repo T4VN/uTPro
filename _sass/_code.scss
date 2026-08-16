@@ -27,6 +27,8 @@
     word-break: normal;
     overflow-wrap: normal;
     white-space: pre;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 
     code {
         padding: 0;
@@ -35,6 +37,8 @@
         word-break: normal;
         overflow-wrap: normal;
         white-space: pre;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
     }
 }
 
