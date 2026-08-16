@@ -131,11 +131,22 @@
             }
         }
 
-        if (scrollContainer) {
-            scrollContainer.addEventListener('scroll', updateActiveToc, { passive: true });
+        var rafPending = false;
+        function onScroll() {
+            if (!rafPending) {
+                rafPending = true;
+                requestAnimationFrame(function() {
+                    updateActiveToc();
+                    rafPending = false;
+                });
+            }
         }
-        window.addEventListener('scroll', updateActiveToc, { passive: true });
-        document.addEventListener('scroll', updateActiveToc, { passive: true });
+
+        if (scrollContainer) {
+            scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        document.addEventListener('scroll', onScroll, { passive: true });
 
         // On load: activate TOC item matching URL hash and scroll to it
         var hash = window.location.hash;
