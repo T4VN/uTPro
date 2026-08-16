@@ -194,11 +194,12 @@
     color: var(--color-text-muted);
 
     a {
-        color: var(--color-primary);
-        text-decoration: none;
+        color: #b35400;
+        text-decoration: underline;
+        text-underline-offset: 2px;
 
         &:hover {
-            text-decoration: underline;
+            color: var(--color-primary-dark);
         }
     }
 }

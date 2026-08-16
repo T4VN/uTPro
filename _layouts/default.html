@@ -13,12 +13,12 @@ layout: compress
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#f6821f">
     <link rel="canonical" href="{{ page.url | absolute_url }}">
-    <link rel="icon" type="image/png" href="{{ '/Logo.png' | relative_url }}">
+    <link rel="icon" type="image/png" href="{{ '/logo.webp' | relative_url }}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ page.title | default: site.title }} – uTPro Documentation">
     <meta property="og:description" content="{{ page.description | default: site.description }}">
-    <meta property="og:image" content="{{ '/Logo.png' | absolute_url }}">
+    <meta property="og:image" content="{{ '/logo.webp' | absolute_url }}">
     <meta property="og:url" content="{{ page.url | absolute_url }}">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="uTPro Documentation">
@@ -27,7 +27,7 @@ layout: compress
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="{{ page.title | default: site.title }} – uTPro Documentation">
     <meta name="twitter:description" content="{{ page.description | default: site.description }}">
-    <meta name="twitter:image" content="{{ '/Logo.png' | absolute_url }}">
+    <meta name="twitter:image" content="{{ '/logo.webp' | absolute_url }}">
 
     <!-- Prev/Next navigation for SEO -->
     {% assign pages_order = "/,/1-Intro,/2-Setup,/3-Project-Structure,/4-Configurations,/5-Script-Queue,/6-Dashboard,/7-Content-Editing,/8-Global-Settings,/9-Developer-Reference,/10-Backoffice-Tools" | split: "," %}
@@ -85,7 +85,7 @@ layout: compress
             "url": "https://t4vn.com",
             "logo": {
                 "@type": "ImageObject",
-                "url": "{{ '/Logo.png' | absolute_url }}"
+                "url": "{{ '/logo.webp' | absolute_url }}"
             }
         },
         "about": {
@@ -114,7 +114,7 @@ layout: compress
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="{{ '/' | relative_url }}" class="sidebar-brand">
-                    <img src="{{ '/Logo.png' | relative_url }}" alt="uTPro" width="32" height="32">
+                    <img src="{{ '/logo.webp' | relative_url }}" alt="uTPro" width="32" height="32">
                     <span>uTPro Docs</span>
                 </a>
                 <button class="sidebar-close" id="sidebar-close" aria-label="Close navigation">✕</button>
