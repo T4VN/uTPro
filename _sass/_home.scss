@@ -28,6 +28,11 @@
     }
 
     img {
+        width: 72;
+        height: 72px;
+        padding: calc(72px * 0.21428);
+        border-radius: 50%;
+        background: #fff;
         box-shadow: none;
         margin-bottom: 16px;
         filter: drop-shadow(0 0 8px rgba(246, 130, 31, 1)) drop-shadow(0 0 20px rgba(246, 130, 31, 0.7)) drop-shadow(0 0 40px rgba(246, 130, 31, 0.4));
@@ -69,6 +74,7 @@
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        filter: drop-shadow(0 0 8px rgba(246, 130, 31, 1)) drop-shadow(0 0 20px rgba(246, 130, 31, 0.7)) drop-shadow(0 0 40px rgba(246, 130, 31, 0.4));
 
         &::placeholder {
             color: var(--color-text-muted);
