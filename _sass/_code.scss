@@ -49,11 +49,13 @@
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
+    font-size: inherit;
 
     td {
         padding: 0;
         border: none;
         line-height: 1.6;
+        font-size: inherit;
     }
 
     tr:first-child td {
@@ -78,6 +80,7 @@
     position: sticky;
     left: 0;
     z-index: 1;
+    font-size: inherit;
 }
 
 .hljs-ln-code {
@@ -86,4 +89,5 @@
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     vertical-align: top;
     white-space: pre;
+    font-size: inherit;
 }
