@@ -63,7 +63,7 @@
     var tocMobile = document.getElementById('toc-mobile');
     var headings = document.querySelectorAll('.doc-content h2');
 
-    if (tocNav && headings.length > 0) {
+    if (tocNav && headings.length > 0 && window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
         var tocHtml = '';
         for (var h = 0; h < headings.length; h++) {
             if (!headings[h].id) {
