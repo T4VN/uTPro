@@ -95,7 +95,9 @@
     }
 
     .doc-content code {
-        word-break: break-all;
+        white-space: normal;
+        word-break: normal;
+        overflow-wrap: break-word;
     }
 
     .hero-search {

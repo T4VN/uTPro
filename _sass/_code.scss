@@ -9,8 +9,9 @@
     padding: 2px 6px;
     border-radius: 4px;
     color: var(--color-primary-dark);
-    word-break: break-all;
-    overflow-wrap: break-word;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: nowrap;
 }
 
 .doc-content pre {
@@ -45,24 +46,21 @@
 // Line numbers (highlightjs-line-numbers plugin)
 .hljs-ln {
     width: 100%;
-    padding: 16px;
     border-collapse: collapse;
+    border-spacing: 0;
 
     td {
         padding: 0;
         border: none;
+        line-height: 1.6;
     }
 
-    tr {
-        background: transparent;
+    tr:first-child td {
+        padding-top: 16px;
+    }
 
-        &:first-child td {
-            padding-top: 10px;
-        }
-
-        &:last-child td {
-            padding-bottom: 10px;
-        }
+    tr:last-child td {
+        padding-bottom: 16px;
     }
 }
 
@@ -83,5 +81,7 @@
 
 .hljs-ln-code {
     padding-left: 12px !important;
+    padding-right: 16px !important;
     border-left: 1px solid rgba(255, 255, 255, 0.1);
+    vertical-align: top;
 }
