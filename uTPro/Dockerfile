@@ -41,6 +41,10 @@ ENV DOTNET_GCConserveMemory=9
 ENV DOTNET_GCHeapHardLimit=0x18000000
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
+# Disable file watchers — Render Free limits inotify instances to 128.
+# ASP.NET Core's reloadOnChange creates too many watchers and crashes.
+ENV DOTNET_hostBuilder__reloadConfigOnChange=false
+
 # Writable temp for Umbraco (NuCache, Examine indexes, locks)
 RUN mkdir -p /tmp/umbraco
 ENV TMPDIR=/tmp/umbraco
