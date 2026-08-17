@@ -35,6 +35,23 @@ public static class PerformanceSetup
         // ─── WebOptimizer: CSS/JS minification ───────────────────────────────────
         var enableDiskCache = perfSection.GetValue("WebOptimizer:EnableDiskCache", false);
 
+        // WebOptimizer's AssetResponseStore.GetPath ALWAYS calls Path.Combine(CacheDirectory, ...)
+        // with no null-check — even when disk cache is disabled — and throws ArgumentNullException
+        // if CacheDirectory is null. The AddWebOptimizer(pipeline, options) overload uses
+        // InCodeWebOptimizerConfig, which (unlike the default WebOptimizerConfig) does NOT
+        // derive CacheDirectory from ContentRootPath. So we MUST always provide a valid,
+        // writable path. Use a writable temp location (Render's filesystem is read-only except
+        // /tmp and mounted disks) and create it up-front so reads never fault.
+        var contentRoot = string.IsNullOrWhiteSpace(env.ContentRootPath)
+            ? Directory.GetCurrentDirectory()
+            : env.ContentRootPath;
+        var webOptimizerCacheDir = Path.Combine(Path.GetTempPath(), "WebOptimizerCache");
+        if (string.IsNullOrWhiteSpace(webOptimizerCacheDir))
+        {
+            webOptimizerCacheDir = Path.Combine(contentRoot, "obj", "WebOptimizerCache");
+        }
+        try { Directory.CreateDirectory(webOptimizerCacheDir); } catch { /* best effort */ }
+
         services.AddWebOptimizer(pipeline =>
         {
             pipeline.MinifyCssFiles(new NUglify.Css.CssSettings
@@ -55,16 +72,7 @@ public static class PerformanceSetup
         {
             options.EnableDiskCache = enableDiskCache;
             options.AllowEmptyBundle = true;
-
-            // WebOptimizer bug: AssetResponseStore.TryGet always calls Path.Combine
-            // with CacheDirectory even when EnableDiskCache=false. If it's null the
-            // call throws ArgumentNullException. Provide a fallback path so it can
-            // safely no-op the disk lookup.
-            if (!enableDiskCache)
-            {
-                options.CacheDirectory = Path.Combine(
-                    env.ContentRootPath, "obj", "weboptimizer-cache");
-            }
+            options.CacheDirectory = webOptimizerCacheDir;
         });
 
         // ─── WebMarkupMin: HTML minification + compression ───────────────────────
