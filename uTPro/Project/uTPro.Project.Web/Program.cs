@@ -22,7 +22,7 @@ builder.ConfigureMediaPath();
 builder.ConfigureUmbraco();
 
 // 3. Performance (Razor, WebOptimizer, WebMarkupMin, OutputCache, ResponseCache)
-builder.Services.AddPerformanceServices(builder.Environment);
+builder.Services.AddPerformanceServices(builder.Environment, builder.Configuration);
 
 // 4. Security (DataProtection, Form/IIS/Kestrel limits)
 builder.Services.AddSecurityServices(builder);
