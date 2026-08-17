@@ -6,12 +6,17 @@ namespace uTPro.Project.Web.Startup;
 
 /// <summary>
 /// Performance services: Razor, WebOptimizer (CSS/JS minify), WebMarkupMin (HTML minify + compression),
-/// Output Caching, Response Caching.
+/// Output Caching, Response Caching. All tunable via appsettings (uTPro:Performance section).
 /// </summary>
 public static class PerformanceSetup
 {
-    public static IServiceCollection AddPerformanceServices(this IServiceCollection services, IWebHostEnvironment env)
+    public static IServiceCollection AddPerformanceServices(
+        this IServiceCollection services,
+        IWebHostEnvironment env,
+        IConfiguration configuration)
     {
+        var perfSection = configuration.GetSection("uTPro:Performance");
+
         // Razor + runtime compilation (dev only to save RAM/CPU in production)
         var mvcBuilder = services.AddRazorPages();
         if (env.IsDevelopment())
@@ -19,9 +24,9 @@ public static class PerformanceSetup
             mvcBuilder.AddRazorRuntimeCompilation();
         }
 
-        // WebOptimizer: CSS/JS minification in ALL environments.
-        // By default WebOptimizer skips processing in Development — we override
-        // via the options callback to force minification always on.
+        // ─── WebOptimizer: CSS/JS minification ───────────────────────────────────
+        var enableDiskCache = perfSection.GetValue("WebOptimizer:EnableDiskCache", false);
+
         services.AddWebOptimizer(pipeline =>
         {
             pipeline.MinifyCssFiles(new NUglify.Css.CssSettings
@@ -38,16 +43,16 @@ public static class PerformanceSetup
                 "js/**/*.js", "assets/**/*.js", "scripts/**/*.js", "uTPro/**/*.js"
             );
         },
-
-        // Force minification even in Development
         options =>
         {
-            options.EnableDiskCache = false;
+            options.EnableDiskCache = enableDiskCache;
             options.AllowEmptyBundle = true;
         });
 
-        // WebMarkupMin: HTML minification + Brotli/GZip/Deflate compression
+        // ─── WebMarkupMin: HTML minification + compression ───────────────────────
+        var maxResponseSizeMB = perfSection.GetValue("WebMarkupMin:MaxResponseSizeMB", 10);
         var isDev = env.IsDevelopment();
+
         services.AddWebMarkupMin(options =>
         {
             options.AllowMinificationInDevelopmentEnvironment = true;
@@ -55,7 +60,7 @@ public static class PerformanceSetup
             options.DisablePoweredByHttpHeaders = true;
             options.DisableMinification = false;
             options.DefaultEncoding = System.Text.Encoding.UTF8;
-            options.MaxResponseSize = 10 * 1024 * 1024;
+            options.MaxResponseSize = maxResponseSizeMB * 1024 * 1024;
         })
         .AddHtmlMinification(options =>
         {
@@ -74,14 +79,28 @@ public static class PerformanceSetup
             ];
         });
 
-        // Output Caching — stores fully-rendered responses in memory.
+        // ─── Output Caching ──────────────────────────────────────────────────────
+        var outputCacheEnabled = perfSection.GetValue("OutputCache:Enabled", true);
+        var sizeLimitMB = perfSection.GetValue("OutputCache:SizeLimitMB", 100);
+        var defaultTTLSeconds = perfSection.GetValue("OutputCache:DefaultTTLSeconds", 120);
+        var sitemapTTLMinutes = perfSection.GetValue("OutputCache:SitemapTTLMinutes", 30);
+
         services.AddOutputCache(options =>
         {
-            options.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(120);
+            options.SizeLimit = sizeLimitMB * 1024 * 1024;
+            options.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(defaultTTLSeconds);
+
+            if (!outputCacheEnabled)
+            {
+                // When disabled, set a minimal expiration so entries expire almost immediately.
+                options.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(1);
+                options.SizeLimit = 1;
+                return;
+            }
 
             options.AddPolicy("Page", policy =>
             {
-                policy.Expire(TimeSpan.FromSeconds(120));
+                policy.Expire(TimeSpan.FromSeconds(defaultTTLSeconds));
                 policy.SetVaryByHost(true);
                 policy.SetVaryByQuery("page", "culture", "p");
                 policy.SetVaryByHeader("Accept-Language");
@@ -90,7 +109,7 @@ public static class PerformanceSetup
 
             options.AddPolicy("Sitemap", policy =>
             {
-                policy.Expire(TimeSpan.FromMinutes(30));
+                policy.Expire(TimeSpan.FromMinutes(sitemapTTLMinutes));
                 policy.SetVaryByHost(true);
                 policy.Tag("sitemap");
             });
