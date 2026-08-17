@@ -241,13 +241,14 @@ layout: compress
     <script src="{{ '/assets/js/app.js' | relative_url }}" defer></script>
     <script src="{{ '/assets/js/highlight.min.js' | relative_url }}" defer></script>
     <script src="{{ '/assets/js/csharp.min.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/js/cshtml-razor.min.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/js/http.min.js' | relative_url }}" defer></script>
     <script src="{{ '/assets/js/highlightjs-line-numbers.min.js' | relative_url }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('pre code').forEach(function(block) {
-                if (block.className.match(/language-razor/)) {
-                    block.classList.remove('language-razor');
-                    block.classList.add('language-csharp');
+                if (block.className.match(/language-(razor|cshtml)$/)) {
+                    block.className = block.className.replace(/language-(razor|cshtml)$/, 'language-cshtml-razor');
                 }
                 hljs.highlightElement(block);
                 hljs.lineNumbersBlock(block);
