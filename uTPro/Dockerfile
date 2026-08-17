@@ -47,6 +47,8 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 # Disable file watchers — Render Free limits inotify instances to 128.
 # ASP.NET Core's reloadOnChange creates too many watchers and crashes.
 ENV DOTNET_hostBuilder__reloadConfigOnChange=false
+# Use polling instead of inotify for any remaining file watchers (avoids inotify exhaustion).
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
 # Writable temp for Umbraco (NuCache, Examine indexes, locks)
 RUN mkdir -p /tmp/umbraco

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using WebMarkupMin.AspNet.Common.Compressors;
 using WebMarkupMin.AspNetCoreLatest;
 using WebMarkupMin.Core;
@@ -24,6 +25,13 @@ public static class PerformanceSetup
             mvcBuilder.AddRazorRuntimeCompilation();
         }
 
+        // Replace the default file version provider to avoid inotify exhaustion
+        // on constrained hosts (Render Free: 128 inotify limit).
+        if (!env.IsDevelopment())
+        {
+            services.AddSingleton<IFileVersionProvider, NoWatchFileVersionProvider>();
+        }
+
         // ─── WebOptimizer: CSS/JS minification ───────────────────────────────────
         var enableDiskCache = perfSection.GetValue("WebOptimizer:EnableDiskCache", false);
 
@@ -47,6 +55,16 @@ public static class PerformanceSetup
         {
             options.EnableDiskCache = enableDiskCache;
             options.AllowEmptyBundle = true;
+
+            // WebOptimizer bug: AssetResponseStore.TryGet always calls Path.Combine
+            // with CacheDirectory even when EnableDiskCache=false. If it's null the
+            // call throws ArgumentNullException. Provide a fallback path so it can
+            // safely no-op the disk lookup.
+            if (!enableDiskCache)
+            {
+                options.CacheDirectory = Path.Combine(
+                    env.ContentRootPath, "obj", "weboptimizer-cache");
+            }
         });
 
         // ─── WebMarkupMin: HTML minification + compression ───────────────────────
