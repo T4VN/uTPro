@@ -5,6 +5,8 @@ description: "Enhance Umbraco site search with synonym expansion and diacritics-
 permalink: "/uTPro.Feature.SearchPlus/"
 feature: true
 feature_name: "Search Plus"
+feature_order: 4
+feature_tagline: "Synonym expansion & diacritics-insensitive search"
 ---
 
 # uTPro Search Plus for Umbraco

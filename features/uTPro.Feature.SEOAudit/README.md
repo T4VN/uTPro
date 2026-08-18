@@ -5,6 +5,8 @@ description: "Site-wide SEO & content audit for Umbraco – crawls every URL, ch
 permalink: "/uTPro.Feature.SEOAudit/"
 feature: true
 feature_name: "SEO Audit"
+feature_order: 1
+feature_tagline: "Site-wide crawler, health score & CSV export"
 ---
 
 # uTPro SEO Audit for Umbraco

@@ -5,6 +5,8 @@ description: "A lightweight form builder for Umbraco – create and manage dynam
 permalink: "/uTPro.Feature.SimpleFormBuilder/"
 feature: true
 feature_name: "Simple Form Builder"
+feature_order: 3
+feature_tagline: "Visual form builder, entries & file uploads"
 ---
 
 # uTPro Simple Form Builder for Umbraco

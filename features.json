@@ -1,0 +1,16 @@
+---
+layout: null
+permalink: /features.json
+---
+[
+{% assign feats = site.pages | where_exp: "p", "p.feature_order" | sort: "feature_order" %}
+{% for f in feats %}
+  {
+    "id": {{ f.title | jsonify }},
+    "name": {{ f.feature_name | jsonify }},
+    "tagline": {{ f.feature_tagline | jsonify }},
+    "description": {{ f.description | jsonify }},
+    "url": {{ f.url | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
+]

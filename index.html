@@ -91,61 +91,38 @@ permalink: "/"
 <p style="color: var(--color-text-muted); margin-bottom: 20px;">Standalone feature packages for Umbraco — install
     independently or alongside the uTPro Starter Kit.</p>
 
-<div class="home-grid">
-    <a href="/uTPro.Feature.SEOAudit/" class="home-card">
+<div class="home-grid" id="feature-grid" data-stats="https://release.utpro.dev/data/packages.json">
+    {% assign feats = site.pages | where_exp: "p", "p.feature_order" | sort: "feature_order" %}
+    {% for f in feats %}
+    <a href="{{ f.url }}" class="home-card">
         <div class="home-card-header">
-            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.seoaudit/2.0.4/icon" alt="" width="20"
-                height="20" class="home-card-icon" loading="lazy">
-            <strong>SEO Audit</strong>
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%23004880'/%3E%3Ccircle cx='170' cy='350' r='80' fill='%23fff'/%3E%3Ccircle cx='350' cy='290' r='120' fill='%23fff'/%3E%3Ccircle cx='170' cy='210' r='45' fill='%23fff'/%3E%3C/svg%3E"
+                data-pkg="{{ f.title | downcase }}" alt="" width="20" height="20" class="home-card-icon"
+                loading="lazy">
+            <strong>{{ f.feature_name }}</strong>
         </div>
-        <span>Site-wide SEO crawler, health score, issues & CSV export</span>
+        <span>{{ f.feature_tagline }}</span>
     </a>
-    <a href="/uTPro.Feature.UrlViewer/" class="home-card">
-        <div class="home-card-header">
-            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.urlviewer/3.1.0/icon" alt="" width="20"
-                height="20" class="home-card-icon" loading="lazy">
-            <strong>URL Viewer</strong>
-        </div>
-        <span>Fetch URLs, redirect chain, SEO score analysis</span>
-    </a>
-    <a href="/uTPro.Feature.SimpleFormBuilder/" class="home-card">
-        <div class="home-card-header">
-            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.simpleformbuilder/5.0.1/icon" alt=""
-                width="20" height="20" class="home-card-icon" loading="lazy">
-            <strong>Simple Form Builder</strong>
-        </div>
-        <span>Visual form builder, entries, file uploads, API</span>
-    </a>
-    <a href="/uTPro.Feature.SearchPlus/" class="home-card">
-        <div class="home-card-header">
-            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.searchplus/1.0.0/icon" alt="" width="20"
-                height="20" class="home-card-icon" loading="lazy">
-            <strong>Search Plus</strong>
-        </div>
-        <span>Synonym expansion & diacritics-insensitive search</span>
-    </a>
-    <a href="/uTPro.Feature.FileManager/" class="home-card">
-        <div class="home-card-header">
-            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.filemanager/6.0.0/icon" alt="" width="20"
-                height="20" class="home-card-icon" loading="lazy">
-            <strong>File Manager</strong>
-        </div>
-        <span>Server file browser, code editor, media cleanup</span>
-    </a>
-    <a href="/uTPro.Feature.JobMonitor/" class="home-card">
-        <div class="home-card-header">
-            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.jobmonitor/2.0.0/icon" alt="" width="20"
-                height="20" class="home-card-icon" loading="lazy">
-            <strong>Job Monitor</strong>
-        </div>
-        <span>Background jobs dashboard, telemetry, manual trigger</span>
-    </a>
-    <a href="/uTPro.Feature.AuditLog/" class="home-card">
-        <div class="home-card-header">
-            <img src="https://api.nuget.org/v3-flatcontainer/utpro.feature.auditlog/5.0.0/icon" alt="" width="20"
-                height="20" class="home-card-icon" loading="lazy">
-            <strong>Audit Log</strong>
-        </div>
-        <span>Browse, search & export audit trail and content logs</span>
-    </a>
+    {% endfor %}
 </div>
+
+<script>
+    // Load package icons from the release stats data so versions stay current.
+    (function () {
+        var grid = document.getElementById('feature-grid');
+        if (!grid || !grid.dataset.stats) return;
+        fetch(grid.dataset.stats, { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+            .then(function (pkgs) {
+                if (!Array.isArray(pkgs)) return;
+                var ver = {};
+                pkgs.forEach(function (p) { ver[String(p.id).toLowerCase()] = p.version; });
+                grid.querySelectorAll('img[data-pkg]').forEach(function (img) {
+                    var id = img.getAttribute('data-pkg');
+                    var v = ver[id];
+                    if (v) img.src = 'https://api.nuget.org/v3-flatcontainer/' + id + '/' + v + '/icon';
+                });
+            })
+            .catch(function () { /* keep fallback icons */ });
+    })();
+</script>

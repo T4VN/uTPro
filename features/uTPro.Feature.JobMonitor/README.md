@@ -5,6 +5,8 @@ description: "Background Jobs Monitor for Umbraco – auto-discover recurring jo
 permalink: "/uTPro.Feature.JobMonitor/"
 feature: true
 feature_name: "Job Monitor"
+feature_order: 6
+feature_tagline: "Background jobs dashboard, telemetry & manual trigger"
 ---
 
 # uTPro Background Jobs Monitor for Umbraco

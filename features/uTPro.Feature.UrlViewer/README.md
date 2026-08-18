@@ -5,6 +5,8 @@ description: "Fetch any URL from the Umbraco backoffice – see redirect chains,
 permalink: "/uTPro.Feature.UrlViewer/"
 feature: true
 feature_name: "URL Viewer"
+feature_order: 2
+feature_tagline: "Fetch URLs, redirect chains & SEO score analysis"
 ---
 
 # uTPro URL Viewer for Umbraco

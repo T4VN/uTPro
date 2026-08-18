@@ -5,6 +5,8 @@ description: "A powerful File Manager and Media Cleanup toolkit for the Umbraco 
 permalink: "/uTPro.Feature.FileManager/"
 feature: true
 feature_name: "File Manager"
+feature_order: 5
+feature_tagline: "Server file browser, code editor & media cleanup"
 ---
 
 # uTPro File Manager & Media Cleanup for Umbraco

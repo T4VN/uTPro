@@ -5,6 +5,8 @@ description: "The missing audit log & content log viewer for the Umbraco backoff
 permalink: "/uTPro.Feature.AuditLog/"
 feature: true
 feature_name: "Audit Log"
+feature_order: 7
+feature_tagline: "Browse, search & export audit trail & content logs"
 ---
 
 # uTPro Audit Log Viewer for Umbraco
