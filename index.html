@@ -137,7 +137,7 @@ permalink: "/"
 </div>
 
 <script>
-    // Load package icons from the release stats data so versions stay current.
+    /* Load package icons from the release stats data so versions stay current. */
     (function () {
         var grid = document.getElementById('feature-grid');
         if (!grid || !grid.dataset.stats) return;
@@ -156,9 +156,9 @@ permalink: "/"
             .catch(function () { /* keep fallback icons */ });
     })();
 
-    // Main uTPro version — tiny version.json cached on the release site.
-    // Deferred to idle time so this cross-origin request stays off the
-    // initial critical path (the badge is non-critical UI).
+    /* Main uTPro version — tiny version.json cached on the release site.
+       Deferred to idle time so this cross-origin request stays off the
+       initial critical path (the badge is non-critical UI). */
     (function () {
         var el = document.getElementById('utpro-version');
         if (!el) return;
@@ -168,7 +168,7 @@ permalink: "/"
                 .then(function (v) {
                     if (!v || !v.version) return;
                     el.textContent = 'uTPro v' + String(v.version).replace(/^v/i, '');
-                    el.hidden = false; // links to the release site (set in HTML)
+                    el.hidden = false; /* links to the release site (set in HTML) */
                 })
                 .catch(function () { /* no version badge if unavailable */ });
         }
