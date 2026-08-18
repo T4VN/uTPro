@@ -156,32 +156,15 @@ permalink: "/"
             .catch(function () { /* keep fallback icons */ });
     })();
 
-    // Main uTPro version — latest GitHub release (cached on the release site).
+    // Main uTPro version — tiny version.json cached on the release site.
     (function () {
         var el = document.getElementById('utpro-version');
         if (!el) return;
-
-        function parse(t) {
-            return String(t).replace(/^v/i, '').split('.').map(function (x) { return parseInt(x, 10) || 0; });
-        }
-        function cmp(a, b) {
-            var pa = parse(a), pb = parse(b);
-            for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
-                var d = (pa[i] || 0) - (pb[i] || 0);
-                if (d) return d;
-            }
-            return 0;
-        }
-
-        fetch('https://release.utpro.dev/data/releases.json', { cache: 'no-cache' })
+        fetch('https://release.utpro.dev/data/version.json', { cache: 'no-cache' })
             .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (rel) {
-                if (!Array.isArray(rel) || !rel.length) return;
-                var best = rel[0];
-                rel.forEach(function (r) { if (r.tag_name && cmp(r.tag_name, best.tag_name) > 0) best = r; });
-                var tag = String(best.tag_name || '').replace(/^v/i, '');
-                if (!tag) return;
-                el.textContent = 'uTPro v' + tag;
+            .then(function (v) {
+                if (!v || !v.version) return;
+                el.textContent = 'uTPro v' + String(v.version).replace(/^v/i, '');
                 el.hidden = false; // links to the release site (set in HTML)
             })
             .catch(function () { /* no version badge if unavailable */ });
