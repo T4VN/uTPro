@@ -9,6 +9,36 @@ permalink: "/"
 <div class="home-hero">
     <img src="/logo.svg" alt="uTPro Logo" width="72" height="72" fetchpriority="high" decoding="async">
     <h1>uTPro Documentation</h1>
+    <a class="home-version" id="utpro-version" href="https://release.utpro.dev/" target="_blank"
+        rel="noopener noreferrer" hidden></a>
+    <style>
+        .home-version {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--color-primary);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 30px;
+        }
+
+        .home-version::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-primary);
+        }
+
+        .home-version:hover {
+            border-color: var(--color-primary);
+        }
+    </style>
     <p>
         <strong>uTPro is a powerful Starter Kit</strong>
         <br />Documentation for both <strong>Developers</strong> and <strong>Content Editors</strong>.
@@ -124,5 +154,36 @@ permalink: "/"
                 });
             })
             .catch(function () { /* keep fallback icons */ });
+    })();
+
+    // Main uTPro version — latest GitHub release (cached on the release site).
+    (function () {
+        var el = document.getElementById('utpro-version');
+        if (!el) return;
+
+        function parse(t) {
+            return String(t).replace(/^v/i, '').split('.').map(function (x) { return parseInt(x, 10) || 0; });
+        }
+        function cmp(a, b) {
+            var pa = parse(a), pb = parse(b);
+            for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+                var d = (pa[i] || 0) - (pb[i] || 0);
+                if (d) return d;
+            }
+            return 0;
+        }
+
+        fetch('https://release.utpro.dev/data/releases.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (rel) {
+                if (!Array.isArray(rel) || !rel.length) return;
+                var best = rel[0];
+                rel.forEach(function (r) { if (r.tag_name && cmp(r.tag_name, best.tag_name) > 0) best = r; });
+                var tag = String(best.tag_name || '').replace(/^v/i, '');
+                if (!tag) return;
+                el.textContent = 'uTPro v' + tag;
+                el.hidden = false; // links to the release site (set in HTML)
+            })
+            .catch(function () { /* no version badge if unavailable */ });
     })();
 </script>
