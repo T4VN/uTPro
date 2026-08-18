@@ -35,171 +35,171 @@
     <title>@titlePage</title>
     <meta name="robots" content="noindex, nofollow" />
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
-            margin: auto;
-        }
+            * {
+                box-sizing: border-box;
+                font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+                margin: auto;
+            }
 
-        .bg-image {
-            position: absolute;
-            bottom: -88%;
-        }
+            .bg-image {
+                position: absolute;
+                bottom: -88%;
+            }
 
-        .container {
-            width: 100%;
-            height: 100vh;
-            margin: auto;
-            background-image: url(/assets/img/bkg-login.jpg);
-            background-repeat: no-repeat;
-            background-position-y: bottom;
-            background-position-x: center;
-            background-attachment: fixed;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-        }
-
-            .container > div {
-                display: flex;
-                flex-direction: column;
+            .container {
                 width: 100%;
                 height: 100vh;
-                background-color: rgba(36, 38, 40, .5);
+                margin: auto;
+                background-image: url(/assets/img/bkg-login.jpg);
+                background-repeat: no-repeat;
+                background-position-y: bottom;
+                background-position-x: center;
+                background-attachment: fixed;
+                -webkit-background-size: cover;
+                -moz-background-size: cover;
+                -o-background-size: cover;
+                background-size: cover;
             }
 
-        h3 {
-            text-align: center;
-            color: #ff9e40;
-            font-size: 24px;
-            font-style: normal;
-            font-weight: 600;
-            margin: 0;
-            line-height: 36px;
-        }
-
-        .header {
-            display: flex;
-            position: relative;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 0px;
-            font-style: normal;
-        }
-
-            .header > h1 {
-                font-style: normal;
-                font-weight: 600;
-                font-size: 48px;
-                line-height: 150%;
-                display: flex;
-                align-items: center;
-                text-align: center;
-                color: #ff9e40;
-            }
-
-            .header > p {
-                font-style: normal;
-                font-weight: 400;
-                font-size: 24px;
-                line-height: 150%;
-                text-align: center;
-                color: #ffffff;
-                flex-grow: 0;
-                margin: 16px 0px;
-            }
-
-        a {
-            color: #ffffff;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: row;
-        }
-
-            .options > a {
-                color: #ffffff;
-                text-decoration: underline;
-                margin: 0px 8px;
-                font-weight: 400;
-                font-size: 24px;
-                line-height: 150%;
-            }
-
-                .options > a:first-of-type {
-                    margin-right: 30px;
+                .container > div {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    height: 100vh;
+                    background-color: rgba(36, 38, 40, .5);
                 }
 
-        .logo > img {
-            width: 90px;
-            height: 90px;
-        }
-
-        .learn-more {
-            vertical-align: middle;
-            text-align: center;
-        }
-
-            .learn-more > a:first-child {
-                font-size: 0
-            }
-
-            .learn-more > a > button {
-                background: #f6821f;
-                border-radius: 4px;
-                border: none;
-                width: 185px;
-                margin-top: 78px;
-                height: 55px;
-                color: #000;
+            h3 {
                 text-align: center;
+                color: #ff9e40;
+                font-size: 24px;
+                font-style: normal;
                 font-weight: 600;
-                font-size: 16px;
-                line-height: 19px;
-                background: rgba(246, 130, 31, 1);
-                box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.25);
-                cursor: pointer;
+                margin: 0;
+                line-height: 36px;
             }
 
-        @@media screen and (max-width: 600px) {
-            .container {
-                background-position-x: -15rem;
+            .header {
+                display: flex;
+                position: relative;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 0px;
+                font-style: normal;
             }
 
-            pre {
-                font-size: 0.8rem;
-                padding: 8px 12px;
-                width: 100%;
+                .header > h1 {
+                    font-style: normal;
+                    font-weight: 600;
+                    font-size: 48px;
+                    line-height: 150%;
+                    display: flex;
+                    align-items: center;
+                    text-align: center;
+                    color: #ff9e40;
+                }
+
+                .header > p {
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 24px;
+                    line-height: 150%;
+                    text-align: center;
+                    color: #ffffff;
+                    flex-grow: 0;
+                    margin: 16px 0px;
+                }
+
+            a {
+                color: #ffffff;
             }
 
-            body {
-                width: 100vw;
+            .options {
+                display: flex;
+                flex-direction: row;
             }
 
-            .header img {
-                margin-left: 0;
+                .options > a {
+                    color: #ffffff;
+                    text-decoration: underline;
+                    margin: 0px 8px;
+                    font-weight: 400;
+                    font-size: 24px;
+                    line-height: 150%;
+                }
+
+                    .options > a:first-of-type {
+                        margin-right: 30px;
+                    }
+
+            .logo > img {
+                width: 90px;
+                height: 90px;
             }
 
-            .installation-steps {
-                width: 100%;
-                box-sizing: border-box;
+            .learn-more {
+                vertical-align: middle;
+                text-align: center;
             }
 
-            h1 {
-                font-size: 1.6rem;
-            }
+                .learn-more > a:first-child {
+                    font-size: 0
+                }
 
-            ol {
-                padding-left: 20px;
-            }
+                .learn-more > a > button {
+                    background: #f6821f;
+                    border-radius: 4px;
+                    border: none;
+                    width: 185px;
+                    margin-top: 78px;
+                    height: 55px;
+                    color: #000;
+                    text-align: center;
+                    font-weight: 600;
+                    font-size: 16px;
+                    line-height: 19px;
+                    background: rgba(246, 130, 31, 1);
+                    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.25);
+                    cursor: pointer;
+                }
 
-            li {
-                margin-bottom: 5px;
+            @@media screen and (max-width: 600px) {
+                .container {
+                    background-position-x: -15rem;
+                }
+
+                pre {
+                    font-size: 0.8rem;
+                    padding: 8px 12px;
+                    width: 100%;
+                }
+
+                body {
+                    width: 100vw;
+                }
+
+                .header img {
+                    margin-left: 0;
+                }
+
+                .installation-steps {
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                h1 {
+                    font-size: 1.6rem;
+                }
+
+                ol {
+                    padding-left: 20px;
+                }
+
+                li {
+                    margin-bottom: 5px;
+                }
             }
-        }
     </style>
 </head>
 <body>

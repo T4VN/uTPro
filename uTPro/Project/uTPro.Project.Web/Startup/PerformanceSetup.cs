@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using WebMarkupMin.AspNet.Common.Compressors;
 using WebMarkupMin.AspNetCoreLatest;
 using WebMarkupMin.Core;
@@ -24,8 +25,32 @@ public static class PerformanceSetup
             mvcBuilder.AddRazorRuntimeCompilation();
         }
 
+        // Replace the default file version provider to avoid inotify exhaustion
+        // on constrained hosts (Render Free: 128 inotify limit).
+        if (!env.IsDevelopment())
+        {
+            services.AddSingleton<IFileVersionProvider, NoWatchFileVersionProvider>();
+        }
+
         // ─── WebOptimizer: CSS/JS minification ───────────────────────────────────
         var enableDiskCache = perfSection.GetValue("WebOptimizer:EnableDiskCache", false);
+
+        // WebOptimizer's AssetResponseStore.GetPath ALWAYS calls Path.Combine(CacheDirectory, ...)
+        // with no null-check — even when disk cache is disabled — and throws ArgumentNullException
+        // if CacheDirectory is null. The AddWebOptimizer(pipeline, options) overload uses
+        // InCodeWebOptimizerConfig, which (unlike the default WebOptimizerConfig) does NOT
+        // derive CacheDirectory from ContentRootPath. So we MUST always provide a valid,
+        // writable path. Use a writable temp location (Render's filesystem is read-only except
+        // /tmp and mounted disks) and create it up-front so reads never fault.
+        var contentRoot = string.IsNullOrWhiteSpace(env.ContentRootPath)
+            ? Directory.GetCurrentDirectory()
+            : env.ContentRootPath;
+        var webOptimizerCacheDir = Path.Combine(Path.GetTempPath(), "WebOptimizerCache");
+        if (string.IsNullOrWhiteSpace(webOptimizerCacheDir))
+        {
+            webOptimizerCacheDir = Path.Combine(contentRoot, "obj", "WebOptimizerCache");
+        }
+        try { Directory.CreateDirectory(webOptimizerCacheDir); } catch { /* best effort */ }
 
         services.AddWebOptimizer(pipeline =>
         {
@@ -47,6 +72,7 @@ public static class PerformanceSetup
         {
             options.EnableDiskCache = enableDiskCache;
             options.AllowEmptyBundle = true;
+            options.CacheDirectory = webOptimizerCacheDir;
         });
 
         // ─── WebMarkupMin: HTML minification + compression ───────────────────────

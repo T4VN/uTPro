@@ -35,11 +35,20 @@ RUN dotnet publish Project/uTPro.Project.Web/uTPro.Project.Web.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
+# Install Kerberos lib needed by Npgsql on Linux
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
+
 # Low-memory tuning (512MB container)
 ENV DOTNET_gcServer=0
 ENV DOTNET_GCConserveMemory=9
 ENV DOTNET_GCHeapHardLimit=0x18000000
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+# Disable file watchers — Render Free limits inotify instances to 128.
+# ASP.NET Core's reloadOnChange creates too many watchers and crashes.
+ENV DOTNET_hostBuilder__reloadConfigOnChange=false
+# Use polling instead of inotify for any remaining file watchers (avoids inotify exhaustion).
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
 # Writable temp for Umbraco (NuCache, Examine indexes, locks)
 RUN mkdir -p /tmp/umbraco
@@ -47,10 +56,11 @@ ENV TMPDIR=/tmp/umbraco
 
 COPY --from=build /app/publish .
 
-# Render uses $PORT env var (default 10000)
-ENV ASPNETCORE_URLS=http://+:10000
+# Render assigns port via $PORT env var
 ENV ASPNETCORE_ENVIRONMENT=Production
+ENV PORT=10000
 
 EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "uTPro.Project.Web.dll"]
+# Use shell form so $PORT is expanded at runtime
+ENTRYPOINT dotnet uTPro.Project.Web.dll --urls "http://+:${PORT}"
