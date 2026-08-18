@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms" Version="17.6.1" />
-    <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.5.0" />
+    <PackageReference Include="Umbraco.Cms" Version="17.6.2" />
+    <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.5.1" />
     <PackageReference Include="UmbracoSeoVisualizer" Version="17.0.0" />
   </ItemGroup>
 
