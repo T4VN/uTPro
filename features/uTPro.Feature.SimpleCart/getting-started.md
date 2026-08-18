@@ -32,7 +32,7 @@ The package multi-targets both, so the correct dependencies are restored automat
 
 On first boot the package prepares everything the cart needs — with **no manual SQL, no migrations and no configuration**:
 
-- **Product document type** — a `uTProProduct` type (with name, SKU, price, description, image and availability properties) is auto-provisioned, so you can start adding products immediately. This is idempotent and safe across restarts.
+- **Product document type** — a `uTProProduct` type (with **Product Name**, **SKU**, **Price**, **Description** and **Available** properties) is auto-provisioned, so you can start adding products immediately. This is idempotent and safe across restarts. An optional product image property is read if you add one — see [Product Catalog](catalog/).
 - **Session** — a distributed-memory-backed session is enabled to hold each visitor's cart. The cart itself needs no database.
 - **APIs & storefront** — the [cart API](cart-api/), the [catalog API](catalog/) and the [cart component](rendering/) become available.
 

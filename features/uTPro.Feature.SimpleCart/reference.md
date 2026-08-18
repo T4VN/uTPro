@@ -15,17 +15,18 @@ feature_name: "Simple Cart"
 
 ## Product schema
 
-Auto-provisioned on first boot (unless disabled via `AutoProvisionSchema`).
+Auto-provisioned on first boot (unless disabled via `AutoProvisionSchema`). The `uTProProduct` type is created with these properties and is allowed at the content root.
 
 | Item | Alias | Notes |
 |---|---|---|
 | Document type | `uTProProduct` | The product content type |
-| Product name | `productName` | Make culture-variant to translate |
+| Product Name | `productName` | Mandatory. Make culture-variant to translate |
 | SKU | `sku` | Variant / stock code |
-| Price | `price` | Numeric unit price |
+| Price | `price` | Mandatory. Numeric unit price |
 | Description | `description` | Optional, culture-variant |
-| Image | `image` | Optional media |
-| Is available | `isAvailable` | Purchasable toggle |
+| Available | `isAvailable` | Purchasable toggle (defaults to available when absent) |
+
+> The catalog also reads an optional **`image`** media property if present, but it is **not** auto-created. Add it to the Product type yourself to enable product images.
 
 ---
 
@@ -47,6 +48,7 @@ See [Cart API](cart-api/) and [Product Catalog](catalog/) for full method/route 
 | Storefront script | `/uTPro/simplecart/simplecart.js` |
 | Storefront stylesheet | `/uTPro/simplecart/simplecart.css` |
 | Cart component view | `Views/Shared/Components/Cart/Default.cshtml` (overridable) |
+| Product card partial | `Views/Partials/SimpleCart/_ProductCard.cshtml` (overridable) |
 
 ---
 

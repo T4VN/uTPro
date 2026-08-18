@@ -28,7 +28,7 @@ Part of the uTPro `Simple*` family (alongside [Simple Form Builder](/uTPro.Featu
 ## Features
 
 - **Self-wiring install** — services, session middleware and schema register themselves; nothing to add to `Program.cs`, and a clean uninstall leaves nothing behind
-- **Product document type auto-provisioned** — a `uTProProduct` type with name, SKU, price, description, image and availability is created on first boot
+- **Product document type auto-provisioned** — a `uTProProduct` type with name, SKU, price, description and availability is created on first boot (an optional image property is read if you add one)
 - **Session-backed cart** — no database, no migrations required for the cart itself
 - **Price-safe by design** — names and prices are always resolved server-side from Umbraco content; the client can never send a price
 - **Multi-language** — product name and price render in the visitor's current culture using Umbraco culture variants

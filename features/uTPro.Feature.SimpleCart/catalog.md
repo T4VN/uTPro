@@ -17,20 +17,23 @@ Products are regular Umbraco content, projected into a lightweight read model th
 
 ## The `uTProProduct` document type
 
-The auto-provisioned Product type carries these properties. If you build your own product type, use the **same property aliases** (or replace the resolver — see [Extensibility](extensibility/)).
+On first boot the package creates a **Product** document type (`uTProProduct`, allowed at the content root) with these properties. If you build your own product type, use the **same property aliases** (or replace the resolver — see [Extensibility](extensibility/)).
 
-| Property | Alias | Purpose |
-|---|---|---|
-| Product name | `productName` | Localized display name |
-| SKU | `sku` | Stock-keeping unit / variant code |
-| Price | `price` | Authoritative unit price |
-| Description | `description` | Localized description (optional) |
-| Image | `image` | Primary image (optional) |
-| Is available | `isAvailable` | Whether the product can currently be purchased |
+| Property | Alias | Required | Purpose |
+|---|---|---|---|
+| Product Name | `productName` | Yes | Localized display name |
+| SKU | `sku` | No | Stock-keeping unit / variant code |
+| Price | `price` | Yes | Authoritative unit price |
+| Description | `description` | No | Localized description |
+| Available | `isAvailable` | No | Whether the product can currently be purchased (defaults to available when absent) |
 
 ![The uTProProduct document type](/screenshots/uTPro.Feature.SimpleCart/product-doctype.png)
 
 > Make `productName`, `price` and `description` **culture-variant** so each language can be translated. See [Multi-language](multi-language/).
+
+### Optional product image
+
+The catalog also reads an optional **image** property (a media picker with the alias `image`) and exposes its URL to the storefront. This property is **not auto-created** — add it to the Product type yourself if you want product images. A missing or misconfigured image never breaks catalog reads; it simply returns no image URL.
 
 ---
 
@@ -42,7 +45,7 @@ There is no separate "category" type — any content node that has product child
 
 ## Availability & self-healing
 
-- A product with **Is available** unchecked cannot be added to the cart.
+- A product with **Available** unchecked cannot be added to the cart.
 - If a product is **unpublished or deleted**, it drops out of any cart automatically on the next read — no stale lines, no orphaned prices.
 
 ---

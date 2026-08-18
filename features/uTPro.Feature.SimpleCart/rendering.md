@@ -23,18 +23,30 @@ Render the current visitor's cart in any Razor view or block:
 @await Component.InvokeAsync("Cart")
 ```
 
-The component reads the live cart (names and prices resolved server-side in the current culture) and renders the lines, quantities and subtotal.
+The component reads the live cart (names and prices resolved server-side in the current culture) and renders the lines, quantities and subtotal. The shipped cart view **includes the stylesheet and script itself**, so on a page that renders the cart component you don't need to add them manually.
 
 ![Cart rendered on the front-end](/screenshots/uTPro.Feature.SimpleCart/cart-render.png)
 
 ---
 
+## Product card partial
+
+The package also ships a reusable **product card** partial with a built-in add-to-cart button. Pass it a catalog `Product` (see [Product Catalog](catalog/)):
+
+```razor
+@await Html.PartialAsync("SimpleCart/_ProductCard", product)
+```
+
+It renders the product image (if any), a linked name, the formatted price, and either an **Add to cart** button or an **Unavailable** label based on the product's availability. Copy it into your own site at `Views/Partials/SimpleCart/_ProductCard.cshtml` to theme it.
+
+---
+
 ## Wiring buttons with `data-*` attributes
 
-Include the shipped script, then annotate elements with `data-simplecart-*` attributes — the helper binds them automatically (no inline JavaScript needed):
+On pages that use add-to-cart buttons but **don't** render the cart component, include the shipped script once, then annotate elements with `data-simplecart-*` attributes — the helper binds them automatically (no inline JavaScript needed):
 
 ```html
-<script src="/uTPro/simplecart/simplecart.js"></script>
+<script src="/uTPro/simplecart/simplecart.js" defer></script>
 ```
 
 | Attribute | Element | Behaviour |
@@ -98,4 +110,19 @@ YourWebProject/
 
 ## Styling
 
-The shipped stylesheet lives at `/uTPro/simplecart/simplecart.css`. Include it, or skip it and style the cart with your own CSS — the markup uses plain, predictable class names you can target from your theme.
+The shipped stylesheet lives at `/uTPro/simplecart/simplecart.css` (the cart view links it automatically). Skip it and use your own CSS if you prefer — the markup uses predictable, BEM-style class names you can target from your theme:
+
+| Class | Element |
+|---|---|
+| `.utpro-cart` | Cart container |
+| `.utpro-cart__empty` | "Your cart is empty" message |
+| `.utpro-cart__table` | Cart line-items table |
+| `.utpro-cart__qty` | Quantity input |
+| `.utpro-cart__remove` | Remove-line button |
+| `.utpro-cart__clear` | Clear-cart button |
+| `.utpro-product-card` | Product card container |
+| `.utpro-product-card__image` | Product image link |
+| `.utpro-product-card__name` | Product name |
+| `.utpro-product-card__price` | Product price |
+| `.utpro-product-card__add` | Add-to-cart button |
+| `.utpro-product-card__unavailable` | Unavailable label |
