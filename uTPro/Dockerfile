@@ -35,8 +35,8 @@ RUN dotnet publish Project/uTPro.Project.Web/uTPro.Project.Web.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# Install Kerberos lib needed by Npgsql on Linux
-RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
+# Install Kerberos lib needed by Npgsql on Linux + curl for container healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 curl && rm -rf /var/lib/apt/lists/*
 
 # Low-memory tuning (512MB container)
 ENV DOTNET_gcServer=0
@@ -60,7 +60,17 @@ COPY --from=build /app/publish .
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV PORT=10000
 
+# Create a non-root user and grant it ownership of the app + writable temp dirs
+RUN groupadd --system --gid 1000 appgroup \
+    && useradd --system --uid 1000 --gid appgroup --no-create-home appuser \
+    && chown -R appuser:appgroup /app /tmp/umbraco
+USER appuser
+
 EXPOSE 10000
+
+# Verify the container is serving requests on the assigned port
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD curl -fsS "http://localhost:${PORT}/" || exit 1
 
 # Use shell form so $PORT is expanded at runtime
 ENTRYPOINT dotnet uTPro.Project.Web.dll --urls "http://+:${PORT}"
