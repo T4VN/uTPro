@@ -1,4 +1,6 @@
 using System.Security.Cryptography;
+using System.Threading;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
@@ -18,7 +20,7 @@ namespace uTPro.Project.Web.Startup;
 internal sealed class NoWatchFileVersionProvider : IFileVersionProvider
 {
     private readonly IWebHostEnvironment _env;
-    private readonly Dictionary<string, string> _cache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _cache = new(StringComparer.Ordinal);
     private readonly Lock _lock = new();
 
     public NoWatchFileVersionProvider(IWebHostEnvironment env)
@@ -33,14 +35,20 @@ internal sealed class NoWatchFileVersionProvider : IFileVersionProvider
 
         var resolvedPath = path;
 
-        // Strip query string if present
+        // Strip query string and fragment if present
         var queryIndex = path.IndexOf('?');
-        if (queryIndex >= 0)
+        var fragmentIndex = path.IndexOf('#');
+
+        if (queryIndex >= 0 && fragmentIndex >= 0)
+            resolvedPath = path[..Math.Min(queryIndex, fragmentIndex)];
+        else if (queryIndex >= 0)
             resolvedPath = path[..queryIndex];
+        else if (fragmentIndex >= 0)
+            resolvedPath = path[..fragmentIndex];
 
         lock (_lock)
         {
-            if (_cache.TryGetValue(resolvedPath, out var cached))
+            if (_cache.TryGetValue(path, out var cached))
                 return cached;
         }
 
@@ -48,7 +56,7 @@ internal sealed class NoWatchFileVersionProvider : IFileVersionProvider
 
         lock (_lock)
         {
-            _cache[resolvedPath] = versionedPath;
+            _cache[path] = versionedPath;
         }
 
         return versionedPath;
@@ -82,8 +90,14 @@ internal sealed class NoWatchFileVersionProvider : IFileVersionProvider
                 .Replace('/', '_')
                 .TrimEnd('=');
 
-            var separator = originalPath.Contains('?') ? "&" : "?";
-            return $"{originalPath}{separator}v={version}";
+            // Extract any fragment from original path
+            var fragmentIndex = originalPath.IndexOf('#');
+            var pathWithoutFragment = fragmentIndex >= 0 ? originalPath[..fragmentIndex] : originalPath;
+            var fragment = fragmentIndex >= 0 ? originalPath[fragmentIndex..] : string.Empty;
+
+            // Append version parameter before fragment
+            var separator = pathWithoutFragment.Contains('?') ? "&" : "?";
+            return $"{pathWithoutFragment}{separator}v={version}{fragment}";
         }
         catch
         {
