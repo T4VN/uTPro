@@ -3,11 +3,6 @@ description: Developer documentation for uTPro – Umbraco Turbo Pro Starter Kit
 url: "https://docs.utpro.dev"
 baseurl: ""
 
-compress_html:
-  clippings: all
-  comments: ["<!--", "-->"]
-  blanklines: false
-
 # Plugins
 plugins:
   - jekyll-seo-tag
@@ -24,7 +19,9 @@ kramdown:
 sass:
   style: compressed
 
-# Compress HTML (exclude JS to prevent single-line comment issues)
+# Compress HTML. NOTE: this collapses whitespace inside inline <script> too,
+# so inline scripts must NOT use // line comments (use /* */ block comments)
+# or the whole line gets commented out after minification.
 compress_html:
   clippings: all
   comments: ["<!-- ", " -->"]

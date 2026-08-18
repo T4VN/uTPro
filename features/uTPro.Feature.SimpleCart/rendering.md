@@ -25,6 +25,8 @@ Render the current visitor's cart in any Razor view or block:
 
 The component reads the live cart (names and prices resolved server-side in the current culture) and renders the lines, quantities and subtotal.
 
+![Cart rendered on the front-end](/screenshots/uTPro.Feature.SimpleCart/cart-render.png)
+
 ---
 
 ## Wiring buttons with `data-*` attributes
@@ -55,6 +57,8 @@ Example add-to-cart control:
 
 <a href="/cart">Cart (<span data-simplecart-count>0</span>)</a>
 ```
+
+![Add to cart on a product listing](/screenshots/uTPro.Feature.SimpleCart/add-to-cart.png)
 
 ---
 

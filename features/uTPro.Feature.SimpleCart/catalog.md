@@ -28,6 +28,8 @@ The auto-provisioned Product type carries these properties. If you build your ow
 | Image | `image` | Primary image (optional) |
 | Is available | `isAvailable` | Whether the product can currently be purchased |
 
+![The uTProProduct document type](/screenshots/uTPro.Feature.SimpleCart/product-doctype.png)
+
 > Make `productName`, `price` and `description` **culture-variant** so each language can be translated. See [Multi-language](multi-language/).
 
 ---

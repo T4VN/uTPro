@@ -21,6 +21,8 @@ Part of the uTPro `Simple*` family (alongside [Simple Form Builder](/uTPro.Featu
 [![NuGet Downloads](https://img.shields.io/nuget/dt/uTPro.Feature.SimpleCart.svg)](https://www.nuget.org/packages/uTPro.Feature.SimpleCart)
 [![Umbraco Marketplace](https://img.shields.io/badge/Umbraco-Marketplace-blue)](https://marketplace.umbraco.com/package/utpro.feature.simplecart)
 
+![uTPro Simple Cart](/screenshots/uTPro.Feature.SimpleCart/cart-overview.png)
+
 ---
 
 ## Features

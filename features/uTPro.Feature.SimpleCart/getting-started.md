@@ -46,6 +46,8 @@ Products are ordinary Umbraco content nodes based on the auto-provisioned `uTPro
 2. Create a node of type **Product** (`uTProProduct`)
 3. Fill in the name, price, SKU and availability, then **Save and publish**
 
+![Editing a product node](/screenshots/uTPro.Feature.SimpleCart/product-content.png)
+
 To organize products into "categories", nest them under a parent node — the [catalog API](catalog/) can list the products under any parent. See [Product Catalog](catalog/) for the full field list and property aliases.
 
 ## Build your first cart
