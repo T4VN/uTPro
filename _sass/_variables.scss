@@ -1,18 +1,20 @@
 // =============================================================================
-// uTPro Design Tokens — SINGLE SOURCE OF TRUTH (shared across all uTPro sites)
+// uTPro Design Tokens — SINGLE SOURCE OF TRUTH (shared across every uTPro site)
 //
-// This exact file is shared byte-for-byte between:
-//   • uTPro.HomePage   -> scss/_variables.scss   (Dart Sass via `sass`)
-//   • uTPro-gh-pages   -> _sass/_variables.scss  (Jekyll / sass-embedded)
+// KEEP THIS FILE 100% IDENTICAL in all three projects:
+//   • homepage : uTPro.HomePage/scss/_variables.scss     (canonical / edit here)
+//   • docs     : uTPro-gh-pages/_sass/_variables.scss
+//   • release  : uTPro.ReleaseStats/scss/_variables.scss
 //
-// Everything is a CSS custom property, so both sites consume tokens with
-// `var(--token-name)`. Change a value here once and BOTH sites update together.
-// To sync: copy this file over the other site's copy (see sync-tokens.ps1).
+// Everything is a CSS custom property, so every site consumes tokens with
+// `var(--token-name)`. Edit a value ONCE here, then copy this file verbatim into
+// the other projects (see uTPro.HomePage/sync-tokens.ps1). One value rules
+// everywhere — no per-site overrides.
 //
 // Rules:
-//   • Token NAMES are the contract — keep them identical across sites.
-//   • Add a token -> add a line below; use it via var(--name).
-//   • Do not re-introduce per-site values; one value rules everywhere.
+//   • Token NAMES are the contract — never rename/remove one that a site uses.
+//   • Add a token -> add a `--name: value;` line; consume via var(--name).
+//   • This is a superset: a site simply ignores tokens it doesn't use.
 // =============================================================================
 
 :root {
@@ -32,19 +34,21 @@
     --color-primary-light: #ff9e40;
     --color-primary-hover: #ffce40;
     --color-primary-dark: #d96d10;
+    --color-primary-active: #d96760;
     --color-primary-gradient: linear-gradient(135deg, #f6821f 0%, #ff9e40 100%);
 
     // ---- Accessible text variants on light backgrounds (WCAG AA) ----
     --color-primary-text: #c2410c;
-    --color-green: #16a34a;
     --color-green-text: #15803d;
 
-    // ---- Neutrals / dark surfaces ----
-    --color-ink: #1c1e26;
-    --color-ink-2: #282b34;
+    // ---- Status / accents ----
+    --color-green: #16a34a;
+    --color-warn: #d97706;
     --color-umbraco: #004880;
 
-    // ---- Docs chrome (sidebar / topbar) ----
+    // ---- Neutrals / dark UI ----
+    --color-ink: #1c1e26;
+    --color-ink-2: #282b34;
     --color-sidebar-bg: #282b34;
     --color-sidebar-text: #ffffff;
     --color-sidebar-active: #f6821f;
