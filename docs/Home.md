@@ -57,7 +57,7 @@ Detailed documentation for each standalone feature package:
 | [SEO Audit](/uTPro.Feature.SEOAudit/) | Site-wide SEO health check, broken link detection, CSV export |
 | [URL Viewer](/uTPro.Feature.UrlViewer/) | Fetch URLs, redirect chain analysis, SEO score |
 | [Simple Form Builder](/uTPro.Feature.SimpleFormBuilder/) | Visual form builder with entries, file uploads, API |
-| [Simple Cart](/uTPro.Feature.SimpleCart/) | Session-backed shopping cart with product catalog & multi-language pricing |
+| [Simple Cart](/uTPro.Feature.SimpleCart/) | E-commerce engine: cart, checkout, orders, payments, shipping, gift cards, discounts |
 | [Search Plus](/uTPro.Feature.SearchPlus/) | Synonym expansion & diacritics-insensitive search |
 | [File Manager](/uTPro.Feature.FileManager/) | Server file browser and media cleanup toolkit |
 | [Job Monitor](/uTPro.Feature.JobMonitor/) | Background jobs dashboard with telemetry |

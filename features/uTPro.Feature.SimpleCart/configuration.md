@@ -1,23 +1,22 @@
 ---
 layout: default
-title: "Configuration – Simple Cart"
-description: "Optional appsettings.json configuration for uTPro Simple Cart: max quantity per line, schema auto-provisioning, and the session cookie name."
+title: "Configuration"
+description: "SimpleCart appsettings reference."
 permalink: "/uTPro.Feature.SimpleCart/configuration/"
-feature: true
-feature_name: "Simple Cart"
 ---
 
 # Configuration
 
-[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
-
-All settings are optional under `uTPro:SimpleCart` in `appsettings.json`. The cart works out of the box with sensible defaults, so configuration is only needed to change behaviour.
+All options are in `appsettings.json` under `uTPro:SimpleCart`. Every value has a sensible default, so configuration is optional.
 
 ```json
 {
   "uTPro": {
     "SimpleCart": {
+      "Currency": "USD",
       "MaxQuantityPerLine": 999,
+      "ShippingFlatRate": 0,
+      "FreeShippingOver": null,
       "AutoProvisionSchema": true,
       "SessionCookieName": "uTPro.SimpleCart.Session"
     }
@@ -25,27 +24,32 @@ All settings are optional under `uTPro:SimpleCart` in `appsettings.json`. The ca
 }
 ```
 
----
-
-## Reference
-
 | Key | Default | Description |
 |-----|---------|-------------|
-| `MaxQuantityPerLine` | `999` | Maximum quantity allowed for a single cart line. Adds and updates are clamped to this value. |
-| `AutoProvisionSchema` | `true` | When true, the `uTProProduct` document type and its data types are auto-provisioned on first boot. Set to `false` if you provide your own product schema (and typically a custom `IProductResolver`). |
-| `SessionCookieName` | `uTPro.SimpleCart.Session` | Name of the session cookie used to persist the cart. |
+| `Currency` | `USD` | ISO currency code stamped onto orders. Single currency per storefront. |
+| `MaxQuantityPerLine` | `999` | Maximum quantity allowed for a single cart line. |
+| `ShippingFlatRate` | `0` | Price used by the built-in flat-rate shipping provider. |
+| `FreeShippingOver` | `null` | Subtotal threshold for free shipping (null = disabled). |
+| `AutoProvisionSchema` | `true` | Auto-create the Product document type + data types on first boot. |
+| `SessionCookieName` | `uTPro.SimpleCart.Session` | The name of the session cookie. |
 
----
+## Add-on configuration
 
-## Bringing your own product schema
+Payment/shipping add-ons have their own config sections that can also be managed from the backoffice **Store settings** (encrypted, per-provider):
 
-If you already have a product content model, set `AutoProvisionSchema` to `false` so the package does not create the `uTProProduct` type. In that case either:
+```json
+{
+  "uTPro": {
+    "SimpleCart": {
+      "Stripe": { "SecretKey": "sk_test_...", "WebhookSecret": "whsec_..." },
+      "VnPay": { "TmnCode": "...", "HashSecret": "...", "BaseUrl": "https://sandbox..." }
+    }
+  }
+}
+```
 
-- reuse the same property aliases (`productName`, `price`, `sku`, `description`, `image`, `isAvailable`), or
-- register a custom `IProductResolver` to map your own content — see [Extensibility](extensibility/).
+Backoffice values (from **Store settings**) take priority over appsettings when set.
 
----
+## Provider enable/disable
 
-## Sessions & load balancing
-
-The cart is session-backed. Out of the box it uses a distributed-memory cache, which is per-instance. For a load-balanced deployment, register a shared distributed cache (for example Redis or SQL Server) in your host so sessions — and therefore carts — are shared across instances.
+When a provider is disabled in **Store settings**, it is hidden from the storefront payment methods / shipping quotes and does not participate in adjustment calculation.

@@ -1,59 +1,93 @@
 ---
 layout: default
-title: "Getting Started – Simple Cart"
-description: "Install uTPro Simple Cart, understand the self-wiring install, and find where products live in the Umbraco backoffice."
+title: "Getting Started"
+description: "Install and run SimpleCart in under 5 minutes."
 permalink: "/uTPro.Feature.SimpleCart/getting-started/"
-feature: true
-feature_name: "Simple Cart"
 ---
 
 # Getting Started
 
-[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
-
-## Install via NuGet
+## 1. Install
 
 ```bash
 dotnet add package uTPro.Feature.SimpleCart
 ```
 
-That's it. The package **self-wires** its services and session middleware through an Umbraco composer, so there are **no changes to your `Program.cs`**. Uninstalling the NuGet package removes everything cleanly — nothing is left behind in the host.
+No `Program.cs` changes are required — the package self-wires its services, session middleware, migrations and backoffice UI through Umbraco composers.
 
-## Framework / Umbraco compatibility
+## 2. First boot
 
-| Umbraco | .NET | Package target |
-|---|---|---|
-| 16 | .NET 9 | `net9.0` |
-| 17 & 18 | .NET 10 | `net10.0` |
+On first run, SimpleCart automatically provisions:
+- An **orders table** (`uTProSimpleCartOrder`) via an idempotent Umbraco migration (cross-database: SQL Server, SQLite, PostgreSQL).
+- A **Product** document type (`uTProProduct`) with properties: Product Name, SKU, Price, Description, Available.
 
-The package multi-targets both, so the correct dependencies are restored automatically for your project.
+Disable auto-provisioning with `uTPro:SimpleCart:AutoProvisionSchema = false` if you manage the schema yourself.
 
-## What happens on first run
+## 3. Create products
 
-On first boot the package prepares everything the cart needs — with **no manual SQL, no migrations and no configuration**:
+In the **Content** section, create nodes of type **Product** and publish them. Enable *Allow vary by culture* for multi-language names/prices.
 
-- **Product document type** — a `uTProProduct` type (with **Product Name**, **SKU**, **Price**, **Description** and **Available** properties) is auto-provisioned, so you can start adding products immediately. This is idempotent and safe across restarts. An optional product image property is read if you add one — see [Product Catalog](catalog/).
-- **Session** — a distributed-memory-backed session is enabled to hold each visitor's cart. The cart itself needs no database.
-- **APIs & storefront** — the [cart API](cart-api/), the [catalog API](catalog/) and the [cart component](rendering/) become available.
+## 4. Enable the backoffice section
 
-> If you already have your own product schema, you can turn off auto-provisioning and point the cart at your content — see [Configuration](configuration/) and [Extensibility](extensibility/).
+Go to **Users → User Groups → (your group) → Sections**, check **uTPro Cart Section**, and save. The section then appears in the top navigation bar.
 
-## Where products live
+## 5. Add a payment gateway (optional)
 
-Products are ordinary Umbraco content nodes based on the auto-provisioned `uTProProduct` document type. Create them anywhere in the content tree and publish them like any other page.
+```bash
+dotnet add package uTPro.Feature.SimpleCart.Payments.Stripe
+# or
+dotnet add package uTPro.Feature.SimpleCart.Payments.VnPay
+```
 
-1. Open the **Content** section
-2. Create a node of type **Product** (`uTProProduct`)
-3. Fill in the name, price, SKU and availability, then **Save and publish**
+Configure keys in **Store settings** (or appsettings). See [Payments](/uTPro.Feature.SimpleCart/payments/).
 
-![Editing a product node](/screenshots/uTPro.Feature.SimpleCart/product-content.png)
+## 6. Add discounts / gift cards (optional)
 
-To organize products into "categories", nest them under a parent node — the [catalog API](catalog/) can list the products under any parent. See [Product Catalog](catalog/) for the full field list and property aliases.
+```bash
+dotnet add package uTPro.Feature.SimpleCart.Discounts
+dotnet add package uTPro.Feature.SimpleCart.GiftCards
+```
 
-## Build your first cart
+Grant the new sections to your user group. See [Discounts](/uTPro.Feature.SimpleCart/discounts/) and [Gift Cards](/uTPro.Feature.SimpleCart/gift-cards/).
 
-1. Add products in **Content** (above)
-2. On a product listing or detail template, add an **Add to cart** button using the `data-simplecart-add` attribute
-3. Render the cart with the `Cart` ViewComponent on your basket page
+## 7. Render the storefront
 
-See [Rendering the Cart](rendering/) for the storefront wiring, and [Multi-language](multi-language/) to make names and prices follow the visitor's culture.
+Include the bundled JS client and call the API:
+
+```html
+<script src="/uTPro/simplecart/simplecart.js"></script>
+```
+
+```js
+uTProSimpleCart.add(productKey);          // add to cart
+uTProSimpleCart.get();                     // read cart
+uTProSimpleCart.shippingQuotes({});        // get shipping options
+uTProSimpleCart.previewAdjustments(codes); // preview discount/gift-card
+uTProSimpleCart.checkout({ customerName, customerEmail, shippingMethod, paymentProvider, codes });
+uTProSimpleCart.startPayment({ orderNumber, returnUrl, cancelUrl }); // redirect to gateway
+```
+
+Or use the Razor view component:
+
+```cshtml
+@await Component.InvokeAsync("Cart")
+```
+
+## 8. Configuration (optional)
+
+```json
+{
+  "uTPro": {
+    "SimpleCart": {
+      "Currency": "USD",
+      "MaxQuantityPerLine": 999,
+      "ShippingFlatRate": 0,
+      "FreeShippingOver": null,
+      "AutoProvisionSchema": true,
+      "SessionCookieName": "uTPro.SimpleCart.Session"
+    }
+  }
+}
+```
+
+See [Configuration](/uTPro.Feature.SimpleCart/configuration/) for details.

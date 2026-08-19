@@ -1,44 +1,110 @@
 ---
 layout: default
-title: "Extensibility – Simple Cart"
-description: "Override where products come from in uTPro Simple Cart by registering a custom IProductResolver, and swap cart storage later without a rewrite."
+title: "Extensibility"
+description: "SimpleCart extension points — add your own payment, shipping, discount or event handler."
 permalink: "/uTPro.Feature.SimpleCart/extensibility/"
-feature: true
-feature_name: "Simple Cart"
 ---
 
 # Extensibility
 
-[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
+SimpleCart is designed so that **third-party features plug in from your own composer — you never edit the core package**. All extension points are DI-resolved Umbraco collection builders.
 
-The cart is built around small, replaceable seams so you can adapt it to your own catalog or storage without rewriting anything.
+## Extension points
 
----
+| Interface | Builder method | Purpose |
+|-----------|---------------|---------|
+| `IPaymentProvider` | `builder.SimpleCartPaymentProviders()` | Add a payment gateway |
+| `IShippingProvider` | `builder.SimpleCartShippingProviders()` | Add shipping rate logic |
+| `IOrderAdjustmentProvider` | `builder.SimpleCartOrderAdjustmentProviders()` | Add discounts / gift cards / fees |
+| `IOrderEventHandler` | `builder.SimpleCartOrderEventHandlers()` | Side-effects (email, ERP, stock) |
+| `IProductResolver` | Register via `builder.Services.AddScoped<>()` | Change where products come from |
+| `ICartService` | Register via `builder.Services.AddScoped<>()` | Change cart storage (session → DB) |
+| `IConfigurableProvider` | Implement alongside one of the above | Expose a backoffice settings form |
 
-## Custom product source (`IProductResolver`)
-
-By default the cart reads products from Umbraco content using the conventional `uTProProduct` aliases. To source products from somewhere else — a different document type, an external PIM, or the future Catalog module — register your own `IProductResolver` in a composer:
+## Registering from your own composer
 
 ```csharp
-public sealed class MyProductResolverComposer : IComposer
+using uTPro.Feature.SimpleCart.Composing;
+
+public class MyShopComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
-        => builder.Services.AddScoped<IProductResolver, MyProductResolver>();
+    {
+        builder.SimpleCartPaymentProviders().Append<MyGateway>();
+        builder.SimpleCartShippingProviders().Append<MyShipping>();
+        builder.SimpleCartOrderAdjustmentProviders().Append<MyCouponEngine>();
+        builder.SimpleCartOrderEventHandlers().Append<MyEmailHandler>();
+    }
 }
 ```
 
-The resolver's job is simple: given a product **key** (and optional SKU), return the authoritative, culture-resolved **name**, **price** and **availability** — or `null` if the product should not be added / should drop from the cart. Because the cart reads everything through this one seam, your prices stay server-side and [price-safe](security/).
+Builders are ordered collections — you can also `Insert<>`, `InsertBefore<>`, `Remove<>`.
 
-> When you supply your own product model, consider setting `AutoProvisionSchema` to `false` so the default `uTProProduct` type is not created. See [Configuration](configuration/).
+## IPaymentProvider
 
----
+```csharp
+public sealed class MyGateway : IPaymentProvider, IConfigurableProvider
+{
+    public string Alias => "my-gateway";
+    public string Name  => "My Gateway";
 
-## Swapping cart storage later
+    public IEnumerable<ProviderSettingField> GetSettingFields() => [
+        new("ApiKey", "API Key", ProviderSettingType.Password, required: true),
+    ];
 
-The cart stores only the product key, SKU and quantity, behind a cart service seam. The default storage is session-backed, but moving to a database later is an **implementation swap, not a rewrite** — the storefront, API and resolver stay exactly the same.
+    public Task<PaymentInitiationResult> StartAsync(PaymentRequest request) { ... }
+    public Task<PaymentCallbackResult> HandleCallbackAsync(HttpContext ctx) { ... }
+}
+```
 
----
+## IShippingProvider
 
-## Roadmap seams
+```csharp
+public sealed class MyShipping : IShippingProvider
+{
+    public string Alias => "dhl";
+    public string Name  => "DHL";
 
-The same approach extends to the planned modules — pluggable payment and shipping providers, and an order-capture pipeline — so each concern can be added or replaced independently. See [Reference](reference/) for the roadmap.
+    public Task<IEnumerable<ShippingQuote>> GetQuotesAsync(ShippingContext ctx) { ... }
+}
+```
+
+## IOrderAdjustmentProvider
+
+```csharp
+public sealed class MyCoupons : IOrderAdjustmentProvider
+{
+    public string Alias => "my-coupons";
+    public string Name  => "My Coupons";
+
+    public Task<IEnumerable<OrderAdjustment>> GetAdjustmentsAsync(AdjustmentContext ctx)
+    {
+        // ctx.Codes contains the shopper's codes; ctx.SubTotal the current subtotal.
+        // Return adjustments with negative Amount to reduce the total.
+    }
+}
+```
+
+## IOrderEventHandler
+
+```csharp
+public sealed class EmailHandler : IOrderEventHandler
+{
+    public Task OnOrderPlacedAsync(Order order) { /* send email */ }
+    public Task OnOrderStatusChangedAsync(Order order, string prev) { /* notify */ }
+}
+```
+
+Handlers run best-effort: an exception in one is logged and never blocks the others.
+
+## IConfigurableProvider (backoffice settings form)
+
+Any provider that implements this gets an auto-generated form in **Store settings**. Field types: `Text`, `Password` (encrypted at rest, masked in UI), `Number`, `Decimal`, `Boolean`, `Select`.
+
+Read stored values at runtime via `IProviderSettingsService`:
+
+```csharp
+var key = _settings.GetValue("my-gateway", "ApiKey");
+```
+
+Disabled providers are hidden from the storefront.

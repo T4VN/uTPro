@@ -1,85 +1,82 @@
 ---
 layout: default
-title: "Cart API – Simple Cart"
-description: "The public JSON cart API for uTPro Simple Cart: get, add, update quantity, remove and clear, with price-safe server-side resolution."
+title: "Cart API"
+description: "SimpleCart public cart, checkout, shipping, payment and adjustment endpoints."
 permalink: "/uTPro.Feature.SimpleCart/cart-api/"
-feature: true
-feature_name: "Simple Cart"
 ---
 
-# Cart API
+# Public API
 
-[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
+All storefront endpoints are anonymous and JSON. The cart is scoped to the visitor's session.
 
-The public storefront cart API is served at `/api/simplecart/cart`. It is intentionally **anonymous** (a shopper does not need to log in to build a cart) and **session-scoped** (a cart belongs to one visitor). See [Security](security/).
-
----
-
-## Endpoints
+## Cart — `/api/simplecart/cart`
 
 | Method | Route | Body | Result |
 |--------|-------|------|--------|
-| `GET` | `/api/simplecart/cart` | — | Current cart |
-| `POST` | `/api/simplecart/cart/items` | `{ "productKey": "<guid>", "sku": "optional", "quantity": 1 }` | Updated cart |
-| `PUT` | `/api/simplecart/cart/items/{productKey}` | `{ "quantity": 2 }` | Updated cart |
-| `DELETE` | `/api/simplecart/cart/items/{productKey}` | — | Updated cart |
-| `DELETE` | `/api/simplecart/cart` | — | `204 No Content` |
+| `GET` | `/cart` | — | Current cart |
+| `POST` | `/cart/items` | `{ productKey, sku?, quantity }` | Updated cart (404 if unavailable) |
+| `PUT` | `/cart/items/{productKey}` | `{ quantity }` | Updated cart (0 removes) |
+| `DELETE` | `/cart/items/{productKey}` | — | Updated cart |
+| `DELETE` | `/cart` | — | 204 No Content |
 
-The request carries **only** a product key (plus optional SKU and quantity) — never a price or name.
+## Checkout — `/api/simplecart/checkout`
 
----
+| Method | Route | Body |
+|--------|-------|------|
+| `POST` | `/checkout` | `{ customerName, customerEmail, customerPhone?, shippingAddress?, notes?, shippingMethod?, paymentProvider?, codes? }` |
 
-## Add an item
+Returns the created order or 400.
 
-```http
-POST /api/simplecart/cart/items
-Content-Type: application/json
+## Shipping — `/api/simplecart/shipping`
 
-{ "productKey": "8f3c...e21a", "quantity": 2 }
+| Method | Route | Body |
+|--------|-------|------|
+| `POST` | `/shipping/quotes` | `{ countryCode?, address? }` |
+
+Returns `[{ methodAlias, methodName, price, providerAlias }]`.
+
+## Payment — `/api/simplecart/payment`
+
+| Method | Route | Body / Purpose |
+|--------|-------|----------------|
+| `GET` | `/payment/methods` | List enabled methods |
+| `POST` | `/payment/start` | `{ orderNumber, providerAlias?, returnUrl?, cancelUrl? }` |
+| `GET\|POST` | `/payment/callback/{alias}` | Gateway callback (provider-specific) |
+
+## Adjustments — `/api/simplecart/adjustments`
+
+| Method | Route | Body |
+|--------|-------|------|
+| `POST` | `/adjustments/preview` | `{ codes: ["SAVE10", "GC-..."] }` |
+
+Returns `{ currency, subTotal, adjustments, adjustmentTotal, total }`.
+
+## Catalog — `/api/simplecart/catalog`
+
+| Method | Route |
+|--------|-------|
+| `GET` | `/catalog/products?parentKey={guid?}` |
+| `GET` | `/catalog/products/{key}` |
+
+## JavaScript client
+
+```html
+<script src="/uTPro/simplecart/simplecart.js"></script>
 ```
 
-- Adding a product that is already in the cart **increments** that line rather than duplicating it.
-- Quantity is clamped to the configured maximum per line (see [Configuration](configuration/)); values below 1 are treated as 1.
-- An unknown, unpublished or unavailable product returns **404 Not Found**.
-- A missing or empty `productKey` returns **400 Bad Request**.
+```js
+uTProSimpleCart.get();
+uTProSimpleCart.add(productKey, quantity, sku);
+uTProSimpleCart.update(productKey, quantity);
+uTProSimpleCart.remove(productKey);
+uTProSimpleCart.clear();
+uTProSimpleCart.shippingQuotes({ countryCode, address });
+uTProSimpleCart.paymentMethods();
+uTProSimpleCart.previewAdjustments(codes);
+uTProSimpleCart.checkout({ customerName, customerEmail, ..., codes });
+uTProSimpleCart.startPayment({ orderNumber, providerAlias, returnUrl, cancelUrl });
 
-## Update quantity
-
-```http
-PUT /api/simplecart/cart/items/8f3c...e21a
-Content-Type: application/json
-
-{ "quantity": 5 }
+// Events
+document.addEventListener("simplecart:changed", e => { /* e.detail = cart */ });
+document.addEventListener("simplecart:ordered", e => { /* e.detail = order */ });
 ```
-
-Sets the **absolute** quantity for the line. A quantity of `0` (or less) removes the line.
-
-## Remove an item / clear the cart
-
-```http
-DELETE /api/simplecart/cart/items/8f3c...e21a   → updated cart
-DELETE /api/simplecart/cart                      → 204 No Content
-```
-
----
-
-## Cart response shape
-
-```json
-{
-  "items": [
-    {
-      "productKey": "8f3c...e21a",
-      "sku": "TSHIRT-BLK-M",
-      "name": "Black T-Shirt",
-      "unitPrice": 19.90,
-      "quantity": 2,
-      "lineTotal": 39.80
-    }
-  ],
-  "totalQuantity": 2,
-  "subTotal": 39.80
-}
-```
-
-`name` and `unitPrice` are resolved live from product content in the current culture on every read, and totals are computed on read, so they can never drift from the underlying lines.
