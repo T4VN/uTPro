@@ -3,6 +3,7 @@ layout: default
 title: "Quick Overview"
 description: "Quick overview of uTPro – features, architecture, tech stack, screenshots, and what's included in the Umbraco Starter Kit."
 permalink: "/quick-overview/"
+nav_order: 1
 ---
 
 # Quick Overview

@@ -3,6 +3,7 @@ layout: default
 title: "Getting Started"
 description: "Get started with uTPro – quick start guide, documentation overview, and contact information for the Umbraco Starter Kit by T4VN."
 permalink: "/getting-started/"
+nav_order: 2
 ---
 
 # Getting Started

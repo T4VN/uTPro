@@ -1,0 +1,31 @@
+---
+layout: null
+permalink: /llms.txt
+---
+# uTPro Documentation
+
+> uTPro (Umbraco Turbo Pro) is a turbocharged Umbraco Starter Kit by T4VN that ships enterprise architecture, performance, SEO and security out of the box — for developers, by developers. This is the official documentation for Developers and Content Editors.
+
+- Canonical site: {{ '/' | absolute_url }}
+- Each linked page below is a standalone HTML document.
+
+## Documentation
+
+{% assign doc_pages = site.pages | where_exp: "p", "p.nav_order" | sort: "nav_order" -%}
+{% for p in doc_pages -%}
+- [{{ p.title | default: p.name }}]({{ p.url | absolute_url }}){% if p.description %}: {{ p.description }}{% endif %}
+{% endfor %}
+## Features
+
+{% assign feat_pages = site.pages | where_exp: "p", "p.feature_order" | sort: "feature_order" -%}
+{% for f in feat_pages -%}
+- [{{ f.feature_name | default: f.title }}]({{ f.url | absolute_url }}){% if f.description %}: {{ f.description }}{% endif %}
+{% endfor %}
+## Optional
+
+- [Contributing]({{ '/CONTRIBUTING/' | absolute_url }}): How to contribute to uTPro.
+- [Security]({{ '/SECURITY/' | absolute_url }}): Security policy and vulnerability reporting.
+- [License]({{ '/LICENSE/' | absolute_url }}): License information.
+- [uTPro Home](https://utpro.dev): Product / marketing homepage.
+- [Live Demo](https://demo.utpro.dev): Live demo site.
+- [Release Stats](https://release.utpro.dev): Version history, download counts and package stats.
