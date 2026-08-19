@@ -1,31 +1,71 @@
-// ═══════════════════════════════════════════════
-// Design Tokens
-// ═══════════════════════════════════════════════
+// =============================================================================
+// uTPro Design Tokens — SINGLE SOURCE OF TRUTH (shared across all uTPro sites)
+//
+// This exact file is shared byte-for-byte between:
+//   • uTPro.HomePage   -> scss/_variables.scss   (Dart Sass via `sass`)
+//   • uTPro-gh-pages   -> _sass/_variables.scss  (Jekyll / sass-embedded)
+//
+// Everything is a CSS custom property, so both sites consume tokens with
+// `var(--token-name)`. Change a value here once and BOTH sites update together.
+// To sync: copy this file over the other site's copy (see sync-tokens.ps1).
+//
+// Rules:
+//   • Token NAMES are the contract — keep them identical across sites.
+//   • Add a token -> add a line below; use it via var(--name).
+//   • Do not re-introduce per-site values; one value rules everywhere.
+// =============================================================================
 
 :root {
+    // ---- Surfaces / backgrounds ----
+    --color-bg: #faf8f5;
+    --color-bg-alt: #f5f3ef;
+    --color-bg-code: #f6f3ef;
+    --color-surface: #ffffff;
+    --color-border: #e8e4de;
+
+    // ---- Text ----
+    --color-text: #141424;
+    --color-text-muted: #4b5563;
+
+    // ---- Brand / primary ----
     --color-primary: #f6821f;
     --color-primary-light: #ff9e40;
-    --color-primary-hover: #FFCE40;
+    --color-primary-hover: #ffce40;
     --color-primary-dark: #d96d10;
     --color-primary-gradient: linear-gradient(135deg, #f6821f 0%, #ff9e40 100%);
-    --color-bg: #faf8f5;
-    --color-bg-alt: #faf8f5;
-    --color-bg-code: #f6f3ef;
-    --color-text: #141424;
-    --color-text-muted: #6b7280;
-    --color-border: #e8e4de;
-    --color-surface: #ffffff;
-    /* Accessible text variants for orange/green on light backgrounds (WCAG AA) */
+
+    // ---- Accessible text variants on light backgrounds (WCAG AA) ----
     --color-primary-text: #c2410c;
     --color-green: #16a34a;
     --color-green-text: #15803d;
+
+    // ---- Neutrals / dark surfaces ----
+    --color-ink: #1c1e26;
+    --color-ink-2: #282b34;
+    --color-umbraco: #004880;
+
+    // ---- Docs chrome (sidebar / topbar) ----
     --color-sidebar-bg: #282b34;
     --color-sidebar-text: #ffffff;
     --color-sidebar-active: #f6821f;
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    // ---- Typography ----
+    --font-sans: 'Inter', 'Inter Fallback', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', Consolas, 'Courier New', monospace;
+
+    // ---- Radii ----
+    --radius: 12px;
+    --radius-sm: 6px;
+    --radius-lg: 20px;
+    --radius-pill: 30px;
+
+    // ---- Shadows ----
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.1);
+
+    // ---- Layout ----
+    --max-width: 1120px;
+    --header-height: 76px;
     --sidebar-width: 280px;
     --topbar-height: 56px;
-    --radius: 8px;
-    --shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }

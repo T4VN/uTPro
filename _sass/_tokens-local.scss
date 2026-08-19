@@ -1,0 +1,12 @@
+// =============================================================================
+// Docs-only design tokens — layout values specific to the documentation site.
+// These legitimately differ from the other uTPro sites, so they are NOT part
+// of the shared _variables.scss. Imported after _variables so they can also
+// override a shared token locally if ever needed.
+// =============================================================================
+:root {
+    --radius: 8px;
+    --shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    --sidebar-width: 280px;
+    --topbar-height: 56px;
+}
