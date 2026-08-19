@@ -1,11 +1,16 @@
 ---
 layout: default
-title: "Shipping"
+title: "Shipping – Simple Cart"
 description: "SimpleCart shipping providers – quotes, flat-rate built-in, and building your own."
 permalink: "/uTPro.Feature.SimpleCart/shipping/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Shipping
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
+
 
 Shipping rate calculation is **pluggable** via `IShippingProvider`. Each provider returns one or more `ShippingQuote`s for the current cart; all providers' quotes are merged for the shopper.
 

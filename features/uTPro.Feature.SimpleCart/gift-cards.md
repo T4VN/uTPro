@@ -1,11 +1,16 @@
 ---
 layout: default
-title: "Gift Cards"
+title: "Gift Cards – Simple Cart"
 description: "SimpleCart Gift Cards add-on – create, bulk-create and redeem gift cards at checkout."
 permalink: "/uTPro.Feature.SimpleCart/gift-cards/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Gift Cards
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
+
 
 > Add-on package: `uTPro.Feature.SimpleCart.GiftCards`
 

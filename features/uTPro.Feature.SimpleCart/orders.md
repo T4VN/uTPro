@@ -1,11 +1,16 @@
 ---
 layout: default
-title: "Checkout & Orders"
+title: "Checkout & Orders – Simple Cart"
 description: "SimpleCart checkout flow, order model, status workflow and backoffice management."
 permalink: "/uTPro.Feature.SimpleCart/orders/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Checkout & Orders
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
+
 
 ## How checkout works
 

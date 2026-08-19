@@ -1,11 +1,16 @@
 ---
 layout: default
-title: "Payments"
+title: "Payments – Simple Cart"
 description: "SimpleCart payment providers – Stripe, VNPay and building your own."
 permalink: "/uTPro.Feature.SimpleCart/payments/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Payments
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
+
 
 Payment gateways are **add-on packages** that implement `IPaymentProvider` and register themselves via a composer — no edits to the core. The storefront then lists available methods, starts payment, and handles callbacks.
 

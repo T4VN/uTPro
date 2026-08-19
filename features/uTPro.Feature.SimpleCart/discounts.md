@@ -1,11 +1,15 @@
 ---
 layout: default
-title: "Discounts"
+title: "Discounts – Simple Cart"
 description: "SimpleCart Discounts add-on – percentage and fixed-amount coupon codes."
 permalink: "/uTPro.Feature.SimpleCart/discounts/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Discounts
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
 
 > Add-on package: `uTPro.Feature.SimpleCart.Discounts`
 

@@ -1,11 +1,17 @@
 ---
 layout: default
-title: "Cart API"
+title: "Cart API – Simple Cart"
 description: "SimpleCart public cart, checkout, shipping, payment and adjustment endpoints."
 permalink: "/uTPro.Feature.SimpleCart/cart-api/"
+feature: true
+feature_name: "Simple Cart"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Public API
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
 
 All storefront endpoints are anonymous and JSON. The cart is scoped to the visitor's session.
 

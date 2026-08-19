@@ -1,11 +1,15 @@
 ---
 layout: default
-title: "Extensibility"
+title: "Extensibility – Simple Cart"
 description: "SimpleCart extension points — add your own payment, shipping, discount or event handler."
 permalink: "/uTPro.Feature.SimpleCart/extensibility/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Extensibility
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
 
 SimpleCart is designed so that **third-party features plug in from your own composer — you never edit the core package**. All extension points are DI-resolved Umbraco collection builders.
 

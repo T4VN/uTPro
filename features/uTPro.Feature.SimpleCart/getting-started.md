@@ -1,11 +1,16 @@
 ---
 layout: default
-title: "Getting Started"
+title: "Getting Started – Simple Cart"
 description: "Install and run SimpleCart in under 5 minutes."
 permalink: "/uTPro.Feature.SimpleCart/getting-started/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Getting Started
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
+
 
 ## 1. Install
 

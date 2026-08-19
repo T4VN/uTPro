@@ -1,11 +1,15 @@
 ---
 layout: default
-title: "Configuration"
+title: "Configuration – Simple Cart"
 description: "SimpleCart appsettings reference."
 permalink: "/uTPro.Feature.SimpleCart/configuration/"
+feature: true
+feature_name: "Simple Cart"
 ---
 
 # Configuration
+
+[← Back to Simple Cart](/uTPro.Feature.SimpleCart/)
 
 All options are in `appsettings.json` under `uTPro:SimpleCart`. Every value has a sensible default, so configuration is optional.
 
