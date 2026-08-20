@@ -16,11 +16,11 @@
 
   <ItemGroup>
     <PackageReference Include="uTPro.Feature.AuditLog" Version="5.0.0" />
-    <PackageReference Include="uTPro.Feature.FileManager" Version="6.0.0" />
+    <PackageReference Include="uTPro.Feature.FileManager" Version="6.0.1" />
     <PackageReference Include="uTPro.Feature.JobMonitor" Version="2.0.0" />
     <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="5.0.1" />
     <PackageReference Include="uTPro.Feature.UrlViewer" Version="3.1.0" />
-    <PackageReference Include="uTPro.Feature.SEOAudit" Version="2.0.4" />
+    <PackageReference Include="uTPro.Feature.SEOAudit" Version="2.0.5" />
     <PackageReference Include="uTPro.Feature.SearchPlus" Version="1.0.0" />
   </ItemGroup>
 
