@@ -50,6 +50,7 @@ See [Configuration](configuration/) for SSRF guard options.
 | Guide | Description |
 |---|---|
 | [Getting Started](getting-started/) | Install, architecture, security |
+| [How It Works](how-it-works/) | Fetch pipeline, redirect chain, scoring engine, cloaking detection |
 | [SEO Analysis](analysis/) | Redirect chain, score breakdown, social, technical, carbon, API |
 | [Configuration](configuration/) | SSRF guard relaxation for internal/dev hosts |
 

@@ -44,6 +44,7 @@ See [Configuration](configuration/) for all `appsettings.json` options (upload l
 | [Getting Started](getting-started/) | Install, permissions, UI overview |
 | [Media Cleanup](media-cleanup/) | Scan categories, actions, smart duplicates |
 | [Configuration](configuration/) | Upload limits, multi-root, security lists |
+| [Security](security/) | RCE prevention, SSRF protection, path traversal, role-based access |
 
 ---
 

@@ -49,6 +49,7 @@ Navigate to **Settings → Advanced → Audit Log Viewer**. No configuration req
 | Guide | Description |
 |---|---|
 | [Getting Started](getting-started/) | Install, three views, features, security, how it works |
+| [Reference](reference/) | Views breakdown, column reference, filtering, export, API endpoint |
 
 ---
 
