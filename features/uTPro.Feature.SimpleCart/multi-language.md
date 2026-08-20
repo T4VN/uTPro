@@ -29,6 +29,6 @@ Standard Umbraco culture routing (domains or path prefixes) decides which cultur
 
 ## Language ≠ currency
 
-Language and currency are deliberately kept separate. Product prices are stored as plain numeric values; formatting them into a currency (and any currency conversion or market-specific pricing) is a **market** concern on the roadmap. That separation means an `en-NL` shopper can read English but still pay in EUR.
+Language and currency are deliberately kept separate. Product prices are stored as plain numeric values; the store currency is configured globally (`uTPro:SimpleCart:Currency`). This means an `en-NL` shopper can read English but still pay in the store's configured currency (e.g. EUR). Multi-currency (market-specific pricing) is on the roadmap as a future enhancement.
 
-> **Live vs. frozen:** the cart resolves names and prices **live** on every read. Order capture (roadmap) will instead **freeze a snapshot** at purchase time so historical orders keep the price the customer actually paid.
+> **Live vs. frozen:** the cart resolves names and prices **live** on every read. At checkout, the order **freezes a snapshot** — product names, prices and line totals are stored permanently so historical orders always reflect the price the customer actually paid, regardless of future edits to the product content.

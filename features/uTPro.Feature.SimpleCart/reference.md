@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Reference – Simple Cart"
-description: "Product schema aliases, endpoints, static assets and the FoxCart-style module roadmap for uTPro Simple Cart."
+description: "Product schema aliases, endpoints, static assets, configuration keys and architecture overview for uTPro Simple Cart."
 permalink: "/uTPro.Feature.SimpleCart/reference/"
 feature: true
 feature_name: "Simple Cart"
@@ -36,8 +36,13 @@ Auto-provisioned on first boot (unless disabled via `AutoProvisionSchema`). The 
 |---|---|---|
 | Cart | `/api/simplecart/cart` | Anonymous, session-scoped |
 | Catalog | `/api/simplecart/catalog` | Anonymous, read-only |
+| Checkout | `/api/simplecart/checkout` | Anonymous |
+| Shipping | `/api/simplecart/shipping` | Anonymous |
+| Payment | `/api/simplecart/payment` | Anonymous |
+| Adjustments | `/api/simplecart/adjustments` | Anonymous |
+| Backoffice | `/umbraco/management/api/v1/utpro/simple-cart` | Authenticated (backoffice users) |
 
-See [Cart API](cart-api/) and [Product Catalog](catalog/) for full method/route tables.
+See [Cart API](cart-api/) for full method/route tables, [Orders](orders/) for checkout, and [Payments](payments/) for the payment flow.
 
 ---
 
@@ -56,7 +61,10 @@ See [Cart API](cart-api/) and [Product Catalog](catalog/) for full method/route 
 
 | Section | Key | Default |
 |---|---|---|
+| `uTPro:SimpleCart` | `Currency` | `USD` |
 | `uTPro:SimpleCart` | `MaxQuantityPerLine` | `999` |
+| `uTPro:SimpleCart` | `ShippingFlatRate` | `0` |
+| `uTPro:SimpleCart` | `FreeShippingOver` | `null` |
 | `uTPro:SimpleCart` | `AutoProvisionSchema` | `true` |
 | `uTPro:SimpleCart` | `SessionCookieName` | `uTPro.SimpleCart.Session` |
 
@@ -64,14 +72,25 @@ See [Configuration](configuration/) for details.
 
 ---
 
-## Roadmap (FoxCart-style module split)
+## Architecture
 
-Simple Cart is the **cart** slice of a larger, modular commerce story. Planned modules:
+Simple Cart is a modular commerce engine — each concern is a separate layer that plugs in via public interfaces:
 
-- **Catalog** — richer product/category/variant modelling and a formal product service.
-- **Checkout** — a pluggable checkout pipeline (address → shipping → payment → confirmation).
-- **Orders** — order persistence, status workflow and a backoffice order dashboard.
-- **Payments** — pluggable payment providers, one package per gateway.
-- **Shipping** — pluggable shipping providers for rate calculation.
+| Module | Status | Description |
+|--------|--------|-------------|
+| **Cart** | ✅ Included | Session-scoped, server-side price resolution |
+| **Catalog** | ✅ Included | Product content type, read-only JSON API, `ICatalogService` |
+| **Checkout** | ✅ Included | Guest checkout, frozen order snapshot, adjustment pipeline |
+| **Orders** | ✅ Included | Persistence, status workflow, backoffice dashboard |
+| **Payments** | ✅ Add-ons | Pluggable `IPaymentProvider` — Stripe, VNPay, COD built-in |
+| **Shipping** | ✅ Add-ons | Pluggable `IShippingProvider` — flat-rate built-in |
+| **Discounts** | ✅ Add-on | Percentage / fixed-amount coupon codes |
+| **Gift Cards** | ✅ Add-on | Create, bulk-create, redeem at checkout |
 
-Each module plugs into the existing seams (see [Extensibility](extensibility/)), so adopting them is additive rather than a migration.
+Each add-on registers through public interfaces and collection builders — no edits to the core package. See [Extensibility](extensibility/) for all seams.
+
+## Planned
+
+- `ITaxCalculator` — populate the tax total already stored on orders.
+- Member-linked persistent carts and order history.
+- Richer product variants / options modelling.

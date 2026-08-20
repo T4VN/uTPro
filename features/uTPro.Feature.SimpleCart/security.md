@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Security – Simple Cart"
-description: "The security model of uTPro Simple Cart: price-safe server-side resolution, anonymous session-scoped endpoints, and roadmap notes for checkout."
+description: "The security model of uTPro Simple Cart: price-safe server-side resolution, session-scoped endpoints, checkout integrity, and encrypted provider secrets."
 permalink: "/uTPro.Feature.SimpleCart/security/"
 feature: true
 feature_name: "Simple Cart"
@@ -41,12 +41,18 @@ If a product is unpublished or deleted, it is dropped from any cart on the next 
 
 ---
 
-## Roadmap: checkout, orders & payments
+## Checkout & orders
 
-The current package is the **cart** slice. Future checkout, order and payment endpoints are a different security posture and, when added, must:
+The cart is anonymous; checkout also remains anonymous (guest checkout) but enforces server-side integrity:
 
-- add authentication where appropriate (the cart stays anonymous; capturing an order does not),
-- re-validate stock and pricing server-side at capture time, and
-- **freeze a price snapshot** on the order so historical records are stable.
+- The checkout endpoint **re-reads the cart server-side** — it never accepts prices or line items from the client request.
+- A **frozen price snapshot** is stored on the order so historical records are stable regardless of future product edits.
+- Stock/availability is re-validated at capture time — unpublished or unavailable products are rejected.
 
-See [Reference](reference/) for the full roadmap.
+## Payments
+
+Payment callbacks (Stripe webhooks, VNPay IPN) are **signature-verified** by each provider before any state change. The callback endpoint is provider-specific and does not expose order data.
+
+Provider secrets (API keys, webhook secrets) are **encrypted at rest** in the database and masked in the backoffice UI. They can also be set via appsettings (which is developer-managed, outside the database).
+
+See [Payments](/uTPro.Feature.SimpleCart/payments/) for provider details and [Extensibility](/uTPro.Feature.SimpleCart/extensibility/) to build your own.
