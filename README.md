@@ -8,7 +8,7 @@ nav_order: 1
 
 # Quick Overview
 
-<img width="50" height="50" alt="Logo" src="/screenshots/uTPro/logo-utpro.png" /> **uTPro – Umbraco Turbo Pro**
+**uTPro – Umbraco Turbo Pro**
 
 A powerful **Starter Kit Template** built to **accelerate website development on the Umbraco platform**.
 It enables developers to create **enterprise-grade websites** faster, more reliably, and with a professional structure from day one.
