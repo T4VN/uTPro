@@ -92,6 +92,7 @@
     color: var(--color-text-muted);
     overflow-wrap: break-word;
     word-wrap: break-word;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .1);
 
     p:last-child {
         margin-bottom: 0;
