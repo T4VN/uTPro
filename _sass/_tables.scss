@@ -48,7 +48,11 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
 
-        thead, tbody, tr, th, td {
+        thead,
+        tbody,
+        tr,
+        th,
+        td {
             display: revert;
         }
     }
@@ -59,6 +63,8 @@
     .doc-content > table:not(.hljs-ln) {
         display: block;
         overflow-x: visible;
+        border: none;
+        background: transparent;
 
         thead {
             display: none;
@@ -75,28 +81,49 @@
             border-radius: var(--radius);
             overflow: hidden;
             background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        tbody tr:nth-child(odd),
+        tbody tr:nth-child(even),
+        tbody tr:hover {
+            background: #ffffff !important;
         }
 
         td {
-            display: block;
-            padding: 10px 14px !important;
-            border-bottom: 1px solid var(--color-border);
-            font-size: 0.84rem;
-            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 14px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            text-align: left !important;
+            border-bottom: 1px solid var(--color-border) !important;
+            font-size: 0.875rem;
+            line-height: 1.5;
 
             &::before {
                 content: attr(data-label);
-                display: block;
+                display: inline-block;
+                flex-shrink: 0;
+                width: 90px; 
                 font-weight: 600;
-                color: var(--color-primary-text);
-                font-size: 0.7rem;
+                color: var(--color-primary);
+                font-size: 0.75rem;
                 text-transform: uppercase;
                 letter-spacing: 0.03em;
-                margin-bottom: 4px;
+                margin: 0 10px 0 0 !important;
+                padding: 0;
             }
 
             &:last-child {
                 border-bottom: none;
+                display: block;
+                
+                &::before {
+                    display: block;
+                    width: 100%;
+                    margin-bottom: 6px !important;
+                }
             }
         }
     }
