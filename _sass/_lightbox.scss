@@ -1,0 +1,408 @@
+// ═══════════════════════════════════════════════
+// Lightbox — full-screen image viewer
+// Features: prev/next, swipe, pinch zoom, thumbnails,
+//           caption, loading, origin animation, swipe-to-close
+// ═══════════════════════════════════════════════
+
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    touch-action: none;
+    user-select: none;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
+
+    &.active {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* ─── Blurred background image (like social media) ─── */
+
+.lightbox-bg-blur {
+    position: absolute;
+    inset: -40px;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 1;
+    }
+}
+
+.lightbox-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(30px) saturate(1.2) brightness(0.7);
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+.lightbox-img-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90vw;
+    height: 85vh;
+    touch-action: none;
+    position: relative;
+    z-index: 2;
+
+    .zoomed & {
+        overflow: hidden;
+    }
+}
+
+.lightbox-img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 6px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
+    transform-origin: center center;
+    touch-action: none;
+
+    .zoomed & {
+        cursor: grab;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+}
+
+/* ─── Loading spinner ─── */
+
+.lightbox-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+
+    &.visible {
+        opacity: 1;
+    }
+}
+
+.lightbox-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: lightbox-spin 0.7s linear infinite;
+}
+
+@keyframes lightbox-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ─── Caption ─── */
+
+.lightbox-caption {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.85rem;
+    max-width: 60%;
+    text-align: center;
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.visible {
+        opacity: 1;
+    }
+}
+
+/* ─── Bottom bar (counter + zoom indicator) ─── */
+
+.lightbox-bottom-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 3;
+}
+
+.lightbox-counter {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+
+.lightbox-zoom-indicator {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.78rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 4px 10px;
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    &.visible {
+        opacity: 1;
+    }
+}
+
+/* ─── Controls ─── */
+
+.lightbox-close {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background 0.15s;
+    z-index: 10;
+
+    &:hover,
+    &:focus-visible {
+        background: rgba(255, 255, 255, 0.15);
+    }
+}
+
+.lightbox-prev,
+.lightbox-next {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 1.6rem;
+    padding: 14px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s, opacity 0.2s;
+    z-index: 10;
+
+    &:hover,
+    &:focus-visible {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .zoomed & {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+}
+
+.lightbox-prev {
+    left: 16px;
+}
+
+.lightbox-next {
+    right: 16px;
+}
+
+/* ─── Zoom controls ─── */
+
+.lightbox-zoom-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+
+    button {
+        background: rgba(255, 255, 255, 0.12);
+        border: none;
+        color: #fff;
+        font-size: 1.1rem;
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s;
+        font-weight: 500;
+
+        &:hover,
+        &:focus-visible {
+            background: rgba(255, 255, 255, 0.25);
+        }
+    }
+
+    .lightbox-zoom-reset {
+        font-size: 0.75rem;
+        letter-spacing: -0.5px;
+    }
+}
+
+/* ─── Thumbnail strip ─── */
+
+.lightbox-thumbnails {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    max-width: 80vw;
+    overflow-x: auto;
+    scrollbar-width: none;
+    z-index: 3;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.lightbox-thumb {
+    flex-shrink: 0;
+    width: 48px;
+    height: 36px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    background: none;
+    padding: 0;
+
+    &.active {
+        opacity: 1;
+        border-color: #fff;
+        transform: scale(1.1);
+    }
+
+    &:hover:not(.active) {
+        opacity: 0.8;
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* ─── Mobile adjustments ─── */
+
+@media (max-width: 768px) {
+    .lightbox-img-wrap {
+        width: 100vw;
+        height: 85vh;
+        padding: 10px;
+    }
+
+    .lightbox-img {
+        max-width: calc(100vw - 20px);
+        max-height: 85vh;
+        border-radius: 4px;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+        padding: 10px 12px;
+        font-size: 1.3rem;
+    }
+
+    .lightbox-prev {
+        left: 8px;
+    }
+
+    .lightbox-next {
+        right: 8px;
+    }
+
+    .lightbox-close {
+        top: 10px;
+        right: 12px;
+        font-size: 1.8rem;
+    }
+
+    .lightbox-zoom-controls {
+        bottom: 14px;
+        right: 12px;
+
+        button {
+            width: 32px;
+            height: 32px;
+            font-size: 1rem;
+        }
+    }
+
+    .lightbox-bottom-bar {
+        bottom: 16px;
+    }
+
+    .lightbox-counter {
+        font-size: 0.78rem;
+        padding: 5px 12px;
+    }
+
+    .lightbox-caption {
+        top: 10px;
+        left: 12px;
+        transform: none;
+        text-align: left;
+        max-width: 55%;
+        font-size: 0.8rem;
+    }
+
+    .lightbox-thumbnails {
+        bottom: 50px;
+        max-width: 90vw;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .lightbox-thumb {
+        width: 40px;
+        height: 30px;
+    }
+}
