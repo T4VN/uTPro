@@ -22,7 +22,7 @@
         overflow: hidden;
     }
 
-    & > * {
+    &>* {
         position: relative;
         z-index: 1;
     }
@@ -212,6 +212,10 @@
     display: flex;
     align-items: center;
     gap: 6px;
+
+    img {
+        border-radius: none !important;
+    }
 }
 
 .home-card-icon {
