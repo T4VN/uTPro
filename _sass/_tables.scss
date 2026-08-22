@@ -45,8 +45,8 @@
 // Responsive table wrapper — allows horizontal scroll on smaller screens
 @media (max-width: 1100px) {
     .doc-content>table:not(.hljs-ln) {
-        display: block;
-        overflow-x: auto;
+        // display: block;
+        // overflow-x: auto;
         -webkit-overflow-scrolling: touch;
 
         thead,
