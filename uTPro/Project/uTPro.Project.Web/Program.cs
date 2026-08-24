@@ -7,6 +7,18 @@ using uTPro.Project.Web.Startup;
 var setup = HostingSetup.BuildWebApplicationOptions(args);
 var builder = WebApplication.CreateBuilder(setup);
 
+#if DEBUG
+// Enable DI container validation in Debug mode only.
+// - ValidateScopes: throws if a Scoped service is resolved from the root provider (e.g. injecting scoped into singleton).
+// - ValidateOnBuild: throws at Build() if any service has missing or unresolvable dependencies.
+// Catches DI misconfigurations early during development instead of failing silently at runtime.
+builder.Host.UseDefaultServiceProvider((context, options) =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
+});
+#endif
+
 // Expose the resolved web/content root to PathFolder (a DI-less static helper) so code
 // that locates files via PathFolder respects the configured RootPath instead of assuming
 // the default wwwroot under the process current directory.
