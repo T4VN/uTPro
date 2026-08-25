@@ -1,4 +1,4 @@
-# <img width="50" height="50" alt="Logo" src="https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/screenshots/uTPro/logo-utpro.png" /> uTPro – Umbraco Turbo Pro
+# <img width="50" height="50" alt="Logo" src="https://docs.utpro.dev/screenshots/uTPro/logo-utpro.png" /> uTPro – Umbraco Turbo Pro
 
 **For developers, by developers**
 
@@ -42,9 +42,9 @@ dotnet run --project Project/uTPro.Project.Web/uTPro.Project.Web.csproj
 
 ## Screenshots
 
-![Dashboard](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/screenshots/uTPro/readme-dashboard.png)
+![Dashboard](https://docs.utpro.dev/screenshots/uTPro/readme-dashboard.png)
 
-![Block Preview](https://raw.githubusercontent.com/T4VN/uTPro/refs/heads/gh-pages/screenshots/uTPro/readme-block-preview-live.png)
+![Block Preview](https://docs.utpro.dev/screenshots/uTPro/readme-block-preview-live.png)
 
 ---
 
