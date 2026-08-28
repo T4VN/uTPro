@@ -6,7 +6,7 @@
     <!-- SDK build/publish-time Brotli+GZip pre-compression of static web assets (.NET 9+). -->
     <CompressionEnabled>true</CompressionEnabled>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
-    <Version>17.11.3</Version>
+    <Version>17.11.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Controllers\Api\**" />
@@ -21,8 +21,8 @@
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
     <!-- Default database provider (umbracoDbDSN_ProviderName = "Npgsql2"). Remove this if switching to SQL Server / SQLite. -->
     <PackageReference Include="Our.Umbraco.PostgreSql" Version="17.6.0" />
-    <PackageReference Include="uSync" Version="17.3.7" />
-    <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.1" />
+    <PackageReference Include="uSync" Version="17.3.8" />
+    <PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.22.3" />
     <ProjectReference Include="..\..\Feature\uTPro.Feature\uTPro.Feature.csproj" />
     <ProjectReference Include="..\..\Foundation\uTPro.Foundation\uTPro.Foundation.csproj" />
     <ProjectReference Include="..\uTPro.Project.Web.Configure\uTPro.Project.Web.Configure.csproj" />
