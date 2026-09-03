@@ -1,0 +1,21 @@
+{
+  "github": {
+    "repo": "T4VN/uTPro",
+    "assetPattern": "publish_output*.zip"
+  },
+  "sites": [
+    {
+      "name": "Site1",
+      "appPool": "uTPro-Site1",
+      "path": "C:\\inetpub\\wwwroot\\uTPro-Site1"
+    }
+  ],
+  "preserve": [
+    "appsettings.Production.json",
+    "appsettings.Development.json",
+    "umbraco/Data",
+    "wwwroot/media",
+    "media",
+    "App_Data"
+  ]
+}

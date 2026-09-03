@@ -17,6 +17,8 @@ export const UTPRO = {
     myActivityApi: `${API_BASE}/my-activity`,                // current user's recent activity
     recentTrailApi: `${API_BASE}/recent-trail`,              // all users' recent audit trail
     myTrailApi: `${API_BASE}/my-trail`,                      // current user's recent audit trail
+    deployApi: `${API_BASE}/deploy`,                         // trigger deploy (POST)
+    deployStatusApi: `${API_BASE}/deploy/status`,            // deploy status check (GET)
     releasesUrl: 'https://github.com/T4VN/uTPro/releases',   // "Update" target
     website: 'https://github.com/T4VN/uTPro',                // "Website" target
     dashboardPath: '/umbraco/section/content/dashboard/utpro', // uTPro dashboard tab
@@ -152,4 +154,30 @@ export async function createSite(authContext, name) {
     } catch (e) {
         return { ok: false, status: 0, body: { error: String(e) } };
     }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Deploy: triggers the platform-specific deploy script via the management API.
+// The script downloads the latest GitHub release, stops app pools/services,
+// removes old DLLs, overlays new files (preserving user data), and restarts.
+// ──────────────────────────────────────────────────────────────────────────────
+
+// Triggers a deploy. Returns { ok, status, body }. On success body contains:
+// { success, message, script, platform, triggeredAt, triggeredBy }.
+// On conflict (deploy already running): status 409.
+export async function triggerDeploy(authContext) {
+    const init = await authInit(authContext);
+    if (!init) return { ok: false, status: 0, body: { error: 'Not authenticated yet — try again.' } };
+    try {
+        const resp = await fetch(UTPRO.deployApi, { ...init, method: 'POST' });
+        const body = await resp.json().catch(() => null);
+        return { ok: resp.ok, status: resp.status, body };
+    } catch (e) {
+        return { ok: false, status: 0, body: { error: String(e) } };
+    }
+}
+
+// Checks the current deploy status. Returns { deploying, installedVersion, platform } or null.
+export async function fetchDeployStatus(authContext) {
+    return apiGet(UTPRO.deployStatusApi, authContext);
 }
