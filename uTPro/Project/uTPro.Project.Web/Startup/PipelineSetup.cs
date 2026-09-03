@@ -1,3 +1,4 @@
+using uTPro.Feature.GeoLocation.Extensions;
 using uTPro.Foundation.Middleware;
 using WebMarkupMin.AspNetCoreLatest;
 
@@ -26,6 +27,7 @@ public static class PipelineSetup
         app.UseWebMarkupMin();
         app.UseOutputCache();
         app.UseCookiePolicy();
+        app.UseGeoLocationDetection();
         app.UseInitMiddleware();
         app.ConfigureUmbracoPipeline();
         app.MapControllers();

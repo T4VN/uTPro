@@ -305,8 +305,19 @@ namespace uTPro.Foundation.Middleware
             }
             else
             {
-                // Root URL — try cookie
+                // Root URL — try cookie first, then GeoLocation detection, then site default.
                 culture = context.Request.Cookies[CookieCulture]?.ToString() ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(culture))
+                {
+                    // Only use GeoLocation culture if the site actually serves that language
+                    // (i.e. a matching Umbraco domain exists). Otherwise fall through to default.
+                    var geoCulture = GetGeoLocationCulture(context);
+                    if (!string.IsNullOrEmpty(geoCulture) && HasDomainForCulture(domains, geoCulture))
+                    {
+                        culture = geoCulture;
+                    }
+                }
             }
 
             if (cul == null)
@@ -318,6 +329,48 @@ namespace uTPro.Foundation.Middleware
             }
 
             return (cul?.Culture ?? string.Empty, cul?.Name ?? string.Empty, isRedirect);
+        }
+
+        /// <summary>
+        /// Reads the culture name resolved by the uTPro.Feature.GeoLocation middleware
+        /// (if installed and detected). The GeoLocation middleware stores its result in
+        /// <c>HttpContext.Items["uTPro.GeoLocation.Result"]</c> before this middleware runs.
+        /// Loose-coupled: Foundation does not reference the Feature package — reads via reflection-free
+        /// duck-typing on the Items dictionary.
+        /// </summary>
+        private static string? GetGeoLocationCulture(HttpContext context)
+        {
+            const string GeoLocationItemKey = "uTPro.GeoLocation.Result";
+
+            if (!context.Items.TryGetValue(GeoLocationItemKey, out var resultObj) || resultObj is null)
+                return null;
+
+            // The result object has a public CultureInfo? Culture property and a bool IsDetected property.
+            // We access it via dynamic to avoid a hard reference to the Feature assembly.
+            try
+            {
+                dynamic geoResult = resultObj;
+                if (!(bool)geoResult.IsDetected)
+                    return null;
+
+                var culture = geoResult.Culture as CultureInfo;
+                return culture?.Name;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> if the site has at least one Umbraco domain configured for the given culture.
+        /// Prevents GeoLocation from redirecting to a language the site does not serve.
+        /// </summary>
+        private static bool HasDomainForCulture(IReadOnlyList<Umbraco.Cms.Core.Routing.Domain> domains, string culture)
+        {
+            return domains.Any(d =>
+                !string.IsNullOrEmpty(d.Culture) &&
+                d.Culture.Equals(culture, StringComparison.OrdinalIgnoreCase));
         }
 
         private static Umbraco.Cms.Core.Routing.Domain? SelectDomainForCulture(
