@@ -60,9 +60,11 @@ COPY --from=build /app/publish .
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV PORT=10000
 
-# Create a non-root user and grant it ownership of the app + writable temp dirs
-RUN groupadd --system --gid 1000 appgroup \
-    && useradd --system --uid 1000 --gid appgroup --no-create-home appuser \
+# Create a non-root user and grant it ownership of the app + writable temp dirs.
+# Use --force so groupadd is a no-op if GID 1000 already exists in the base image,
+# and use the -o (non-unique) flag on useradd to tolerate a pre-existing UID 1000.
+RUN groupadd --system --gid 1000 --force appgroup \
+    && useradd --system --uid 1000 -o --gid appgroup --no-create-home appuser \
     && chown -R appuser:appgroup /app /tmp/umbraco
 USER appuser
 
