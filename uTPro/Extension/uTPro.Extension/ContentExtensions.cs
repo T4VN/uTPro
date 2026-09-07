@@ -11,12 +11,28 @@ namespace uTPro.Extension
         // bottomComponent, site-level toggles) so the repeated walks add up.
         private static readonly object _cacheKey = new();
 
+        /// <summary>
+        /// Retrieves a strongly-typed value for the specified property alias by walking up the content
+        /// tree (self and ancestors) until a node with that property is found, then returns the value
+        /// cast to type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The expected type of the property value.</typeparam>
+        /// <param name="content">The content node to start searching from.</param>
+        /// <param name="alias">The property alias to search for.</param>
+        /// <returns>The inherited property value, or the default value of <typeparamref name="T"/> if not found.</returns>
         public static T? ValueInherited<T>(this IPublishedContent content, string alias)
         {
             var node = content.Inherited(alias);
             return node == null ? default : node.Value<T>(alias);
         }
 
+        /// <summary>
+        /// Finds the nearest ancestor (or self) that has a value for the specified property alias.
+        /// Results are cached per-request to avoid repeated tree traversals for the same content and alias.
+        /// </summary>
+        /// <param name="content">The content node to start searching from.</param>
+        /// <param name="alias">The property alias to search for.</param>
+        /// <returns>The nearest <see cref="IPublishedContent"/> node that has the property, or null if not found.</returns>
         public static IPublishedContent? Inherited(this IPublishedContent content, string alias)
         {
             var cache = TryGetCache();
@@ -36,6 +52,16 @@ namespace uTPro.Extension
             return ResolveInherited(content, alias);
         }
 
+        /// <summary>
+        /// Searches the content tree (self and ancestors) for the first node that has a value for any
+        /// of the specified property aliases, returning both the matched alias and the node containing it.
+        /// </summary>
+        /// <param name="content">The content node to start searching from.</param>
+        /// <param name="alias">One or more property aliases to search for, checked in order.</param>
+        /// <returns>
+        /// A tuple containing the matched alias and the <see cref="IPublishedContent"/> node that has it,
+        /// or (null, null) if none of the aliases are found.
+        /// </returns>
         public static (string? alias, IPublishedContent? value) Inherited(this IPublishedContent content, params string[] alias)
         {
             foreach (var node in content.AncestorsOrSelf())
