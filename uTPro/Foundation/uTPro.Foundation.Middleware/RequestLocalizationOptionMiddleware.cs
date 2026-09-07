@@ -308,6 +308,9 @@ namespace uTPro.Foundation.Middleware
                 // Root URL — try cookie first, then GeoLocation detection, then site default.
                 culture = context.Request.Cookies[CookieCulture]?.ToString() ?? string.Empty;
 
+                if (!string.IsNullOrWhiteSpace(culture) && !HasDomainForCulture(domains, culture))
+                    culture = string.Empty;
+
                 if (string.IsNullOrWhiteSpace(culture))
                 {
                     // Only use GeoLocation culture if the site actually serves that language

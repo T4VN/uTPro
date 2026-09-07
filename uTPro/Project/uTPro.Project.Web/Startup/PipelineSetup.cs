@@ -46,16 +46,23 @@ public static class PipelineSetup
                 && !path.StartsWith("/umbraco", StringComparison.OrdinalIgnoreCase)
                 && !path.StartsWith("/app_plugins", StringComparison.OrdinalIgnoreCase)
                 && !path.Contains('.');
+            var isRootPage = string.IsNullOrEmpty(path) || path == "/";
 
             if (isWebsitePage)
             {
                 context.Response.OnStarting(() =>
                 {
-                    if (context.Response.StatusCode == 200
-                        && !context.Response.Headers.ContainsKey("Cache-Control"))
+                    if (context.Response.StatusCode == 200)
                     {
-                        context.Response.Headers.CacheControl =
-                            "public, max-age=120, stale-while-revalidate=60";
+                        if (isRootPage)
+                        {
+                            context.Response.Headers.CacheControl = "private, no-store";
+                        }
+                        else if (!context.Response.Headers.ContainsKey("Cache-Control"))
+                        {
+                            context.Response.Headers.CacheControl =
+                                "public, max-age=120, stale-while-revalidate=60";
+                        }
                     }
                     return Task.CompletedTask;
                 });
