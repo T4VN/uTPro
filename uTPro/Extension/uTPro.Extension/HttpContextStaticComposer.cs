@@ -13,6 +13,11 @@ namespace uTPro.Extension
     /// </summary>
     public class HttpContextStaticComposer : IComposer
     {
+        /// <summary>
+        /// Composes the Umbraco application by registering <see cref="IHttpContextAccessor"/>
+        /// and wiring it into the application startup pipeline via <see cref="HttpContextStaticStartupFilter"/>.
+        /// </summary>
+        /// <param name="builder">The Umbraco builder used to register services.</param>
         public void Compose(IUmbracoBuilder builder)
         {
             builder.Services.AddHttpContextAccessor();
