@@ -17,6 +17,10 @@
         /// </summary>
         public static string? ContentRootPathOverride { get; set; }
 
+        /// <summary>
+        /// Gets the wwwroot directory path. Returns <see cref="WebRootPathOverride"/> if set,
+        /// otherwise returns a default path of 'wwwroot' under <see cref="DirectoryRootServer"/>.
+        /// </summary>
         public static string DirectoryWWWRoot
         {
             get
@@ -27,6 +31,10 @@
             }
         }
 
+        /// <summary>
+        /// Gets the content root directory path. Returns <see cref="ContentRootPathOverride"/> if set,
+        /// otherwise returns the process's current working directory.
+        /// </summary>
         public static string DirectoryRootServer
         {
             get
