@@ -1,0 +1,360 @@
+/* ==========================================================================
+   Video Analyzer component (pageVideoAnalyzer + pageLogin templates)
+   Uses the shared uTPro design tokens from variables.css.
+   ========================================================================== */
+
+.va-wrap {
+    padding: 3rem 0 4rem;
+}
+
+.va-header h1 {
+    margin-bottom: 0.4rem;
+}
+
+.va-intro {
+    color: var(--utp-text-light, #606167);
+    margin-bottom: 1.5rem;
+}
+
+/* --- Form ---------------------------------------------------------------- */
+
+.va-form,
+.va-chat-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.va-input,
+.va-select {
+    flex: 1 1 auto;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--utp-border-medium, #ddd);
+    background: var(--utp-bg-input, #eee);
+    color: var(--utp-text-dark, #1a1a1a);
+    border-radius: 4px;
+    min-width: 220px;
+}
+
+.va-input:focus,
+.va-select:focus {
+    background: var(--utp-bg-input-focus, #f8f8f8);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--utp-border-input, #a0a1a7);
+}
+
+.va-btn {
+    padding: 0.7rem 1.4rem;
+    border: 0;
+    border-radius: 4px;
+    background: var(--utp-primary, #f6821f);
+    color: var(--utp-text-white, #fff);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.va-btn:hover:not(:disabled) {
+    background: var(--utp-primary-hover, #FFCE40);
+}
+
+.va-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.va-btn-secondary {
+    background: var(--utp-dark-medium, #2f333b);
+}
+
+.va-quota {
+    color: var(--utp-text-muted, #717479);
+    font-size: 0.9rem;
+}
+
+/* --- Progress & errors ---------------------------------------------------- */
+
+.va-progress {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--utp-bg-light, #f3f3f3);
+    overflow: hidden;
+}
+
+.va-progress-bar {
+    height: 100%;
+    width: 4%;
+    border-radius: 4px;
+    background: var(--utp-primary, #f6821f);
+    transition: width 0.6s ease;
+}
+
+.va-stage {
+    color: var(--utp-text-light, #606167);
+    margin-top: 0.5rem;
+}
+
+.va-error {
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    background: rgba(212, 32, 84, 0.08);
+    border: 1px solid rgba(212, 32, 84, 0.4);
+    color: #d42054;
+    margin: 0.8rem 0;
+}
+
+/* --- Report --------------------------------------------------------------- */
+
+.va-video-head {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin: 1.5rem 0 1rem;
+}
+
+.va-video-head img {
+    width: 220px;
+    max-width: 40%;
+    border-radius: 6px;
+}
+
+.va-meta {
+    color: var(--utp-text-muted, #717479);
+    font-size: 0.88rem;
+}
+
+.va-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.va-card-wide {
+    grid-column: 1 / -1;
+}
+
+.va-card {
+    border: 1px solid var(--utp-border-light, #eee);
+    border-radius: 6px;
+    padding: 1rem 1.1rem;
+    background: var(--utp-bg-white, #fff);
+}
+
+.va-card h3 {
+    margin-top: 0;
+    font-size: 1rem;
+    color: var(--utp-dark, #282b34);
+}
+
+/* Age rating */
+
+.va-age-card {
+    text-align: center;
+}
+
+.va-age-label {
+    display: inline-block;
+    min-width: 64px;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--utp-text-white, #fff);
+    margin-bottom: 0.5rem;
+}
+
+.va-age-p { background: #2e7d32; }
+.va-age-k { background: #7cb342; }
+.va-age-c13 { background: #f9a825; }
+.va-age-c16 { background: #ef6c00; }
+.va-age-c18 { background: #c62828; }
+
+.va-flags {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+}
+
+.va-flag-chip {
+    font-size: 0.78rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: var(--utp-bg-light, #f3f3f3);
+    border: 1px solid var(--utp-border-medium, #ddd);
+}
+
+#va-age-reasons {
+    padding-left: 1.1rem;
+    text-align: left;
+    font-size: 0.88rem;
+    color: var(--utp-text, #484d55);
+}
+
+/* Chips / mentions */
+
+.va-chips {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.va-chip {
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(246, 130, 31, 0.12);
+    color: var(--utp-text-dark, #1a1a1a);
+    font-size: 0.82rem;
+}
+
+.va-mentions {
+    list-style: none;
+    padding: 0;
+}
+
+.va-mention {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--utp-border-light, #eee);
+}
+
+.va-mention:last-child {
+    border-bottom: 0;
+}
+
+.va-mention-type {
+    flex: 0 0 auto;
+    font-size: 0.72rem;
+}
+
+.va-mention-ctx {
+    font-size: 0.85rem;
+    color: var(--utp-text-light, #606167);
+}
+
+/* Timeline */
+
+.va-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.va-timeline li {
+    display: flex;
+    gap: 0.9rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--utp-border-light, #eee);
+}
+
+.va-timeline li:last-child {
+    border-bottom: 0;
+}
+
+.va-time {
+    flex: 0 0 64px;
+    font-weight: 700;
+    color: var(--utp-primary, #f6821f);
+}
+
+.va-tl-desc {
+    margin: 0.15rem 0 0;
+    color: var(--utp-text-light, #606167);
+    font-size: 0.9rem;
+}
+
+.va-sentiment {
+    font-style: italic;
+    color: var(--utp-text, #484d55);
+}
+
+.va-actions {
+    margin-top: 1rem;
+}
+
+/* --- Chat ------------------------------------------------------------------ */
+
+#va-chat h3 {
+    margin-top: 2.5rem;
+}
+
+.va-chat-log {
+    max-height: 420px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.va-bubble {
+    max-width: 85%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    white-space: pre-wrap;
+}
+
+.va-bubble-user {
+    align-self: flex-end;
+    background: var(--utp-primary, #f6821f);
+    color: var(--utp-text-white, #fff);
+}
+
+.va-bubble-bot {
+    align-self: flex-start;
+    background: var(--utp-bg-light, #f3f3f3);
+    color: var(--utp-text-dark, #1a1a1a);
+}
+
+.va-disclaimer {
+    margin-top: 2.5rem;
+    font-size: 0.82rem;
+    color: var(--utp-text-muted, #717479);
+}
+
+/* --- Login ------------------------------------------------------------------ */
+
+.va-login-container {
+    max-width: 460px;
+}
+
+.va-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.va-login-form label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+}
+
+.va-remember {
+    font-weight: 400 !important;
+}
+
+.va-remember input {
+    margin-right: 0.35rem;
+}
+
+@media (max-width: 736px) {
+    .va-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .va-video-head {
+        flex-direction: column;
+    }
+
+    .va-video-head img {
+        max-width: 100%;
+    }
+}

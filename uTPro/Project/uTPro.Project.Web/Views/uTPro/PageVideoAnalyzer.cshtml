@@ -1,0 +1,110 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    // Interactive tool page — the report/chat UI lives in video-analyzer.js.
+    // Access is protected by Umbraco Public Access (member group videoAnalyzerUsers);
+    // unauthenticated visitors are bounced to the configured login page by Umbraco.
+    var heading = Model.Value<string>("titleText");
+    var intro = Model.Value<string>("introText");
+
+    var rootName = CurrentSite.GetItem().Root.Name;
+}
+@section Styles {
+    <link rel="stylesheet" href="/css/uTPro/Components/VideoAnalyzer.css" />
+}
+<section class="va-wrap">
+    <div class="container">
+        <header class="va-header">
+            <h1>@(string.IsNullOrEmpty(heading) ? "Phân tích video YouTube" : heading)</h1>
+            @if (!string.IsNullOrEmpty(intro))
+            {
+                <p class="va-intro">@intro</p>
+            }
+        </header>
+
+        <form id="va-form" class="va-form" autocomplete="off">
+            <input id="va-url" name="url" type="text" class="va-input"
+                   placeholder="Dán link YouTube (video hoặc Shorts) — ví dụ https://www.youtube.com/watch?v=…"
+                   required />
+            <select id="va-lang" class="va-select" title="Ngôn ngữ báo cáo">
+                <option value="vi">Báo cáo tiếng Việt</option>
+                <option value="en">English report</option>
+            </select>
+            <button id="va-submit" type="submit" class="va-btn">Phân tích</button>
+        </form>
+        <p id="va-quota" class="va-quota" hidden></p>
+
+        <div id="va-status" class="va-status" hidden>
+            <div class="va-progress"><div id="va-progress-bar" class="va-progress-bar"></div></div>
+            <p id="va-stage" class="va-stage">Đang xử lý…</p>
+        </div>
+        <div id="va-error" class="va-error" hidden role="alert"></div>
+
+        <article id="va-report" hidden>
+            <div class="va-video-head">
+                <img id="va-thumb" alt="" />
+                <div>
+                    <h2 id="va-title"></h2>
+                    <p id="va-meta" class="va-meta"></p>
+                </div>
+            </div>
+
+            <div class="va-grid">
+                <div class="va-card va-card-wide">
+                    <h3>Tóm tắt</h3>
+                    <p id="va-summary"></p>
+                </div>
+                <div class="va-card va-age-card">
+                    <h3>Độ tuổi phù hợp</h3>
+                    <div id="va-age-label" class="va-age-label"></div>
+                    <ul id="va-age-flags" class="va-flags"></ul>
+                    <ul id="va-age-reasons"></ul>
+                    <p id="va-age-confidence" class="va-meta"></p>
+                </div>
+                <div class="va-card">
+                    <h3>Chủ đề chính</h3>
+                    <ul id="va-topics" class="va-chips"></ul>
+                </div>
+                <div class="va-card">
+                    <h3>Được nhắc đến</h3>
+                    <ul id="va-mentions" class="va-mentions"></ul>
+                </div>
+                <div class="va-card">
+                    <h3>Từ khoá</h3>
+                    <ul id="va-keywords" class="va-chips"></ul>
+                </div>
+                <div class="va-card va-card-wide">
+                    <h3>Timeline</h3>
+                    <ol id="va-timeline" class="va-timeline"></ol>
+                </div>
+            </div>
+
+            <p id="va-sentiment" class="va-sentiment"></p>
+            <p id="va-source" class="va-meta"></p>
+
+            <div class="va-actions">
+                <button id="va-refresh" type="button" class="va-btn va-btn-secondary">Phân tích lại</button>
+            </div>
+        </article>
+
+        <section id="va-chat" hidden>
+            <h3>Hỏi &amp; đáp về video</h3>
+            <div id="va-chat-log" class="va-chat-log" aria-live="polite"></div>
+            <form id="va-chat-form" class="va-chat-form">
+                <input id="va-chat-input" type="text" class="va-input"
+                       placeholder="Ví dụ: video nói gì ở phút 5?" maxlength="500" />
+                <button type="submit" class="va-btn">Gửi</button>
+            </form>
+        </section>
+
+        <p class="va-disclaimer">
+            Kết quả do AI tạo ra, chỉ mang tính tham khảo. Thẻ độ tuổi theo thang P/K/C13/C16/C18
+            (Nghị định 81/2023/NĐ-CP) không thay thế đánh giá của chuyên gia.
+        </p>
+    </div>
+</section>
+@section Scripts {
+    @{
+        // Vanilla JS, no jQuery dependency — standalone deferred loader.
+        Html.QueueStandaloneScript($"/scripts/{rootName}/video-analyzer.js");
+    }
+}

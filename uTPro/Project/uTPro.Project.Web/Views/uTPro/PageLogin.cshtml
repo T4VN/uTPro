@@ -1,0 +1,44 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    // Member login page — target of Umbraco Public Access redirect for the
+    // Video Analyzer page. No self-registration: members are created in the backoffice.
+    var error = TempData.ContainsKey(uTPro.Feature.VideoAnalyzer.Controllers.MemberAuthSurfaceController.ErrorTempDataKey)
+        ? TempData[uTPro.Feature.VideoAnalyzer.Controllers.MemberAuthSurfaceController.ErrorTempDataKey]?.ToString()
+        : null;
+    var returnUrl = Context.Request.Query["ReturnUrl"].ToString();
+}
+@section Styles {
+    <link rel="stylesheet" href="/css/uTPro/Components/VideoAnalyzer.css" />
+}
+<section class="va-wrap">
+    <div class="container va-login-container">
+        <header class="va-header">
+            <h1>@(Model.Value<string>("titleText") ?? "Đăng nhập")</h1>
+            <p class="va-intro">@(Model.Value<string>("introText") ?? "Đăng nhập để sử dụng công cụ phân tích video.")</p>
+        </header>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="va-error" role="alert">@error</div>
+        }
+
+        @using (Html.BeginUmbracoForm<uTPro.Feature.VideoAnalyzer.Controllers.MemberAuthSurfaceController>(
+            nameof(uTPro.Feature.VideoAnalyzer.Controllers.MemberAuthSurfaceController.Login),
+            new { returnUrl }))
+        {
+            <div class="va-login-form">
+                <label for="username">Tên đăng nhập hoặc email</label>
+                <input id="username" name="username" type="text" class="va-input" autocomplete="username" required autofocus />
+
+                <label for="password">Mật khẩu</label>
+                <input id="password" name="password" type="password" class="va-input" autocomplete="current-password" required />
+
+                <label class="va-remember">
+                    <input type="checkbox" name="rememberMe" value="true" /> Ghi nhớ đăng nhập
+                </label>
+
+                <button type="submit" class="va-btn">Đăng nhập</button>
+            </div>
+        }
+    </div>
+</section>
