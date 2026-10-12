@@ -1,0 +1,106 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UTproDemo__Breadcrumbs>>
+@using Umbraco.Cms.Core.Models.PublishedContent
+@{
+    // Breadcrumb is built from the page currently being rendered (not from the block element),
+    // so this component can be dropped into any region and always reflects the current page.
+    var current = Umbraco.AssignedContentItem;
+    if (current is null)
+    {
+        return;
+    }
+
+    var crumbs = current.AncestorsOrSelf()
+        .Where(n =>
+        {
+            var u = n.Url(mode: UrlMode.Relative);
+            return !string.IsNullOrEmpty(u) && u != "#";
+        })
+        .Reverse()
+        .ToList();
+
+    if (crumbs.Count == 0)
+    {
+        return;
+    }
+
+    // Category breadcrumb: when the URL contains a category segment (from CategoryUrlProvider or
+    // CategoryLandingContentFinder), inject the category as an extra crumb before the current page.
+    string? categoryCrumbName = null;
+    string? categoryCrumbUrl = null;
+    var isCategoryLanding = Context.Items.TryGetValue(
+        CategoryLandingContentFinder.CategoryLandingItemKey, out var categoryLandingValue);
+
+    var categoryUrlService = Context.RequestServices.GetService<CategoryUrlService>();
+
+    if (!isCategoryLanding)
+    {
+        // Page with category in URL (e.g. /huong-dan/bat-dau/gioi-thieu/)
+        if (categoryUrlService is not null)
+        {
+            var (url, name) = categoryUrlService.GetUrlNameCategory(current);
+            categoryCrumbUrl = !string.IsNullOrEmpty(url) ? url : null;
+            categoryCrumbName = !string.IsNullOrEmpty(name) ? name : null;
+        }
+    }
+    else
+    {
+        // Category landing page (e.g. /huong-dan/bat-dau/) — category IS the last crumb (current page)
+        var categoryKey = categoryLandingValue as Guid?;
+        if (categoryKey.HasValue && categoryKey.Value != Guid.Empty)
+        {
+            var categoryNode = Umbraco.Content(categoryKey.Value);
+            if (categoryNode is not null)
+            {
+                categoryCrumbName = categoryNode.Name;
+                // No URL needed — it's the "current" crumb (no link)
+            }
+        }
+    }
+}
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Breadcrumbs.css" />
+}
+else
+{
+    @using (Html.SetSection(Model.GetType().ToString() + "", HtmlSectionBlockExtensions.Position.BodyBottom))
+    {
+        <link rel="stylesheet" href="~/css/@CurrentSite.GetItem().Root.Name/Components/Breadcrumbs.css" />
+    }
+}
+<section class="container breadcrumbs" aria-label="breadcrumb">
+    @for (var i = 0; i < crumbs.Count; i++)
+    {
+        var node = crumbs[i];
+        if (i > 0)
+        {
+            <span class="sep">/</span>
+        }
+
+        @if (i == crumbs.Count - 1 && isCategoryLanding && !string.IsNullOrEmpty(categoryCrumbName))
+        {
+            // Category landing: show parent as link, then category as current
+            <a href="@node.Url()">@node.Name</a>
+            <span class="sep">/</span>
+            <span aria-current="page">@categoryCrumbName</span>
+        }
+        else if (i == crumbs.Count - 1 && !isCategoryLanding && !string.IsNullOrEmpty(categoryCrumbName))
+        {
+            // Page with category: insert category link before the current page
+            if (!string.IsNullOrEmpty(categoryCrumbUrl))
+            {
+                <a href="@categoryCrumbUrl">@categoryCrumbName</a>
+                <span class="sep">/</span>
+            }
+            <span aria-current="page">@node.Name</span>
+        }
+        else if (i == crumbs.Count - 1)
+        {
+            <span aria-current="page">@node.Name</span>
+        }
+        else
+        {
+            <a href="@node.Url()">@node.Name</a>
+        }
+    }
+</section>
