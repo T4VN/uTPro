@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Routing;
@@ -543,6 +545,194 @@ public class uTProDashboardManagementController(
         public string? UserName { get; set; }
         public string? NodeName { get; set; }
         public Guid? NodeKey { get; set; }
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Deploy: triggers the platform-specific deploy script (fire-and-forget).
+    // The script downloads the latest GitHub release, stops app pools / services,
+    // removes old DLLs, overlays new files (preserving data), and restarts.
+    // Admin-only. The script runs detached so the response returns immediately
+    // (the app pool hosting this endpoint may be restarted by the script).
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Prevents concurrent deploy triggers.
+    private static int _deployRunning;
+
+    /// <summary>
+    /// Triggers a deploy of the latest uTPro release to all configured sites.
+    /// Returns immediately after launching the deploy script (fire-and-forget),
+    /// since the script will restart the app pool that hosts this endpoint.
+    /// </summary>
+    [HttpPost("deploy")]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public IActionResult Deploy()
+    {
+        if (!IsAdmin()) return Forbid();
+
+        // Prevent concurrent deploys.
+        if (Interlocked.CompareExchange(ref _deployRunning, 1, 0) != 0)
+        {
+            return Conflict(new { error = "A deploy is already in progress." });
+        }
+
+        try
+        {
+            var scriptPath = GetDeployScriptPath();
+            if (scriptPath is null)
+            {
+                Interlocked.Exchange(ref _deployRunning, 0);
+                return BadRequest(new
+                {
+                    error = "Deploy script not found for this platform.",
+                    platform = RuntimeInformation.OSDescription,
+                });
+            }
+
+            // Fire-and-forget: launch the script detached so it survives an app pool restart.
+            LaunchDeployScript(scriptPath);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Deploy triggered. The site will restart shortly.",
+                script = Path.GetFileName(scriptPath),
+                platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux-macos",
+                triggeredAt = DateTime.UtcNow,
+                triggeredBy = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Name ?? "unknown",
+            });
+        }
+        catch (Exception ex)
+        {
+            Interlocked.Exchange(ref _deployRunning, 0);
+            return BadRequest(new { error = $"Failed to trigger deploy: {ex.Message}" });
+        }
+    }
+
+    /// <summary>
+    /// Returns the current deploy status: whether a deploy is running, and the installed
+    /// version marker from the first configured site (if available).
+    /// </summary>
+    [HttpGet("deploy/status")]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult DeployStatus()
+    {
+        if (!IsAdmin()) return Forbid();
+
+        var configPath = GetDeployConfigPath();
+        string? installedVersion = null;
+
+        if (configPath is not null && System.IO.File.Exists(configPath))
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(System.IO.File.ReadAllText(configPath));
+                var sites = doc.RootElement.GetProperty("sites");
+                if (sites.GetArrayLength() > 0)
+                {
+                    var sitePath = sites[0].GetProperty("path").GetString();
+                    if (sitePath is not null)
+                    {
+                        var marker = Path.Combine(sitePath, ".utpro-release");
+                        if (System.IO.File.Exists(marker))
+                            installedVersion = System.IO.File.ReadAllText(marker).Trim();
+                    }
+                }
+            }
+            catch { /* config unreadable — skip */ }
+        }
+
+        return Ok(new
+        {
+            deploying = _deployRunning == 1,
+            installedVersion,
+            platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux-macos",
+        });
+    }
+
+    private static string? GetDeployConfigPath()
+    {
+        // Deploy scripts and config live under Deploy/ relative to this assembly's location.
+        var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if (assemblyDir is null) return null;
+
+        // At runtime the DLL is in the publish/bin output; the Deploy folder is a content file
+        // copied to the output root. Try several conventional locations.
+        var candidates = new[]
+        {
+            Path.Combine(assemblyDir, "Deploy", "deploy.config.json"),
+            Path.Combine(assemblyDir, "..", "Deploy", "deploy.config.json"),
+            Path.Combine(AppContext.BaseDirectory, "Deploy", "deploy.config.json"),
+        };
+
+        return candidates.FirstOrDefault(System.IO.File.Exists);
+    }
+
+    private static string? GetDeployScriptPath()
+    {
+        var configPath = GetDeployConfigPath();
+        if (configPath is null) return null;
+
+        var deployDir = Path.GetDirectoryName(configPath)!;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            var ps = Path.Combine(deployDir, "win", "deploy.ps1");
+            return System.IO.File.Exists(ps) ? ps : null;
+        }
+        else
+        {
+            var sh = Path.Combine(deployDir, "linux-macos", "deploy.sh");
+            return System.IO.File.Exists(sh) ? sh : null;
+        }
+    }
+
+    private static void LaunchDeployScript(string scriptPath)
+    {
+        ProcessStartInfo psi;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            psi = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\"",
+                UseShellExecute = true,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+            };
+        }
+        else
+        {
+            // Ensure the script is executable.
+            try
+            {
+                var chmod = Process.Start(new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    Arguments = $"+x \"{scriptPath}\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                });
+                chmod?.WaitForExit(5000);
+            }
+            catch { /* best effort */ }
+
+            psi = new ProcessStartInfo
+            {
+                FileName = "/bin/bash",
+                Arguments = $"\"{scriptPath}\"",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
+            };
+        }
+
+        Process.Start(psi);
     }
 
     [HttpGet("current-user")]

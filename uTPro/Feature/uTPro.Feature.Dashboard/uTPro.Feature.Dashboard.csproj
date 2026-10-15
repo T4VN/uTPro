@@ -14,6 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Deploy\deploy.config.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Deploy\win\deploy.ps1" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Deploy\linux-macos\deploy.sh" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

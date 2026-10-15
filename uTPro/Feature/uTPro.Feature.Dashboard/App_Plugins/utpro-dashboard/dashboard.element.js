@@ -4,7 +4,7 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UTPRO, fetchVersionInfo, refreshVersionInfo, fetchStats, fetchCurrentUser, fetchRecentActivity, fetchMyActivity, fetchRecentTrail, fetchMyTrail, createSite } from './config.js';
+import { UTPRO, fetchVersionInfo, refreshVersionInfo, fetchStats, fetchCurrentUser, fetchRecentActivity, fetchMyActivity, fetchRecentTrail, fetchMyTrail, createSite, triggerDeploy, fetchDeployStatus } from './config.js';
 import { discoverApps, canUsePackage } from './packages-config.js';
 // Vendored locally (MIT) — no CDN/runtime external call, matching config.js' philosophy.
 import { Chart } from './vendor/frappe-charts.min.esm.js';
@@ -96,6 +96,9 @@ export class UtproDashboardElement extends UmbLitElement {
         _siteName: { state: true },
         _creating: { state: true },
         _seoRuns: { state: true },
+        _deploying: { state: true },
+        _deployStatus: { state: true },
+        _deployResult: { state: true },
     };
 
     constructor() {
@@ -125,6 +128,11 @@ export class UtproDashboardElement extends UmbLitElement {
 
         // SEO Audit score trend: null = not loaded / not installed, [] = no runs.
         this._seoRuns = null;
+
+        // Deploy state.
+        this._deploying = false;
+        this._deployStatus = null;   // { deploying, installedVersion, platform } from server
+        this._deployResult = null;   // last trigger result message
 
         // "uTPro Apps" card. We auto-discover sibling uTPro packages by watching the extension
         // registry for the entry points they register (sections + Settings menu items). Cards
@@ -174,6 +182,7 @@ export class UtproDashboardElement extends UmbLitElement {
             this._allActivity = await fetchRecentActivity(ctx);
             this.#loadTrail();
             this.#loadSeoRuns();
+            this.#loadDeployStatus();
         });
     }
 
@@ -504,6 +513,73 @@ export class UtproDashboardElement extends UmbLitElement {
         }
     }
 
+    // ── Deploy ──────────────────────────────────────────────────────────────────
+    // Fetches the current deploy status from the server (admin-only endpoint).
+    async #loadDeployStatus() {
+        if (!this._authContext) return;
+        const status = await fetchDeployStatus(this._authContext);
+        if (status) this._deployStatus = status;
+    }
+
+    // Triggers a deploy via the management API. Fire-and-forget: the server launches the
+    // platform-specific script and responds immediately.
+    async #triggerDeploy() {
+        if (this._deploying || !this._authContext) return;
+        // Confirm before proceeding — this restarts the site.
+        if (!confirm('Deploy the latest release? This will restart all configured sites.')) return;
+        this._deploying = true;
+        this._deployResult = null;
+        try {
+            const res = await triggerDeploy(this._authContext);
+            if (res.ok && res.body?.success) {
+                this._deployResult = { success: true, message: res.body.message };
+                this.#notify('positive', res.body.message || 'Deploy triggered.');
+            } else if (res.status === 409) {
+                this._deployResult = { success: false, message: 'A deploy is already in progress.' };
+                this.#notify('warning', 'A deploy is already in progress.');
+            } else {
+                this._deployResult = { success: false, message: res.body?.error || 'Deploy failed.' };
+                this.#notify('danger', res.body?.error || 'Deploy trigger failed.');
+            }
+        } catch (e) {
+            this._deployResult = { success: false, message: String(e) };
+            this.#notify('danger', 'Deploy request failed.');
+        } finally {
+            this._deploying = false;
+        }
+    }
+
+    // Deploy card: shown in the sidebar. Shows installed version (from marker), platform,
+    // and a "Deploy" button to trigger an update.
+    #deployCard() {
+        const s = this._deployStatus;
+        const platform = s?.platform || '—';
+        const installed = s?.installedVersion || '—';
+        const isDeploying = this._deploying || s?.deploying;
+
+        return html`
+            <uui-box class="card" headline="Deploy">
+                <uui-icon slot="header-actions" name="icon-cloud-upload"></uui-icon>
+                ${this.#row('Platform', platform)}
+                ${this.#row('Deployed version', installed)}
+                ${this._deployResult
+                    ? html`<div class="deploy-result ${this._deployResult.success ? 'deploy-ok' : 'deploy-err'}">
+                        ${this._deployResult.message}
+                    </div>`
+                    : nothing}
+                <div class="card-actions">
+                    <uui-button
+                        look="primary"
+                        color="positive"
+                        label="Deploy Latest"
+                        ?disabled=${isDeploying}
+                        @click=${this.#triggerDeploy}>
+                        ${isDeploying ? 'Deploying…' : 'Deploy Latest'}
+                    </uui-button>
+                </div>
+            </uui-box>`;
+    }
+
     // SEO Audit score trend card — only rendered when the package is installed and has runs.
     #seoScoreTrendCard() {
         if (!this._seoRuns || this._seoRuns.length < 2) return nothing;
@@ -733,6 +809,8 @@ export class UtproDashboardElement extends UmbLitElement {
                 ${this.#row('Runtime environment', s ? s.runtimeVersion : '…')}
                 ${this.#row('Base CMS', s ? 'Umbraco ' + s.umbracoVersion : '…')}
             </uui-box>
+
+            ${this.#deployCard()}
 
             <uui-box class="card" headline="Site">
                 <uui-icon slot="header-actions" name="icon-globe"></uui-icon>
@@ -1001,6 +1079,23 @@ export class UtproDashboardElement extends UmbLitElement {
             margin: 0 0 0 -5px;
             border: 5px solid transparent;
             border-top-color: rgba(0, 0, 0, 0.85);
+        }
+
+        /* Deploy card result feedback */
+        .deploy-result {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: var(--uui-border-radius, 3px);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .deploy-ok {
+            background: var(--uui-color-positive-standalone, #d4edda);
+            color: var(--uui-color-positive, #155724);
+        }
+        .deploy-err {
+            background: var(--uui-color-danger-standalone, #f8d7da);
+            color: var(--uui-color-danger, #721c24);
         }
 
         .card { width: 100%; }
