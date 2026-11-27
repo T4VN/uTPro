@@ -15,15 +15,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="uTPro.Feature.AuditLog" Version="17.5.2" />
-    <PackageReference Include="uTPro.Feature.FileManager" Version="17.6.2" />
-    <PackageReference Include="uTPro.Feature.JobMonitor" Version="17.2.2" />
-    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="17.5.2" />
-    <PackageReference Include="uTPro.Feature.UrlViewer" Version="17.3.3" />
-    <PackageReference Include="uTPro.Feature.SEOAudit" Version="17.2.2" />
-    <PackageReference Include="uTPro.Feature.SearchPlus" Version="17.1.2" />
-    <PackageReference Include="uTPro.Feature.GeoLocation" Version="17.1.1" />
-    <PackageReference Include="uTPro.Feature.AIPageBuilder" Version="17.0.0" />
+    <PackageReference Include="uTPro.Feature.AuditLog" Version="17.5.3" />
+    <PackageReference Include="uTPro.Feature.FileManager" Version="17.6.3" />
+    <PackageReference Include="uTPro.Feature.JobMonitor" Version="17.2.3" />
+    <PackageReference Include="uTPro.Feature.SimpleFormBuilder" Version="17.5.3" />
+    <PackageReference Include="uTPro.Feature.UrlViewer" Version="17.3.4" />
+    <PackageReference Include="uTPro.Feature.SEOAudit" Version="17.2.3" />
+    <PackageReference Include="uTPro.Feature.SearchPlus" Version="17.1.3" />
+    <PackageReference Include="uTPro.Feature.GeoLocation" Version="17.1.2" />
+    <PackageReference Include="uTPro.Feature.AIPageBuilder" Version="17.0.1" />
   </ItemGroup>
 
   <ItemGroup>
